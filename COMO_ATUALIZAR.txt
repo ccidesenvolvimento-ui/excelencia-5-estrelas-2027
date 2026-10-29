@@ -1,0 +1,23 @@
+PROGRAMA EXCELÊNCIA 5 ESTRELAS 2027 — VISÃO GERAL v0.3
+
+Este pacote atualiza SOMENTE a página inicial do frontend.
+Não modifica Supabase, dados reais, workflows, importações nem outras telas.
+
+Arquivos do pacote:
+- src/app/page.tsx (substitui a página inicial existente)
+- src/app/visao-geral.module.css (novo estilo exclusivo dessa página)
+
+Atualização pelo navegador, SEM terminal:
+1. Extraia o ZIP no Windows.
+2. Abra o GitHub no repositório ccidesenvolvimento-ui/excelencia-5-estrelas-2027.
+3. Recomendado: registre uma Issue para "Redesenhar Visão Geral" e crie a branch feat/design-visao-geral-v03 a partir da main.
+4. Na branch, selecione Add file > Upload files.
+5. Arraste a pasta "src" do ZIP extraído (incluindo app/page.tsx e app/visao-geral.module.css).
+6. Confirme a substituição do page.tsx e a criação do CSS; não envie o ZIP como um arquivo só.
+7. Faça Commit changes na branch e abra Pull Request para main.
+8. Faça o merge após revisar; se o workflow do GitHub Pages estiver corretamente configurado, a main inicia uma nova publicação automática.
+9. Teste a raiz do site e filtre por período, mês, segmento e filial. Consulte os links para Ranking, Pendências, Importações e RH0034.
+
+Atenção: usa APENAS dados fictícios já presentes em src/lib/dados-demo.ts.
+Em abril/2027, com todos os segmentos e filiais, devem aparecer 17 participantes, 16 elegíveis, 0 inelegíveis e 1 pendente.
+Se o processo de GitHub Pages falhar, consulte a aba Actions: a compilação completa ainda precisa ser executada no projeto com as dependências instaladas.
