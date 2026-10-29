@@ -1,0 +1,4 @@
+/* Central de Pendências v0.7 — etiquetas de leitura rápida na tabela. */
+.pendencia-etiquetas { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 190px; }
+.pendencia-etiqueta { display: inline-flex; align-items: center; border: 1px solid #7d6544; background: #5b422e5e; color: #ffdfae; font-size: 11px; font-weight: 700; padding: 6px 9px; border-radius: 7px; white-space: normal; }
+.pendencia-etiqueta:hover { background: #70513382; }

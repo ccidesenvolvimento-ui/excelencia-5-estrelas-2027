@@ -51,6 +51,15 @@ export function notasDe(p:Pessoa,mes:number):Notas {
  if(p.id==="m007"&&mes===0) delete notas.treinamentos;
  if(p.id==="m009"&&mes===1) delete notas.produtividade;
  if(p.id==="m004"&&mes===3) {delete notas.produtividade;delete notas.dirigibilidade;delete notas.jornada;delete notas.treinamentos;}
+ // Casos de teste exclusivamente fictícios para exercitar os filtros da Central de Pendências.
+ if(mes===3){
+   if(p.id==="m006") delete notas.seguranca; // Segurança ausente (diferente de nota zero).
+   if(p.id==="m008") delete notas.dirigibilidade; // Bebidas: fonte IDT.
+   if(p.id==="m010") delete notas.dirigibilidade; // Fonte Maxtrack atribuída apenas na simulação.
+   if(p.id==="m015") delete notas.dirigibilidade; // Operadores: Eficiência Operacional.
+   if(p.id==="m016") delete notas.jornada; // Operadores: Conservação/Operação.
+   if(p.id==="m019") return {}; // Simula mês sem nenhuma avaliação recebida.
+ }
  return notas;
 }
 export type Periodo="mensal"|"ciclo1"|"ciclo2"|"ciclo3"|"anual";

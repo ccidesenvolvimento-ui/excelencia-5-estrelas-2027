@@ -1,0 +1,31 @@
+EXCELÊNCIA 5 ESTRELAS 2027 — CENTRAL DE PENDÊNCIAS v0.7
+
+Atualização incremental sobre a versão 0.6.
+
+ARQUIVOS INCLUÍDOS
+  src/app/pendencias/page.tsx         (substituir)
+  src/app/pendencias/pendencias.css    (novo)
+  src/lib/tipos-pendencia.ts          (novo)
+  src/lib/dados-demo.ts               (substituir; casos de teste FICTÍCIOS)
+  scripts/testar-pendencias-v07.cjs   (novo; teste local opcional)
+  docs/FILTRO_PENDENCIAS_V07.md       (novo)
+
+SEM TERMINAL:
+1) Crie uma branch fix/pendencias-tipo-v07 a partir da main.
+2) Extraia este ZIP e arraste as pastas src, scripts e docs para Upload files.
+3) Verifique a estrutura: src/app/pendencias/page.tsx na RAIZ correta.
+4) Commit na branch, abra Pull Request e aguarde o build do GitHub Actions.
+5) Faça merge após validar e depois teste na Central de Pendências.
+
+CASOS DE TESTE (Abr/2027, dados fictícios):
+- IDT / Bebidas / Contagem: Henrique Rocha
+- Gobrax / Sucro / Jataí: Diego Alves (férias em simulação)
+- Maxtrack / Rodoviário / Lavras: João Carvalho
+- Segurança / Mineração / Itabira: Felipe Costa
+- Sem nenhum dado / Florestal / Jataí: Sara Fernandes
+- Eficiência Operacional: Olivia Santos
+- Conservação/Operação: Paulo Mendes
+
+Filtro composto: competência E segmento E filial E tipo E nome/matrícula.
+Exportar CSV obedece o resultado filtrado, com coluna de tipos.
+Não são realizadas importações reais, gravações ou alterações no Supabase.
