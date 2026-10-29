@@ -276,3 +276,14 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
   }
   .mobile-close:focus-visible { outline: 2px solid #8cdbff; outline-offset: 2px; }
 }
+
+
+/* v0.5 — o botão superior alterna entre os modos flutuante e fixo.
+   Os links do menu não podem alterar esse modo. */
+.sidebar-toggle[aria-pressed="true"] {
+  background: #20587c;
+  color: #d9f6ff;
+  border-color: #65bfe9;
+  box-shadow: inset 0 0 0 1px #45a7d32b;
+}
+.sidebar-toggle[aria-pressed="true"]:hover { background: #276c96; }

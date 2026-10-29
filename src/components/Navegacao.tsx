@@ -18,18 +18,23 @@ const itens: ItemMenu[] = [
   { url: "/configuracoes", titulo: "Configurações", icone: "configuracoes" },
   { url: "/diagnostico", titulo: "Testes e erros", icone: "diagnostico" },
 ];
-const CHAVE_MENU = "excelencia-5-estrelas-sidebar-recolhida";
+const CHAVE_MENU = "excelencia-5-estrelas-sidebar-modo-v05";
+type ModoMenu = "flutuante" | "fixo";
 
 export function Navegacao({ children }: { children: ReactNode }) {
   const caminho = usePathname();
   const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-  const [recolhida, setRecolhida] = useState(false);
+  // No primeiro acesso a navegação começa flutuante. Só o botão superior fixa o menu.
+  const [modoMenu, setModoMenu] = useState<ModoMenu>("flutuante");
   const [expansaoTemporaria, setExpansaoTemporaria] = useState(false);
   const [mobileAberto, setMobileAberto] = useState(false);
-  const expandida = !recolhida || expansaoTemporaria;
+  const flutuante = modoMenu === "flutuante";
+  const expandida = !flutuante || expansaoTemporaria;
 
   useEffect(() => {
-    try { setRecolhida(window.localStorage.getItem(CHAVE_MENU) === "sim"); } catch { /* modo privativo */ }
+    try {
+      setModoMenu(window.localStorage.getItem(CHAVE_MENU) === "fixo" ? "fixo" : "flutuante");
+    } catch { /* armazenamento indisponível */ }
   }, []);
   useEffect(() => { setMobileAberto(false); }, [caminho]);
   useEffect(() => {
@@ -39,41 +44,41 @@ export function Navegacao({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", tecla);
   }, [mobileAberto]);
 
-  function alternarRecolhimento() {
-    const proximo = !recolhida;
-    setRecolhida(proximo);
+  function alternarModo() {
+    const proximo: ModoMenu = flutuante ? "fixo" : "flutuante";
+    setModoMenu(proximo);
     setExpansaoTemporaria(false);
-    try { window.localStorage.setItem(CHAVE_MENU, proximo ? "sim" : "nao"); } catch { /* modo privativo */ }
+    try { window.localStorage.setItem(CHAVE_MENU, proximo); } catch { /* armazenamento indisponível */ }
   }
 
-  return <div className={`app-shell ${recolhida ? "nav-recolhida" : ""} ${expansaoTemporaria ? "nav-hover" : ""}`}>
+  return <div className={`app-shell ${flutuante ? "nav-recolhida" : "nav-fixa"} ${flutuante && expansaoTemporaria ? "nav-hover" : ""}`}>
     <aside
       className={`sidebar ${mobileAberto ? "sidebar-aberta" : ""}`}
       aria-label="Menu do sistema"
-      onMouseEnter={() => { if (recolhida) setExpansaoTemporaria(true); }}
+      onMouseEnter={() => { if (flutuante) setExpansaoTemporaria(true); }}
       onMouseLeave={() => setExpansaoTemporaria(false)}
-      onFocusCapture={() => { if (recolhida) setExpansaoTemporaria(true); }}
+      onFocusCapture={() => { if (flutuante) setExpansaoTemporaria(true); }}
       onBlurCapture={evento => {
-        if (recolhida && !evento.currentTarget.contains(evento.relatedTarget as Node | null)) {
+        if (flutuante && !evento.currentTarget.contains(evento.relatedTarget as Node | null)) {
           setExpansaoTemporaria(false);
         }
       }}
     >
       <div className="branding">
         <div className="branding-top">
-          <Link href="/" className="branding-home" aria-label="Ir para Visão geral" onClick={() => setMobileAberto(false)}>
+          <Link href="/" className="branding-home" aria-label="Ir para Visão geral" onClick={() => { setMobileAberto(false); if (flutuante) setExpansaoTemporaria(false); }}>
             <img className="branding-imagem" src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas" />
             <span className="branding-marca-mini"><IconeSistema nome="estrela" tamanho={23}/></span>
           </Link>
           <button
             type="button"
             className="sidebar-toggle"
-            onClick={alternarRecolhimento}
-            title={recolhida ? "Manter menu expandido" : "Recolher menu"}
-            aria-label={recolhida ? "Fixar menu expandido" : "Recolher menu para exibir só ícones"}
-            aria-pressed={recolhida}
+            onClick={alternarModo}
+            title={flutuante ? "Fixar menu aberto" : "Ativar menu flutuante"}
+            aria-label={flutuante ? "Fixar menu lateral aberto" : "Ativar menu lateral flutuante"}
+            aria-pressed={!flutuante}
           >
-            <IconeSistema nome={recolhida ? "painel-abrir" : "painel-fechar"} tamanho={19}/>
+            <IconeSistema nome={flutuante ? "painel-abrir" : "painel-fechar"} tamanho={19}/>
           </button>
           <button type="button" className="mobile-close" aria-label="Fechar menu" onClick={() => setMobileAberto(false)}><IconeSistema nome="fechar" tamanho={19}/></button>
         </div>
@@ -93,12 +98,8 @@ export function Navegacao({ children }: { children: ReactNode }) {
           title={!expandida && !mobileAberto ? item.titulo : undefined}
           onClick={() => {
             setMobileAberto(false);
-            // Clique em um ícone recolhido fixa o menu aberto, além de navegar.
-            if (recolhida) {
-              setRecolhida(false);
-              setExpansaoTemporaria(false);
-              try { window.localStorage.setItem(CHAVE_MENU, "nao"); } catch { /* modo privativo */ }
-            }
+            // Navegar NÃO altera o modo. Se flutuante, recolhe após a escolha.
+            if (flutuante) setExpansaoTemporaria(false);
           }}
         >
           <span className="menu-icone"><IconeSistema nome={item.icone} tamanho={20}/></span>
@@ -106,8 +107,8 @@ export function Navegacao({ children }: { children: ReactNode }) {
         </Link>)}
       </nav>
       <div className="sidebar-rodape">
-        <span className="rodape-expandido">Dados fictícios · Nenhuma informação corporativa<br/>v0.4 · Protótipo visual</span>
-        <span className="rodape-recolhido" aria-label="Protótipo versão 0.4">v0.4</span>
+        <span className="rodape-expandido">Dados fictícios · Nenhuma informação corporativa<br/>v0.5 · Protótipo visual</span>
+        <span className="rodape-recolhido" aria-label="Protótipo versão 0.5">v0.5</span>
       </div>
     </aside>
 

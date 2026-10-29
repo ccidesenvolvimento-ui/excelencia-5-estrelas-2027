@@ -1,0 +1,21 @@
+SISTEMA EXCELÊNCIA 5 ESTRELAS 2027 — AJUSTE v0.5
+
+Alterados somente:
+  src/components/Navegacao.tsx
+  src/app/globals.css
+
+Modos:
+ FLUTUANTE (padrão) — coluna com apenas ícones; hover/foco expande por cima da página;
+    clique em qualquer aba navega e recolhe, sem fixar o menu.
+ FIXO — botão superior fixa o menu expandido, reservando espaço para o conteúdo.
+    Clique no mesmo botão para retornar ao modo flutuante.
+ Preferência do modo salva no localStorage.
+ No celular, continua funcionando como gaveta sobreposta.
+
+Enviar usando GitHub: criar branch a partir da main, substituir APENAS os dois
+arquivos nos mesmos caminhos, confirmar as alterações, abrir PR e revisar antes de merge.
+IMPORTANTE: a tela de Upload Files no GitHub pode não sobrescrever arquivos
+existentes; se isso ocorrer, edite os dois arquivos pela interface Web usando
+Edit (ícone lápis), ou use o Codespaces para enviar os arquivos.
+
+Não inclui imagens nem dados reais.
