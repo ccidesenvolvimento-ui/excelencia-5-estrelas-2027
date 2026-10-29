@@ -8,13 +8,10 @@ import { IconeSistema, type NomeIconeSistema } from "@/components/IconesSistema"
 type ItemMenu = { url: string; titulo: string; icone: NomeIconeSistema };
 const itens: ItemMenu[] = [
   { url: "/", titulo: "Visão geral", icone: "visao" },
-  { url: "/painel", titulo: "Painel", icone: "painel" },
   { url: "/ranking", titulo: "Ranking", icone: "ranking" },
   { url: "/pendencias", titulo: "Pendências", icone: "pendencias" },
   { url: "/importacoes", titulo: "Importações", icone: "importacoes" },
   { url: "/rh0034", titulo: "Cadastro RH0034", icone: "rh" },
-  { url: "/relatorios", titulo: "Relatórios", icone: "relatorios" },
-  { url: "/usuarios", titulo: "Usuários e acessos", icone: "usuarios" },
   { url: "/configuracoes", titulo: "Configurações", icone: "configuracoes" },
   { url: "/diagnostico", titulo: "Testes e erros", icone: "diagnostico" },
 ];
@@ -107,8 +104,8 @@ export function Navegacao({ children }: { children: ReactNode }) {
         </Link>)}
       </nav>
       <div className="sidebar-rodape">
-        <span className="rodape-expandido">Dados fictícios · Nenhuma informação corporativa<br/>v0.5 · Protótipo visual</span>
-        <span className="rodape-recolhido" aria-label="Protótipo versão 0.5">v0.5</span>
+        <span className="rodape-expandido">Dados fictícios · Nenhuma informação corporativa<br/>v0.6 · Protótipo visual</span>
+        <span className="rodape-recolhido" aria-label="Protótipo versão 0.6">v0.6</span>
       </div>
     </aside>
 

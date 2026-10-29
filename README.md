@@ -1,17 +1,19 @@
 # Programa Excelência 5 Estrelas 2027
 
-**Versão 0.2 — demonstração navegável para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
+**Versão 0.6 — navegação consolidada e design visual integrado, para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
 
 ## O que funciona nesta versão
 
-- Página inicial e menu responsivo com todos os módulos previstos.
+- Visão Geral com filtros e gráficos fictícios; sidebar flutuante/fixa com ícones modernos e rolagem discreta.
+- Menu consolidado: Visão Geral, Ranking, Pendências, Importações, RH0034, Configurações e Testes.
 - Dashboard ilustrativo, ranking mensal / ciclos / anual por oito categorias, filtro de filial e ordenação.
 - Cálculo ilustrativo com cinco estrelas e regra de inelegibilidade por zero, pendência sem nota e posições por categoria.
 - Prévia de Central de Pendências, exportação **CSV** de dados fictícios.
 - Download dos seis modelos oficiais XLSX em **Importações**. Verificação local de nome/extensão/tamanho (não lê nem importa as linhas do Excel).
 - RH0034 fictícia e simulação de classificação local (`localStorage`), sem afetar a base de notas ou persistir no servidor.
-- Relatório demonstrativo com Top N, exportação CSV e impressão/salvar PDF pelo navegador.
-- Telas de permissões (somente desenho), configurações e testes básicos da lógica + relato de erros baixável ou abertura de Issue no GitHub.
+- Relatório integrado ao Ranking, respeitando período, segmento, filial, pesquisa, ordenação e posições oficiais Top N (CSV e impressão/salvar PDF).
+- Configurações com abas Regras, Usuários e Acessos e Segurança; simulação LOCAL de perfis, permissões e filiais (não são usuários reais).
+- Testes básicos da lógica + relato de erros baixável ou abertura de Issue no GitHub.
 - Compilação para **GitHub Pages** com workflow `.github/workflows/github-pages.yml`.
 - Migração **inicial, ainda não aplicada**, de Supabase/PostgreSQL com RLS fechado por padrão.
 
@@ -58,3 +60,24 @@ O GitHub Pages aceita domínio próprio, com ajustes DNS em **Settings → Pages
 - `.env.local` e arquivos de segredos ficam fora do Git. Nunca usar `service_role` no navegador ou em variáveis `NEXT_PUBLIC_*`.
 - O código pode ficar em repositório privado e **o site público**, caso a estratégia de hospedagem permita. O endereço/dominio público não exige que se publiquem dados corporativos.
 - Ver regras e arquitetura em `docs/`. Checklist de publicação em `docs/PUBLICACAO_GITHUB_PAGES.md`.
+
+## Organização visual consolidada v0.6
+
+- **Visão Geral (`/`)**: painel executivo e filtros.
+- **Ranking (`/ranking`)**: notas, posição, filtros e botão `Gerar relatório`. Top N preserva a colocação original por categoria, mesmo ao filtrar filial. CSV abre no Excel; PDF é obtido por impressão do navegador (não há geração automatizada no servidor).
+- **Pendências (`/pendencias`)**: filtros, pesquisa, resumo e exportação CSV fictícia.
+- **Importações (`/importacoes`)**: seis modelos XLSX e pré-verificação local sem envio.
+- **RH0034 (`/rh0034`)**: prévia e classificação fictícia local (não altera ranking).
+- **Configurações (`/configuracoes`)**: metodologia, categorias e ciclos; aba **Usuários e acessos** com perfis de teste, permissões e filiais; requisitos de autenticação e auditoria.
+- **Testes (`/diagnostico`)**: verificações e relato de erros.
+
+As URLs antigas `/painel`, `/relatorios` e `/usuarios` encaminham para `/`, `/ranking` e `/configuracoes#usuarios` para evitar links quebrados. Não aparecem mais no menu.
+
+### Como atualizar por upload no GitHub
+
+1. Criar branch `feat/interface-unificada-v06` a partir de `main`.
+2. Baixar/extrair o ZIP de atualização v0.6 e enviar o conteúdo da pasta `src` para a raiz do repositório (substituir os arquivos existentes). **Não enviar uma pasta externa adicional**.
+3. Abrir PR para `main`, conferir o workflow Actions (typecheck/test/build), revisar e realizar merge.
+4. O workflow existente publica automaticamente a versão de demonstração no GitHub Pages.
+
+**Segurança:** ambiente público somente com dados fictícios. Não colocar arquivos corporativos reais, e-mails pessoais ou credenciais em formulários de teste.

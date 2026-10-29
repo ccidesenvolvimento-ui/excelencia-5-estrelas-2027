@@ -1,0 +1,33 @@
+PROGRAMA EXCELENCIA 5 ESTRELAS 2027 — INTERFACE v0.6
+
+Este ZIP é uma atualização (não um projeto novo). A base atual é a v0.5.
+
+O QUE FOI FEITO
+- Menu principal com 7 itens. Saiu Painel, Relatorios e Usuarios e acessos como abas independentes.
+- Sidebar flutuante/fixa da v0.5 foi PRESERVADA.
+- Ranking inclui botao Gerar relatorio: usa periodo, segmento, filial, busca, ordenacao e Top N.
+- Relatorios so exportam elegiveis dentro da posicao oficial Top N, nao renumeram ao filtrar.
+- Exporta CSV compativel com Excel e PDF via impressao do navegador (nao PDF automatico).
+- Configuracoes integra Regras/Ciclos, Usuarios/Acessos e Seguranca/Auditoria.
+- Perfis, permissoes e filiais em Configuracoes: TESTE LOCAL, nunca acesso real.
+- Pendencias, Importacoes e RH0034 receberam a identidade visual da Visao Geral.
+- Rotas antigas encaminham para os novos destinos, sem ficar no menu.
+- Sem banco de dados ou alteracoes de regras de producao.
+
+COMO ENVIAR PELO SITE DO GITHUB (SEM TERMINAL)
+1. Abra github.com/ccidesenvolvimento-ui/excelencia-5-estrelas-2027
+2. Em Code, no seletor da branch, crie feat/interface-unificada-v06 a partir da main.
+3. Extraia o ZIP desta atualizacao no Windows.
+4. Na branch nova, Add file > Upload files.
+5. Arraste o CONTEUDO EXTRAIDO (pastas src, scripts, docs e arquivos package.json, README.md etc.) para a raiz. Nao envie a pasta externa inteira, nem o ZIP.
+6. Confira os caminhos e as substituicoes. Em especial: src/app/ranking/page.tsx, src/app/configuracoes/page.tsx, src/app/modulos.css e src/components/Navegacao.tsx.
+7. Commit changes na branch v06. Crie Pull Request da v06 para main.
+8. Confira Actions (typecheck, regras, interface, build e publicacao) antes do merge. Se falhar, nao faça merge: copie o erro para analisarmos.
+9. Quando aprovado, Merge pull request. O site demonstrativo sera atualizado automaticamente.
+
+IMPORTANTE
+- Testes locais aprovados: 16 de regra + 14 de integracao estrutural; sintaxe TS/TSX e CSS verificada.
+- Build completo do Next.js NAO FOI EXECUTADO neste ambiente, por falta de dependencias e acesso ao registro npm. Actions fara a verificacao.
+- Somente dados FICTICIOS. Nunca carregue RH0034 real ou dados corporativos privados no site publico.
+- O ZIP de atualizacao inclui as rotas antigas como encaminhamento; voce NAO precisa excluir arquivos manualmente do GitHub.
+- Nao precisa trocar configuracoes do GitHub Pages ou do workflow ja existente.
