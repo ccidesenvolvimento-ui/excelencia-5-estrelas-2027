@@ -1,0 +1,3 @@
+-- Seed local propositalmente vazio de funcionários.
+-- As oito categorias são cadastradas pela migração inicial.
+-- Nunca registrar RH0034 real nem dados de advertências/acidentes aqui.

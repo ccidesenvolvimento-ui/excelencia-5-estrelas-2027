@@ -1,0 +1,8 @@
+project_id = "excelencia-5-estrelas-2027"
+[api]
+port = 54321
+[db]
+port = 54322
+major_version = 17
+[studio]
+port = 54323
