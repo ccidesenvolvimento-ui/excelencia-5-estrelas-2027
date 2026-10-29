@@ -1,19 +1,7 @@
-import Link from "next/link";
-import { Topo } from "@/components/Topo";
-import { modelos } from "@/lib/modelos";
-export default function Importacoes() {
-  return <><Topo/><main className="container">
-    <div className="kicker">MÓDULO 01 · IMPORTAÇÕES</div>
-    <h1>Modelos <span>oficiais</span> para download</h1>
-    <p className="lead">Escolha a estrela, baixe a planilha padrão e preencha os campos. A função de envio e validação da importação será desenvolvida na próxima entrega.</p>
-    <div className="lista-modelos">
-      {modelos.map((m,i)=><article className="modelo" key={m.id}>
-        <div className="numero">{String(i+1).padStart(2,"0")}</div>
-        <div className="modelo-info"><h2>{m.titulo}</h2><p>{m.subtitulo}</p></div>
-        <a href={`/modelos/${m.arquivo}`} download={m.arquivo} className="botao botao-secundario" aria-label={`Baixar modelo ${m.titulo}`}>↓ Baixar XLSX</a>
-      </article>)}
-    </div>
-    <aside className="orientacao"><strong>Regras de uso</strong><p>Os modelos de avaliação não cadastram funcionários. Cadastros novos devem vir exclusivamente da RH0034. As planilhas de Segurança contêm apenas motoristas penalizados; a nota de 100 só poderá ser gerada após a validação dos dois relatórios.</p></aside>
-    <Link href="/" className="voltar">← Voltar à visão geral</Link>
-  </main></>;
-}
+"use client";
+import {useState} from "react";
+import {Cabecalho,AvisoDemo} from "@/components/Elementos";
+import {modelos} from "@/lib/modelos";
+import {meses} from "@/lib/dados-demo";
+export default function Importacoes(){const [tipo,setTipo]=useState(""),[mes,setMes]=useState(0),[arquivo,setArquivo]=useState<File|null>(null),[resultado,setResultado]=useState("");const base=process.env.NEXT_PUBLIC_BASE_PATH??"";
+function checar(){if(!arquivo){setResultado("Selecione um arquivo antes de verificar.");return}if(!/\.xlsx$/i.test(arquivo.name)){setResultado("Arquivo inválido: selecione uma planilha .xlsx.");return}if(arquivo.size===0){setResultado("Arquivo vazio. Selecione uma planilha preenchida.");return}if(arquivo.size>10*1024*1024){setResultado("Arquivo muito grande para a pré-verificação de demonstração (limite de 10 MB).");return}setResultado(`Arquivo ${arquivo.name} (${(arquivo.size/1024).toFixed(1)} KB) recebido na interface de teste, referente a ${meses[mes]}/2027. Nenhuma linha foi lida, validada ou gravada. A importação real está desativada.`)}return <><Cabecalho tag="ARQUIVOS PADRONIZADOS" titulo="Importações e modelos oficiais" descricao="Seis modelos Excel disponíveis para download. A conferência de arquivos é demonstrativa e não grava dados."/><AvisoDemo texto="O sistema público permite baixar os modelos e testar a seleção de arquivos. Importação RH0034 e notas reais estão DESATIVADAS até autenticação, RLS e validação no servidor."/><div className="lista-modelos">{modelos.map((m,i)=><div className="modelo" key={m.id}><div><span className="rotulo-chave">MODELO {String(i+1).padStart(2,"0")}</span><h3>{m.titulo}</h3><p>{m.subtitulo}</p></div><a className="botao botao-secundario" href={`${base}/modelos/${m.arquivo}`} download={m.arquivo}>↓ XLSX</a></div>)}</div><section className="painel" style={{marginTop:24}}><h2>Área de pré-verificação de arquivo <span className="tag">SEM ENVIO</span></h2><div className="form-grid"><div className="campo"><label>Tipo de planilha</label><select value={tipo} onChange={e=>setTipo(e.target.value)}><option value="">Selecione</option>{modelos.map(m=><option key={m.id} value={m.id}>{m.titulo}</option>)}</select></div><div className="campo"><label>Competência</label><select value={mes} onChange={e=>setMes(Number(e.target.value))}>{meses.map((m,i)=><option key={m} value={i}>{m}/2027</option>)}</select></div><div className="campo"><label>Planilha para conferir nome e tamanho</label><input aria-label="Arquivo Excel" type="file" accept=".xlsx" onChange={e=>{setArquivo(e.target.files?.[0]??null);setResultado("")}}/></div></div><button disabled={!tipo} className="botao" type="button" onClick={checar}>Verificar seleção (demonstração)</button>{resultado&&<div className="bloco-info" role="status">{resultado}</div>}<p className="nota-rodape">Este botão apenas verifica extensão e tamanho no navegador. Não interpreta linhas do Excel, não valida matrículas e não faz upload.</p></section><section className="painel"><h2>Fluxo planejado para importação real</h2><ol className="passos"><li>Selecionar estrela, competência e baixar modelo</li><li>Preencher e enviar planilha XLSX autenticado</li><li>Validar todas as linhas, duplicidades, matrículas, filiais, fontes e notas</li><li>Rejeitar integralmente o lote se houver qualquer erro</li><li>Confirmar lote auditável e atualizar rankings após validação</li></ol></section></>}

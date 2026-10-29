@@ -1,6 +1,6 @@
 {
   "name": "excelencia-5-estrelas-2027",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
-    "db:stop": "supabase stop"
+    "db:stop": "supabase stop",
+    "test:rules": "node scripts/testar-regras.cjs"
   },
   "dependencies": {
     "next": "16.4.3",
