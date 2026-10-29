@@ -1,0 +1,36 @@
+.cabecalhoImportacao{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:17px}
+.cabecalhoImportacao>div:first-child{margin-bottom:0}
+.selo{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;font-size:10px;letter-spacing:.09em;font-weight:800;color:#91d5fa;background:#123f5c;border:1px solid #3d7292;border-radius:7px;padding:8px 10px}
+.importacaoGrade{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(280px,.78fr);gap:19px}
+.areaArquivo,.areaStatus{min-width:0}
+.zonaSoltar{min-height:232px;border:1.5px dashed #4984a8;border-radius:13px;background:linear-gradient(140deg,#112e49aa,#0c263e);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:11px;padding:23px 15px;text-align:center;transition:background .15s,border-color .15s}
+.zonaSoltar.arrastando{border-color:#76dcff;background:#194c70}
+.zonaSoltar strong{font-size:15px;color:#eaf9ff}
+.zonaSoltar>span:not(.iconeArquivo){font-size:12px;color:#a1c0d4}
+.iconeArquivo{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;color:#9be3ff;background:#1b5276;border:1px solid #387ca1}
+.inputArquivo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.arquivoEscolhido{display:flex;align-items:center;gap:11px;padding:13px 14px;margin-top:11px;border-radius:10px;border:1px solid #3b6584;background:#12364e}
+.arquivoEscolhido>span{font-size:23px;color:#8bd9ff}
+.arquivoEscolhido>div{flex:1;min-width:0}
+.arquivoEscolhido strong{display:block;overflow-wrap:anywhere;font-size:13px}
+.arquivoEscolhido small{display:block;color:#a3c5da;margin-top:4px}
+.arquivoEscolhido button{border:1px solid #456e86;border-radius:8px;background:#194460;color:#e8f8ff;font-size:22px;width:32px;height:32px}
+.acoesArquivo{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.resultado{margin-top:13px;padding:14px 15px;border-radius:10px;line-height:1.5;font-size:12px}
+.resultadoOk{background:#143e40;border:1px solid #32796c;color:#a5f0d4}
+.resultadoErro{background:#493036;border:1px solid #98545d;color:#ffd1d2}
+.areaStatus{padding:20px;border:1px solid #2c506d;border-radius:12px;background:#0b243a}
+.linhaStatus{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:16px}
+.linhaStatus span{font-size:12px;color:#9bbed5}
+.linhaStatus strong{font-size:12px;color:#e9f8ff;text-align:right}
+.divisor{height:1px;background:#2d526a;margin:18px 0}
+.areaStatus h3{font-size:14px;margin:0 0 15px;color:#e7f7ff}
+.etapas{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.etapas li{display:flex;align-items:start;gap:10px;color:#a8cbdf;font-size:12px;line-height:1.4}
+.etapas li span{flex:0 0 auto;font-size:10px;font-weight:800;color:#89d8ff;background:#194866;padding:5px;border-radius:6px}
+.notaPrivacidade{font-size:11px;color:#a1bdd0;margin:19px 0 0;line-height:1.6}
+.barraResultado{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 14px;color:#b6d3e5;font-size:12px}
+.rodapeClassificacao{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:17px}
+.rodapeClassificacao span{flex:1 1 260px;font-size:12px;color:#a4c2d7;line-height:1.5}
+@media(max-width:1020px){.importacaoGrade{grid-template-columns:1fr}}
+@media(max-width:560px){.zonaSoltar{min-height:220px}.linhaStatus{align-items:flex-start;flex-direction:column;gap:4px}.linhaStatus strong{text-align:left}.rodapeClassificacao .botao{width:100%}}

@@ -1,0 +1,30 @@
+PROGRAMA EXCELENCIA 5 ESTRELAS 2027 — UPDATE V0.8
+
+O QUE MUDA
+- RH0034: nova area de escolha / arrastar XLSX (somente teste de selecao; nao envia nem importa dados).
+- RH0034: painel de status, fluxo previsto e classificacao demonstrativa com mais filtros.
+- Sem modelo de RH0034 para download.
+- Menu recolhido: simbolo EXTRAIDO da arte oficial do Programa 5 Estrelas.
+- Aba ativa: mesmo contorno e halo azul em todas as sete paginas.
+- Sidebar continua no modo fixo/flutuante controlado exclusivamente pelo botao superior.
+
+ATUALIZACAO PELO NAVEGADOR (SEM TERMINAL)
+1. No GitHub, crie branch 'feat/rh0034-identidade-v08' baseada na main.
+2. Extraia este ZIP no computador.
+3. Na branch nova, acesse Add file > Upload files.
+4. Selecione as pastas 'src', 'public', 'scripts' e 'docs' extraidas. Preserve as estruturas de diretorios e substitua os arquivos existentes.
+5. Faca o commit e abra um Pull Request para a main.
+6. Confira a aba Actions; se o build falhar, nao faca merge e compartilhe o erro.
+7. Depois do merge, teste a navegacao, a estrela recolhida e a nova tela RH0034.
+
+ATENCAO
+- NAO envie ZIP para dentro do repositorio; envie o conteudo extraido.
+- NAO envie planilhas reais de funcionarios para a demonstracao publica.
+- O upload demonstrativo apenas confere a extensao e o tamanho. O botao CONFIRMAR IMPORTACAO permanece desativado.
+- A implementacao efetiva aguardara backend autenticado com autorizacao, validacao integral, RLS e auditoria.
+
+TESTES LOCAIS EXECUTADOS
+- 19 verificacoes da interface v0.8: aprovadas
+- 16 verificacoes do motor de regras: aprovadas
+- CSS: dois arquivos parseados sem erro
+- Compilacao Next.js: NAO EXECUTADA (instalacao de dependencias expirou neste ambiente).

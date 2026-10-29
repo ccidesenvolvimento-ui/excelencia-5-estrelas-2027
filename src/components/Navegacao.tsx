@@ -19,7 +19,7 @@ const CHAVE_MENU = "excelencia-5-estrelas-sidebar-modo-v05";
 type ModoMenu = "flutuante" | "fixo";
 
 export function Navegacao({ children }: { children: ReactNode }) {
-  const caminho = usePathname();
+  const caminho = (usePathname() || "/").replace(/\/+$/, "") || "/";
   const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   // No primeiro acesso a navegação começa flutuante. Só o botão superior fixa o menu.
   const [modoMenu, setModoMenu] = useState<ModoMenu>("flutuante");
@@ -65,7 +65,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
         <div className="branding-top">
           <Link href="/" className="branding-home" aria-label="Ir para Visão geral" onClick={() => { setMobileAberto(false); if (flutuante) setExpansaoTemporaria(false); }}>
             <img className="branding-imagem" src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas" />
-            <span className="branding-marca-mini"><IconeSistema nome="estrela" tamanho={23}/></span>
+            <span className="branding-marca-mini"><img className="estrela-oficial-mini" src={`${base}/estrela-oficial-5-estrelas.png`} alt="Símbolo oficial do Programa 5 Estrelas" /></span>
           </Link>
           <button
             type="button"
@@ -104,8 +104,8 @@ export function Navegacao({ children }: { children: ReactNode }) {
         </Link>)}
       </nav>
       <div className="sidebar-rodape">
-        <span className="rodape-expandido">Dados fictícios · Nenhuma informação corporativa<br/>v0.6 · Protótipo visual</span>
-        <span className="rodape-recolhido" aria-label="Protótipo versão 0.6">v0.6</span>
+        <span className="rodape-expandido">Dados fictícios · Nenhuma informação corporativa<br/>v0.8 · Protótipo visual</span>
+        <span className="rodape-recolhido" aria-label="Protótipo versão 0.8">v0.8</span>
       </div>
     </aside>
 
