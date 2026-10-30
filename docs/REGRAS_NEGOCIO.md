@@ -6,7 +6,7 @@
 
 Exatamente 8: Florestal; Sucro; Mineração; Bebidas; Rodoviário – Cavalo Mecânico; Motoristas de Truck/Toco; E-commerce; Operadores de Máquinas e Tratores.
 
-- Operadores de empilhadeira são **não participantes** e não geram pendências.
+- A base contém somente motoristas e operadores participantes do programa.
 - Categoria deve ser identificada por regras homologadas a partir da RH0034. Casos ambíguos vão para classificação manual durante a importação.
 - O gestor pode aprovar **criar regra automática**, com prévia dos colaboradores afetados, histórico de aprovação e possibilidade de desativar a regra.
 - Preservar histórico de categoria por competência.
@@ -19,7 +19,7 @@ Exatamente 8: Florestal; Sucro; Mineração; Bebidas; Rodoviário – Cavalo Mec
 - Nunca tratar nota vazia como zero. Valor 0 é legítimo e eliminatório.
 - Manter dados de origem, usuário, competência e evidências da validação.
 - A coluna FILIAL substituiu OPERAÇÃO no modelo das notas.
-- Dirigibilidade terá coluna `TIPO DE DADO`: `Gobrax`, `Max Track` ou `IDT`. Bebidas usa IDT; demais operações, sua fonte homologada.
+- Dirigibilidade terá coluna `TIPO DE DADO`: `Gobrax`, `Max Track` ou `IDT`. O sistema deverá determinar a fonte correta pela **filial**, conforme configuração vigente, com possibilidade de alteração futura por administrador autorizado e trilha de auditoria.
 
 ## Segurança
 

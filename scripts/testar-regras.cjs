@@ -22,9 +22,9 @@ const checks = [
   ['Sucro anual 9 meses', () => assert.equal(d.mesesPeriodo('Sucro','anual',0).length,9)],
   ['Sucro fora de janeiro', () => assert.ok(!d.ranking('mensal',0).some(r=>r.pessoa.categoria==='Sucro'))],
   ['Demais ciclos 4 meses', () => assert.equal(d.mesesPeriodo('Florestal','ciclo1',0).length,4)],
-  ['Empilhadeiras excluídas', () => assert.ok(d.ranking('mensal',0).every(r=>r.pessoa.tipo!=='Empilhadeira'))],
+  ['Somente funções participantes na amostra', () => assert.ok(d.pessoas.every(p=>p.tipo==='Motorista'||p.tipo==='Operador'))],
   ['Notas 0 a 100', () => assert.ok(d.pessoas.every(p=>Array.from({length:12},(_,mes)=>Object.values(d.notasDe(p,mes)).every(n=>n>=0&&n<=100)).every(Boolean)))],
+  ['Top 20 da amostra de abril', () => {const t=d.ranking('mensal',3).filter(r=>r.pessoa.categoria==='Florestal'&&r.posicao!==null&&r.posicao<=20);assert.equal(t.length,20)}],
   ['Posições calculadas por categoria', () => {const a=d.ranking('mensal',0).filter(r=>r.pessoa.categoria==='Florestal'&&r.status==='Elegível');assert.equal(new Set(a.map(r=>r.posicao)).size,a.length)}],
-  ['Top 20 Florestal na demo de abril', () => {const a=d.ranking('mensal',3).filter(r=>r.pessoa.categoria==='Florestal'&&r.status==='Elegível'&&r.posicao!==null&&r.posicao<=20);assert.equal(a.length,20)}],
 ];
 let failed=0;for(const [label,run] of checks){try{run();console.log('✓',label)}catch(e){failed++;console.error('✗',label,e.message)}}console.log(`\n${checks.length-failed}/${checks.length} verificações aprovadas`);if(failed)process.exit(1);

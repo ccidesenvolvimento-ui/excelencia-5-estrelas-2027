@@ -1,0 +1,27 @@
+ATUALIZAÇÃO v0.9 — EXCELÊNCIA 5 ESTRELAS 2027
+
+Base: https://github.com/ccidesenvolvimento-ui/excelencia-5-estrelas-2027
+Usar branch: feat/pendencias-cinco-estrelas-v09
+
+1. Extraia este ZIP no computador.
+2. Crie a branch acima a partir de main.
+3. Na página Code da branch, use Add file > Upload files, enviando as pastas src, scripts e docs e os arquivos README.md/package.json.
+4. CONFIRA que src/app/pendencias/page.tsx e src/app/configuracoes/page.tsx foram SUBSTITUÍDOS e que dois NOVOS arquivos existem:
+   src/lib/fontes-dirigibilidade.ts
+   src/components/ConfiguracaoFontes.tsx
+5. Faça Commit, abra Pull Request para main e confira Actions: test:rules, typecheck e build.
+6. Somente após testes aprovados, faça o merge para publicar pelo GitHub Pages.
+
+Não envio: arquivos de Ranking, src/lib/relatorio-ranking-pdf.ts, assets do logo ou migrações Supabase. A alteração de geração de PDF feita pela equipe fica preservada.
+
+VERIFICAR MANUALMENTE
+- Central de Pendências: somente 5 tipos + Todas.
+- Com mês Abr/2027, um colaborador pode exibir várias notas faltantes; nota 0 não é pendência.
+- Filtrar tipo+segmento+filial; clicar no ícone de olho; ordenar; paginar; exportar CSV.
+- Configurações > Regras e ciclos > Fonte da Dirigibilidade: alterar qualquer filial e retornar a Pendências para visualizar a fonte no detalhe.
+- Na tela RH0034 não deve haver qualquer colaborador ou referência à função removida; os registros de teste incluem apenas motoristas e operadores.
+- Validar o relatório Top 20 original; o gerador do colega NÃO foi alterado.
+
+LIMITAÇÃO: esta é uma DEMONSTRAÇÃO PÚBLICA. As fontes de filial são fictícias e armazenadas somente no navegador (localStorage). Não importar dados reais. Importação RH0034 e validação da fonte do arquivo continuarão dependendo do backend seguro.
+
+TESTES: 17 testes das regras de domínio; 17 testes específicos v0.9; TypeScript e CSS analisados sintaticamente; build Next.js completo deve ser confirmado no GitHub Actions.

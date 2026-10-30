@@ -1,6 +1,6 @@
 # Programa Excelência 5 Estrelas 2027
 
-**Versão 0.6 — navegação consolidada e design visual integrado, para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
+**Versão 0.9 — Central de Pendências redesenhada e Dirigibilidade parametrizada por filial, para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
 
 ## O que funciona nesta versão
 
@@ -8,11 +8,11 @@
 - Menu consolidado: Visão Geral, Ranking, Pendências, Importações, RH0034, Configurações e Testes.
 - Dashboard ilustrativo, ranking mensal / ciclos / anual por oito categorias, filtro de filial e ordenação.
 - Cálculo ilustrativo com cinco estrelas e regra de inelegibilidade por zero, pendência sem nota e posições por categoria.
-- Prévia de Central de Pendências, exportação **CSV** de dados fictícios.
+- Central de Pendências com cinco tipos de ausência (Segurança, Produtividade, Dirigibilidade, Jornada e Treinamentos), filtros combinados, paginação, visualização individual e exportação **CSV** de dados fictícios.
 - Download dos seis modelos oficiais XLSX em **Importações**. Verificação local de nome/extensão/tamanho (não lê nem importa as linhas do Excel).
 - RH0034 fictícia e simulação de classificação local (`localStorage`), sem afetar a base de notas ou persistir no servidor.
-- Relatório integrado ao Ranking, respeitando período, segmento, filial, pesquisa, ordenação e posições oficiais Top N (CSV e impressão/salvar PDF).
-- Configurações com abas Regras, Usuários e Acessos e Segurança; simulação LOCAL de perfis, permissões e filiais (não são usuários reais).
+- Relatório integrado ao Ranking, respeitando período, segmento, filial, pesquisa, ordenação e posições oficiais Top N (CSV e PDF direto no navegador, com prévia em páginas).
+- Configurações com abas Regras, Usuários e Acessos e Segurança; simulação LOCAL de perfis, permissões, filiais e fonte de Dirigibilidade por filial (não são parâmetros corporativos reais).
 - Testes básicos da lógica + relato de erros baixável ou abertura de Issue no GitHub.
 - Compilação para **GitHub Pages** com workflow `.github/workflows/github-pages.yml`.
 - Migração **inicial, ainda não aplicada**, de Supabase/PostgreSQL com RLS fechado por padrão.
@@ -81,3 +81,7 @@ As URLs antigas `/painel`, `/relatorios` e `/usuarios` encaminham para `/`, `/ra
 4. O workflow existente publica automaticamente a versão de demonstração no GitHub Pages.
 
 **Segurança:** ambiente público somente com dados fictícios. Não colocar arquivos corporativos reais, e-mails pessoais ou credenciais em formulários de teste.
+
+## Atualização da Central de Pendências v0.9
+
+Consulte `docs/INTERFACE_V09.md`. Nenhum arquivo de Ranking ou geração de PDF é substituído por esta atualização.

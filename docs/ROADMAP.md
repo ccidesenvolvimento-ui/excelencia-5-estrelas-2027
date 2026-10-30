@@ -14,7 +14,7 @@
 
 ## v0.4 — Importações reais (não implementado)
 - Upload RH0034 por usuário autorizado; parser com validação integral e transação.
-- Associação empresa + matrícula, férias e regras de classificação; empilhadeiras excluídas.
+- Associação empresa + matrícula, férias e regras de classificação; somente cadastros autorizados.
 - Upload das seis planilhas; advertências, acidentes e fontes Gobrax/Maxtrack/IDT.
 - Bloqueio integral por matrícula desconhecida, nota fora da faixa, duplicidade e campos ausentes.
 

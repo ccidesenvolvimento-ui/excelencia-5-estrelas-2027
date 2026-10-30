@@ -13,7 +13,7 @@ export function rotuloEstrela(e:Estrela,categoria:Categoria|null):string {
  if(categoria==="Operadores de Máquinas e Tratores") {if(e==="dirigibilidade")return "Eficiência Operacional";if(e==="jornada")return "Conservação/Operação";}
  return rotulos[e];
 }
-export type Pessoa = { id:string; nome:string; matricula:string; empresa:string; filial:string; categoria:Categoria|null; funcao:string; situacao:"Ativo"|"Férias"|"Desligado"; tipo:"Motorista"|"Operador"|"Empilhadeira" };
+export type Pessoa = { id:string; nome:string; matricula:string; empresa:string; filial:string; categoria:Categoria|null; funcao:string; situacao:"Ativo"|"Férias"|"Desligado"; tipo:"Motorista"|"Operador" };
 export const pessoas:Pessoa[] = [
 ["m001","Ana Ribeiro","F001","E01","Lavras",0,"Motorista","Ativo","Motorista"],
 ["m002","Bruno Lima","F002","E01","Lavras",0,"Motorista","Ativo","Motorista"],
@@ -32,7 +32,7 @@ export const pessoas:Pessoa[] = [
 ["m015","Olivia Santos","O001","E02","Jataí",7,"Operador","Ativo","Operador"],
 ["m016","Paulo Mendes","O002","E02","Jataí",7,"Operador","Ativo","Operador"],
 ["m017","Renata Vieira","U001","E01","Lavras",null,"Motorista","Ativo","Motorista"],
-["m018","Rafael Castro","EMP01","E01","Lavras",null,"Empilhadeira","Ativo","Empilhadeira"],
+
 ["m019","Sara Fernandes","F003","E01","Jataí",0,"Motorista","Ativo","Motorista"],
 ["m020","Thiago Moraes","F004","E01","Lavras",0,"Motorista","Ativo","Motorista"],
 ["m021","Valéria Campos","F005","E01","Varginha",0,"Motorista","Ativo","Motorista"],
@@ -62,7 +62,7 @@ export type Notas = Partial<Record<Estrela,number>>;
 export const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 /** Modelo determinístico para demonstração: NÃO simula importação RH0034 real. */
 export function notasDe(p:Pessoa,mes:number):Notas {
- if(p.tipo==="Empilhadeira"||!p.categoria || (p.categoria==="Sucro"&&(mes<2||mes>10))) return {};
+ if(!p.categoria || (p.categoria==="Sucro"&&(mes<2||mes>10))) return {};
  const n=Number(p.id.replace("m",""));
  const base=73+((n*7+mes*3)%22);
  const notas:Notas={ seguranca:100,produtividade:Math.min(100,base),dirigibilidade:Math.min(100,base+4),jornada:Math.min(100,base+2),treinamentos:Math.min(100,base+7) };
@@ -104,7 +104,7 @@ export function avaliarPessoa(pessoa:Pessoa,periodo:Periodo,mes=0):Avaliacao{
 }
 /** Posições são calculadas por segmento ANTES de aplicar filtros de filial. */
 export function ranking(periodo:Periodo,mes:number):Avaliacao[]{
- const registros=pessoas.filter(p=>p.categoria!==null&&p.tipo!=="Empilhadeira"&&p.situacao!=="Desligado"&&!(periodo==="mensal"&&p.categoria==="Sucro"&&(mes<2||mes>10))).map(p=>avaliarPessoa(p,periodo,mes));
+ const registros=pessoas.filter(p=>p.categoria!==null&&p.situacao!=="Desligado"&&!(periodo==="mensal"&&p.categoria==="Sucro"&&(mes<2||mes>10))).map(p=>avaliarPessoa(p,periodo,mes));
  const resultado:Avaliacao[]=[];
  for(const categoria of categorias){
    const setor=registros.filter(r=>r.pessoa.categoria===categoria).sort((a,b)=>(b.score??-1)-(a.score??-1));

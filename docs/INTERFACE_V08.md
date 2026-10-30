@@ -22,7 +22,7 @@
 
 ## Regra de negócio (não implementada na demonstração)
 
-O importador definitivo deverá autenticar o usuário e verificar permissão de importação por filial, validar a RH0034 como lote antes de gravar, identificar colaboradores por **empresa + matrícula**, atualizar lotação/situação/férias sem duplicar cadastros, classificar somente por regras aprovadas, excluir empilhadeiras e registrar usuário, competência, divergências e auditoria. Planilhas das estrelas não podem cadastrar colaboradores.
+O importador definitivo deverá autenticar o usuário e verificar permissão de importação por filial, validar a RH0034 como lote antes de gravar, identificar colaboradores por **empresa + matrícula**, atualizar lotação/situação/férias sem duplicar cadastros, classificar somente por regras aprovadas, admitir somente funções autorizadas e registrar usuário, competência, divergências e auditoria. Planilhas das estrelas não podem cadastrar colaboradores.
 
 ## Checklist manual antes do merge
 1. Executar `npm run typecheck`, `npm run test:rules`, `npm run build` no workflow.

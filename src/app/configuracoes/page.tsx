@@ -2,14 +2,15 @@
 
 import {useEffect,useState} from "react";
 import {AvisoDemo,Cabecalho,BlocoTitulo} from "@/components/Elementos";
-import {categorias,estrelas,pesos,rotulos} from "@/lib/dados-demo";
+import {categorias,estrelas,pesos,rotulos,pessoas} from "@/lib/dados-demo";
+import { ConfiguracaoFontes } from "@/components/ConfiguracaoFontes";
 
 type Aba="regras"|"usuarios"|"seguranca";
 type Perfil="Administrador"|"Analista"|"Consulta";
 type UsuarioDemo={id:string;nome:string;perfil:Perfil;filiais:string[];permissoes:string[];ativo:boolean};
 const OPERACOES=["Visualizar", "Importar", "Editar", "Exportar"];
 const ABAS=["Visão geral","Ranking e relatórios","Pendências","Importações","RH0034","Configurações"];
-const FILIAIS=["Lavras", "Jataí", "Itabira", "Contagem", "Betim"];
+const FILIAIS=[...new Set(pessoas.map(p=>p.filial))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
 const ADMINS:UsuarioDemo[]=Array.from({length:3},(_,i)=>({id:`admin-${i+1}`,nome:`Administrador ${String(i+1).padStart(2,"0")}`,perfil:"Administrador",filiais:["Todas"],permissoes:[],ativo:true}));
 const INICIAIS:UsuarioDemo[]=[...ADMINS,{id:"consulta-001",nome:"Usuário demonstração",perfil:"Consulta",filiais:["Lavras"],permissoes:["Visão geral:Visualizar","Ranking e relatórios:Visualizar"],ativo:true}];
 const STORAGE="excelencia-5-estrelas-usuarios-demo-v06";
@@ -24,7 +25,8 @@ export default function Configuracoes(){
  const [carregado,setCarregado]=useState(false);
  const [aviso,setAviso]=useState("");
  useEffect(()=>{
-   if(window.location.hash==="#usuarios")setAba("usuarios");
+   if(window.location.hash==="#fontes-dirigibilidade")setAba("regras");
+   else if(window.location.hash==="#usuarios")setAba("usuarios");
    else if(window.location.hash==="#seguranca")setAba("seguranca");
    try{const salvo=JSON.parse(localStorage.getItem(STORAGE)||"null") as UsuarioDemo[]|null;
      if(Array.isArray(salvo) && salvo.length>=3 && salvo.every(x=>x&&typeof x.id==="string"&&typeof x.nome==="string"&&Array.isArray(x.filiais)&&Array.isArray(x.permissoes)&&typeof x.ativo==="boolean"&&["Administrador","Analista","Consulta"].includes(x.perfil)))setUsuarios(salvo);
@@ -48,7 +50,8 @@ export default function Configuracoes(){
  <div className="mod-grid-estatisticas"><div className="mod-estatistica"><small>Categorias</small><strong>08</strong><span>Competitivas</span></div><div className="mod-estatistica"><small>Estrelas</small><strong>05</strong><span>Por avaliação</span></div><div className="mod-estatistica"><small>Ciclos</small><strong>03</strong><span>Além do anual</span></div><div className="mod-estatistica"><small>Fechamento mensal</small><strong>12</strong><span>Do mês seguinte</span></div></div>
  <div className="dois-lados"><section className="painel"><BlocoTitulo superior="METODOLOGIA" titulo="Pesos dos cinco pilares" descricao="Distribuição provisória, sujeita a aprovação final."/><div className="barras">{estrelas.map(e=><div key={e} className="barra-item"><span>{rotulos[e]}</span><div><i style={{width:`${pesos[e]*100}%`}}/></div><span>{pesos[e]*100}%</span></div>)}</div><p className="nota-rodape">Operadores utilizam critérios específicos para as estrelas operacionais.</p></section>
  <section className="painel"><BlocoTitulo superior="CALENDÁRIO" titulo="Períodos de avaliação" descricao="Ciclos diferentes para a operação Sucro."/><div className="tabela-scroll"><table className="tabela"><thead><tr><th>Período</th><th>Demais segmentos</th><th>Sucro</th></tr></thead><tbody><tr><td>Ciclo 1</td><td>Jan–Abr</td><td>Mar–Mai</td></tr><tr><td>Ciclo 2</td><td>Mai–Ago</td><td>Jun–Ago</td></tr><tr><td>Ciclo 3</td><td>Set–Dez</td><td>Set–Nov</td></tr><tr><td>Anual</td><td>Jan–Dez</td><td>Mar–Nov</td></tr></tbody></table></div></section></div>
- <section className="painel"><BlocoTitulo superior="ESTRUTURA COMPETITIVA" titulo="Oito categorias participantes" descricao="Operadores de empilhadeira estão excluídos do programa."/><div className="mod-categoria-lista">{categorias.map((c,i)=><div className="mod-categoria-item" key={c}><span className="rotulo-chave">{String(i+1).padStart(2,"0")} / CATEGORIA</span><div style={{marginTop:7}}>{c}</div></div>)}</div></section>
+ <ConfiguracaoFontes/>
+ <section className="painel"><BlocoTitulo superior="ESTRUTURA COMPETITIVA" titulo="Oito categorias participantes" descricao="Categorias oficiais utilizadas nas avaliações do programa."/><div className="mod-categoria-lista">{categorias.map((c,i)=><div className="mod-categoria-item" key={c}><span className="rotulo-chave">{String(i+1).padStart(2,"0")} / CATEGORIA</span><div style={{marginTop:7}}>{c}</div></div>)}</div></section>
  <section className="painel"><BlocoTitulo superior="REGRAS TRANSVERSAIS" titulo="Princípios da avaliação"/><ol className="passos"><li>Segurança: 100 somente após validação das duas planilhas; 0 para quem tiver advertência ou acidente.</li><li>Qualquer estrela com zero elimina a elegibilidade do ciclo e do anual correspondente.</li><li>Nota ausente é pendência, nunca um zero automático.</li><li>Férias: estimativa apenas no fechamento de ciclo, sem alterar as cinco notas originais.</li><li>Fechamento mensal no dia 12 do mês seguinte, ou próximo dia útil se cair no fim de semana.</li><li>Alterações após fechamento: somente administradores e com auditoria.</li></ol></section>
  </>}
  {aba==="usuarios"&&<>

@@ -1,6 +1,6 @@
 {
   "name": "excelencia-5-estrelas-2027",
-  "version": "0.6.0",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,8 +11,9 @@
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
-    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs",
-    "test:ui": "node scripts/testar-interface-v06.cjs"
+    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs && node scripts/testar-pendencias-v09.cjs",
+    "test:ui": "node scripts/testar-interface-v06.cjs",
+    "test:pendencias": "node scripts/testar-pendencias-v09.cjs"
   },
   "dependencies": {
     "next": "16.4.3",

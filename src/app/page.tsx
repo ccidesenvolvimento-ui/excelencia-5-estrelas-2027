@@ -116,7 +116,7 @@ export default function VisaoGeral() {
     return registrosMes.length ? registrosMes.reduce((s, r) => s + (r.score ?? 0), 0) / registrosMes.length : null;
   }), [categoria, filial]);
 
-  const foraDeClassificacao = pessoas.filter(p => p.categoria === null && p.tipo !== "Empilhadeira").length;
+  const foraDeClassificacao = pessoas.filter(p => p.categoria === null).length;
   const emFerias = pessoas.filter(p => p.situacao === "Férias" && p.categoria &&
     (categoria === "Todas" || p.categoria === categoria) &&
     (filial === "Todas" || p.filial === filial)).length;

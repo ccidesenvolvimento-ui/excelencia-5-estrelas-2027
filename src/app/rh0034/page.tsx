@@ -30,16 +30,15 @@ export default function RH0034() {
     setCarregou(true);
   }, []);
 
-  const elegiveisBase = pessoas.filter(p => p.tipo !== "Empilhadeira");
+  const elegiveisBase = pessoas;
   const classificacaoDe = (p: typeof pessoas[number]) =>
-    p.tipo === "Empilhadeira" ? "excluido" : (correcoes[p.id] ?? p.categoria ?? "");
+    correcoes[p.id] ?? p.categoria ?? "";
 
   const pendentes = elegiveisBase.filter(p => !classificacaoDe(p)).length;
   const classificados = elegiveisBase.filter(p => {
     const c = classificacaoDe(p);
     return Boolean(c) && c !== "excluido";
   }).length;
-  const naoParticipam = pessoas.filter(p => classificacaoDe(p) === "excluido").length;
 
   const filiais = useMemo(() => [...new Set(pessoas.map(p => p.filial))].sort((a, b) => a.localeCompare(b, "pt-BR")), []);
   const funcoes = useMemo(() => [...new Set(pessoas.map(p => p.funcao))].sort((a, b) => a.localeCompare(b, "pt-BR")), []);
@@ -90,7 +89,7 @@ export default function RH0034() {
       <div className="mod-estatistica"><small>Cadastros de teste</small><strong>{pessoas.length}</strong><span>Amostra fictícia</span></div>
       <div className="mod-estatistica verde"><small>Classificados</small><strong>{classificados}</strong><span>Participam na simulação</span></div>
       <div className="mod-estatistica amarelo"><small>A classificar</small><strong>{pendentes}</strong><span>Revisão complementar</span></div>
-      <div className="mod-estatistica"><small>Não participantes</small><strong>{naoParticipam}</strong><span>Inclui empilhadeiras</span></div>
+      <div className="mod-estatistica"><small>Filiais presentes</small><strong>{filiais.length}</strong><span>Na amostra demonstrativa</span></div>
     </div>
 
     <section className="painel" aria-labelledby="titulo-importar-rh0034">
@@ -157,11 +156,11 @@ export default function RH0034() {
       </div>
       <div className={estilos.barraResultado}><span>{lista.length} colaborador{lista.length===1?"":"es"} na seleção</span><button type="button" className="botao botao-secundario" onClick={limparClassificacoes}>Reiniciar classificações da demo</button></div>
       <div className="tabela-scroll"><table className="tabela"><thead><tr><th>Colaborador</th><th>Empresa / matrícula</th><th>Filial</th><th>Função</th><th>Situação RH</th><th>Classificação (simulação)</th></tr></thead><tbody>
-        {lista.map(p => <tr key={p.id}><td><strong>{p.nome}</strong></td><td>{p.empresa} · {p.matricula}</td><td>{p.filial}</td><td>{p.funcao}</td><td><span className="mod-status">{p.situacao}</span></td><td><div className="campo"><select aria-label={`Classificação de ${p.nome}`} disabled={!carregou||p.tipo==="Empilhadeira"} value={classificacaoDe(p)} onChange={e=>alterar(p.id,e.target.value)}><option value="">A classificar</option>{categorias.map(c=><option key={c} value={c}>{c}</option>)}<option value="excluido">Não participa</option></select></div></td></tr>)}
+        {lista.map(p => <tr key={p.id}><td><strong>{p.nome}</strong></td><td>{p.empresa} · {p.matricula}</td><td>{p.filial}</td><td>{p.funcao}</td><td><span className="mod-status">{p.situacao}</span></td><td><div className="campo"><select aria-label={`Classificação de ${p.nome}`} disabled={!carregou} value={classificacaoDe(p)} onChange={e=>alterar(p.id,e.target.value)}><option value="">A classificar</option>{categorias.map(c=><option key={c} value={c}>{c}</option>)}<option value="excluido">Não participa</option></select></div></td></tr>)}
         {lista.length===0&&<tr><td colSpan={6} className="mod-vazio"><strong>Nenhum colaborador com esses filtros.</strong> Se todas as pendências foram classificadas, selecione “Todas” em Classificação para visualizar o restante.</td></tr>}
       </tbody></table></div>
-      <div className={estilos.rodapeClassificacao}><span>Empilhadeiras não participam. Simulações de classificação ficam somente neste navegador e não alteram os rankings.</span><button className="botao botao-claro" type="button" disabled title="Regras automáticas exigem prévia dos afetados, aprovação e auditoria no backend">Criar regra automática (em breve)</button></div>
+      <div className={estilos.rodapeClassificacao}><span>As classificações de demonstração ficam somente neste navegador e não alteram os rankings.</span><button className="botao botao-claro" type="button" disabled title="Regras automáticas exigem prévia dos afetados, aprovação e auditoria no backend">Criar regra automática (em breve)</button></div>
     </section>
-    <div className="mod-sem-backend"><strong>Próxima fase técnica:</strong> leitura real da RH0034 com validação de todas as linhas antes de confirmar, deduplicação por empresa + matrícula, classificação por filial/segmento, exclusão de empilhadeiras, férias e auditoria. Nesta demonstração não existe importação, gravação ou acesso a dados reais.</div>
+    <div className="mod-sem-backend"><strong>Próxima fase técnica:</strong> leitura real da RH0034 com validação de todas as linhas antes de confirmar, deduplicação por empresa + matrícula, classificação por filial/segmento, elegibilidade de funções permitidas, férias e auditoria. Nesta demonstração não existe importação, gravação ou acesso a dados reais.</div>
   </>;
 }
