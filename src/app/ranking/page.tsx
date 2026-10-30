@@ -1,130 +1,15 @@
 "use client";
 
-import {useEffect,useMemo,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 import {AvisoDemo,Cabecalho,Estado,BlocoTitulo} from "@/components/Elementos";
-import {categorias,meses,periodos,pessoas,ranking,formatarNota,estrelas,rotuloEstrela,type Periodo,type Categoria,type Avaliacao} from "@/lib/dados-demo";
+import {categorias,meses,periodos,pessoas,ranking,formatarNota,estrelas,rotuloEstrela,type Periodo,type Categoria} from "@/lib/dados-demo";
 import {exportarCsv} from "@/lib/exportar";
+import {renderizarPaginasRelatorio, baixarPDFDireto, type DadosRankingPDF} from "@/lib/relatorio-ranking-pdf";
 
 type Ordem = "maior"|"menor";
 
-type RelatorioVisualProps = {
-  base:string;
-  categoria:Categoria;
-  periodo:Periodo;
-  periodoTexto:string;
-  contexto:string;
-  filial:string;
-  ordem:Ordem;
-  busca:string;
-  limite:number;
-  participantes:number;
-  elegiveis:number;
-  relatorio:Avaliacao[];
-  colunas:string[];
-  geradoEm:string;
-};
-
 const nomePeriodo = (periodo:Periodo,mes:number) => `${periodos.find(p=>p.id===periodo)?.nome??periodo}${periodo==="mensal" ? ` · ${meses[mes]}/2027`:" · 2027"}`;
 const textoOrdenacao = (ordem:Ordem) => ordem==="maior" ? "Score: maior primeiro" : "Score: menor primeiro";
-const medalhas = ["1º lugar","2º lugar","3º lugar"] as const;
-
-function RelatorioVisual({base,categoria,periodo,periodoTexto,contexto,filial,ordem,busca,limite,participantes,elegiveis,relatorio,colunas,geradoEm}:RelatorioVisualProps){
-  const topTres=relatorio.slice(0,3);
-  return <div className="mod-report-page">
-    <section className="mod-report-hero compact">
-      <div className="mod-report-hero-main">
-        <div className="mod-report-branding compact">
-          <div className="mod-report-simbolo"><img src={`${base}/estrela-oficial-5-estrelas.png`} alt="Símbolo do Programa 5 Estrelas"/></div>
-          <div className="mod-report-brand-copy">
-            <img className="mod-report-logo" src={`${base}/marca-programa.png`} alt="Programa 5 Estrelas 2027"/>
-            <span className="mod-report-kicker">Relatório visual de ranking</span>
-            <h3>{categoria} · Top {limite}</h3>
-            <p>{periodoTexto} · {filial||"Todas as filiais"}</p>
-          </div>
-        </div>
-        <div className="mod-report-hero-tags">
-          <span className="mod-report-badge">DEMO · NÃO OFICIAL</span>
-          <span className="mod-report-chip">{textoOrdenacao(ordem)}</span>
-          {busca && <span className="mod-report-chip">Busca: {busca}</span>}
-        </div>
-      </div>
-      <div className="mod-report-meta-stack">
-        <div className="mod-report-meta-box"><span>Participantes</span><strong>{participantes}</strong></div>
-        <div className="mod-report-meta-box destaque"><span>Elegíveis</span><strong>{elegiveis}</strong></div>
-        <div className="mod-report-meta-box mini"><span>Gerado em</span><strong>{geradoEm}</strong></div>
-      </div>
-    </section>
-
-    {!!topTres.length && <section className="mod-report-section slim">
-      <div className="mod-report-section-head compact">
-        <div>
-          <span className="mod-sobre-titulo">DESTAQUES</span>
-          <h4>Pódio do ranking</h4>
-        </div>
-      </div>
-      <div className="mod-report-podium compact">
-        {topTres.map((registro,indice)=><article key={registro.pessoa.id} className={`mod-report-podium-card card-${indice+1}`}>
-          <div className="mod-report-podium-head">
-            <span>{medalhas[indice]??`${registro.posicao}º lugar`}</span>
-            <strong>{registro.posicao}º</strong>
-          </div>
-          <h5>{registro.pessoa.nome}</h5>
-          <p>{registro.pessoa.filial} · {registro.pessoa.matricula}</p>
-          <div className="mod-report-podium-score"><small>Score médio</small><b>{formatarNota(registro.score)}</b></div>
-        </article>)}
-      </div>
-    </section>}
-
-    <section className="mod-report-section slim">
-      <div className="mod-report-section-head compact">
-        <div>
-          <span className="mod-sobre-titulo">CLASSIFICAÇÃO</span>
-          <h4>Top {limite} oficial do recorte</h4>
-        </div>
-      </div>
-      <div className="mod-relatorio-topo">
-        <div className="mod-relatorio-topo-esq">
-          <span className="mod-report-chip">{categoria}</span>
-          <span className="mod-report-chip">{periodoTexto}</span>
-          <span className="mod-report-chip">{filial||"Todas as filiais"}</span>
-        </div>
-        <p>Somente participantes elegíveis com posição oficial aparecem na saída visual.</p>
-      </div>
-      <div className="tabela-scroll mod-relatorio-local mod-relatorio-tematico">
-        <table className="tabela">
-          <thead>
-            <tr>
-              <th>Pos.</th>
-              <th>Colaborador</th>
-              <th>Filial</th>
-              <th>Matrícula</th>
-              {colunas.map((coluna,indice)=><th key={`${coluna}-${indice}`}>{coluna}</th>)}
-              <th>Score médio</th>
-            </tr>
-          </thead>
-          <tbody>
-            {relatorio.map(registro=><tr key={registro.pessoa.id}>
-              <td><strong>{registro.posicao}º</strong></td>
-              <td>{registro.pessoa.nome}</td>
-              <td>{registro.pessoa.filial}</td>
-              <td>{registro.pessoa.matricula}</td>
-              {periodo==="anual"
-                ? registro.mensais.map((valor,indice)=><td key={`${registro.pessoa.id}-${indice}`}>{formatarNota(valor)}</td>)
-                : estrelas.map(estrela=><td key={`${registro.pessoa.id}-${estrela}`}>{formatarNota(registro.notas[estrela])}</td>)}
-              <td><strong>{formatarNota(registro.score)}</strong></td>
-            </tr>)}
-            {!relatorio.length&&<tr><td colSpan={colunas.length+5} className="mod-vazio"><strong>Nenhum elegível dentro do Top {limite}.</strong>Revise os filtros ou aumente o limite do relatório.</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section className="mod-report-footer-line">
-      <span>Dados fictícios gerados para testes de interface e regras de negócio.</span>
-      <span>Programa Excelência 5 Estrelas 2027 · {contexto}</span>
-    </section>
-  </div>;
-}
 
 export default function Ranking(){
  const [periodo,setPeriodo]=useState<Periodo>("mensal");
@@ -135,6 +20,10 @@ export default function Ranking(){
  const [busca,setBusca]=useState("");
  const [relatorioAberto,setRelatorioAberto]=useState(false);
  const [limite,setLimite]=useState(10);
+ const [paginasPrevia,setPaginasPrevia]=useState<string[]>([]);
+ const [gerando,setGerando]=useState(false);
+ const [erroPDF,setErroPDF]=useState("");
+ const paginasCanvas=useRef<HTMLCanvasElement[]>([]);
  const base=process.env.NEXT_PUBLIC_BASE_PATH ?? "";
  const filiais=useMemo(()=>[...new Set(pessoas.filter(p=>p.categoria===categoria).map(p=>p.filial))].sort((a,b)=>a.localeCompare(b,"pt-BR")),[categoria]);
  const todos=useMemo(()=>ranking(periodo,mes),[periodo,mes]);
@@ -143,11 +32,18 @@ export default function Ranking(){
  const lista=useMemo(()=>todos.filter(r=>r.pessoa.categoria===categoria && r.status!=="Pendente" && (!filial||r.pessoa.filial===filial) && `${r.pessoa.nome} ${r.pessoa.matricula}`.toLocaleLowerCase("pt-BR").includes(busca.toLocaleLowerCase("pt-BR"))).sort((a,b)=>ordem==="maior"?(b.score??0)-(a.score??0):(a.score??0)-(b.score??0)),[todos,categoria,filial,busca,ordem]);
  const elegiveis=lista.filter(r=>r.status==="Elegível");
  const inelegiveis=lista.filter(r=>r.status==="Inelegível");
- const relatorio=lista.filter(r=>r.status==="Elegível" && r.posicao!==null && r.posicao<=limite);
- const colunas=periodo==="anual"?meses.slice(categoria==="Sucro"?2:0,categoria==="Sucro"?11:12):estrelas.map(e=>rotuloEstrela(e,categoria));
+ const relatorio=useMemo(()=>lista.filter(r=>r.status==="Elegível" && r.posicao!==null && r.posicao<=limite),[lista,limite]);
+ const colunas=useMemo(()=>periodo==="anual"?meses.slice(categoria==="Sucro"?2:0,categoria==="Sucro"?11:12):estrelas.map(e=>rotuloEstrela(e,categoria)),[periodo,categoria]);
  const periodoTexto=nomePeriodo(periodo,mes);
  const contexto=`${periodoTexto} · ${categoria} · ${filial||"Todas as filiais"}`;
  const geradoEm=useMemo(()=>new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(new Date()),[periodoTexto,categoria,filial,ordem,busca,limite,relatorio.length]);
+ const dadosPDF=useMemo<DadosRankingPDF>(()=>({
+    categoria,periodo:periodoTexto,filial:filial||"Todas as filiais",ordenacao:textoOrdenacao(ordem),top:limite,colunas,geradoEm,
+    registros:relatorio.map(r=>({
+       posicao:r.posicao!,nome:r.pessoa.nome,filial:r.pessoa.filial,matricula:r.pessoa.matricula,score:r.score,
+       notas:periodo==="anual"?r.mensais:estrelas.map(e=>r.notas[e]??null)
+    }))
+ }),[categoria,periodoTexto,filial,ordem,limite,colunas,geradoEm,relatorio,periodo]);
 
  useEffect(()=>{
   if(!relatorioAberto)return;
@@ -155,6 +51,35 @@ export default function Ranking(){
   window.addEventListener("keydown",tecla);
   return ()=>window.removeEventListener("keydown",tecla);
  },[relatorioAberto]);
+
+ useEffect(()=>{
+  if(!relatorioAberto)return;
+  let cancelado=false;
+  paginasCanvas.current=[];
+  setGerando(true);
+  setErroPDF("");
+  setPaginasPrevia([]);
+  renderizarPaginasRelatorio(dadosPDF,base).then(paginas=>{
+    if(cancelado)return;
+    paginasCanvas.current=paginas;
+    setPaginasPrevia(paginas.map(p=>p.toDataURL("image/jpeg",0.91)));
+    setGerando(false);
+  }).catch(erro=>{
+    if(cancelado)return;
+    setGerando(false);
+    setErroPDF(erro instanceof Error?erro.message:"Não foi possível criar o PDF.");
+  });
+  return ()=>{cancelado=true};
+ },[relatorioAberto,dadosPDF,base]);
+
+ function baixar(){
+  if(!paginasCanvas.current.length)return;
+  try{
+    const segmento=categoria.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-");
+    baixarPDFDireto(paginasCanvas.current,`5-estrelas-ranking-${segmento}-top-${limite}-${periodo}-DEMO.pdf`);
+    setErroPDF("");
+  }catch(erro){setErroPDF(erro instanceof Error?erro.message:"Falha no download do PDF.")}
+ }
 
  function csv(){
    const cabecalho=["Posição oficial","Nome","Filial","Matrícula","Segmento","Período",...colunas,"Score médio"];
@@ -164,12 +89,6 @@ export default function Ranking(){
    ])]);
  }
 
- function imprimir(){
-  document.body.classList.add("imprimindo-relatorio");
-  const limpar=()=>{document.body.classList.remove("imprimindo-relatorio");window.removeEventListener("afterprint",limpar)};
-  window.addEventListener("afterprint",limpar);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
- }
 
  return <>
    <Cabecalho tag="DESEMPENHO OPERACIONAL / RANKINGS" titulo="Ranking de Excelência" descricao="Compare as cinco estrelas, consulte as posições por segmento e gere relatórios diretamente dos filtros selecionados." acao={<button className="botao" type="button" onClick={()=>setRelatorioAberto(true)}>▤ Gerar relatório</button>}/>
@@ -196,15 +115,15 @@ export default function Ranking(){
       </tbody></table></div>
       <p className="nota-rodape">Ciclos: médias dos cinco pilares. Anual: pontuações mensais e Score Médio. O segmento Sucro usa mar–nov. A posição não muda ao filtrar ou inverter a ordenação. Férias ainda não são estimadas nesta demonstração.</p>
    </section>
-   {relatorioAberto&&<div className="mod-report-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setRelatorioAberto(false)}}><div className="mod-report-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio"><header><div><div className="mod-sobre-titulo">RELATÓRIO / PRÉVIA DEMONSTRATIVA</div><h2 id="titulo-relatorio">Relatório visual de Ranking</h2><p>Saída visual em padrão premium, com o mesmo clima do sistema e pronta para salvar em PDF pelo navegador.</p></div><button className="mod-fechar" aria-label="Fechar prévia" type="button" onClick={()=>setRelatorioAberto(false)}>×</button></header>
-       <div className="mod-report-filtros"><div className="campo"><label htmlFor="top-n">Limite Top N</label><input id="top-n" min={1} max={500} type="number" value={limite} onChange={e=>setLimite(Math.max(1,Math.min(500,Number(e.target.value)||1)))}/></div><span className="mod-chip">{periodoTexto}</span><span className="mod-chip">{categoria}</span><span className="mod-chip">{filial||"Todas as filiais"}</span>{busca&&<span className="mod-chip">Busca: {busca}</span>}</div>
-       <div className="mod-resumo-filtro"><strong>{relatorio.length} participantes elegíveis nesta prévia.</strong> O PDF agora segue o padrão escuro e visual do restante do sistema.</div>
-       <RelatorioVisual base={base} categoria={categoria} periodo={periodo} periodoTexto={periodoTexto} contexto={contexto} filial={filial} ordem={ordem} busca={busca} limite={limite} participantes={lista.length} elegiveis={elegiveis.length} relatorio={relatorio} colunas={colunas} geradoEm={geradoEm}/>
-       <p className="mod-report-watermark">Demonstração não oficial. Se o navegador mostrar a opção, mantenha a impressão com “gráficos em segundo plano” ativada para preservar o visual completo.</p>
-       <div className="mod-report-botao"><button className="botao botao-claro" type="button" onClick={()=>setRelatorioAberto(false)}>Voltar ao ranking</button><button className="botao botao-secundario" type="button" onClick={csv}>↓ Exportar CSV</button><button className="botao" type="button" onClick={imprimir}>▤ Salvar como PDF</button></div>
-       </div></div>}
-   <section id="relatorio-impressao" className="mod-report-print" aria-label="Relatório pronto para impressão">
-      <RelatorioVisual base={base} categoria={categoria} periodo={periodo} periodoTexto={periodoTexto} contexto={contexto} filial={filial} ordem={ordem} busca={busca} limite={limite} participantes={lista.length} elegiveis={elegiveis.length} relatorio={relatorio} colunas={colunas} geradoEm={geradoEm}/>
-   </section>
+   {relatorioAberto&&<div className="mod-report-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setRelatorioAberto(false)}}><div className="mod-report-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio">
+     <header><div><div className="mod-sobre-titulo">PROGRAMA 5 ESTRELAS / RELATÓRIO DE RANKING</div><h2 id="titulo-relatorio">Relatório visual</h2><p>O arquivo PDF terá fundo azul escuro até as bordas, sem a janela de impressão. Cada página contém no máximo dez posições.</p></div><button className="mod-fechar" aria-label="Fechar prévia" type="button" onClick={()=>setRelatorioAberto(false)}>×</button></header>
+     <div className="mod-report-filtros"><div className="campo"><label htmlFor="top-n">Limite Top N</label><input id="top-n" min={1} max={500} type="number" value={limite} onChange={e=>setLimite(Math.max(1,Math.min(500,Number(e.target.value)||1)))}/></div><span className="mod-chip">{periodoTexto}</span><span className="mod-chip">{categoria}</span><span className="mod-chip">{filial||"Todas as filiais"}</span>{busca&&<span className="mod-chip">Busca: {busca}</span>}</div>
+     <div className="mod-report-preview" aria-live="polite">
+       {gerando&&<div className="mod-report-progress">Preparando prévia visual do PDF...</div>}
+       {erroPDF&&<div className="mod-report-error" role="alert">{erroPDF}</div>}
+       {paginasPrevia.map((url,indice)=><div className="mod-report-preview-page" key={`${indice}-${url.length}`}><div className="mod-report-preview-label">Página {indice+1} de {paginasPrevia.length}</div><img src={url} alt={`Prévia da página ${indice+1} do relatório Top ${limite}`} /></div>)}
+     </div>
+     <div className="mod-report-botao"><button className="botao botao-claro" type="button" onClick={()=>setRelatorioAberto(false)}>Voltar ao ranking</button><button className="botao botao-secundario" type="button" onClick={csv}>↓ Exportar CSV</button><button className="botao" type="button" onClick={baixar} disabled={gerando||!paginasPrevia.length}>↓ Baixar PDF</button></div>
+     </div></div>}
  </>;
 }

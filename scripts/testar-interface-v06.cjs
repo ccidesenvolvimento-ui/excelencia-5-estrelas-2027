@@ -5,6 +5,7 @@ const root=path.join(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const menu=read('src/components/Navegacao.tsx');
 const ranking=read('src/app/ranking/page.tsx');
+const pdf=read('src/lib/relatorio-ranking-pdf.ts');
 const config=read('src/app/configuracoes/page.tsx');
 const css=read('src/app/modulos.css');
 const pendencias=read('src/app/pendencias/page.tsx');
@@ -17,7 +18,9 @@ const resultados=[
  ['Ranking oferece relatórios',ranking.includes('Gerar relatório')],
  ['Top N preserva posições originais',ranking.includes('r.posicao<=limite')],
  ['Relatórios usam apenas elegíveis',ranking.includes('r.status==="Elegível" && r.posicao!==null')],
- ['Relatório oferece CSV e PDF via impressão',ranking.includes('Exportar CSV')&&ranking.includes('Salvar como PDF')],
+ ['Relatório oferece CSV e PDF direto',ranking.includes('Exportar CSV')&&ranking.includes('Baixar PDF')&&!ranking.includes('window.print()')],
+ ['PDF direto sem contadores desnecessários',!pdf.includes('PARTICIPANTES')&&!pdf.includes('ELEGÍVEIS')],
+ ['PDF divide Top 20 em páginas de 10 posições',pdf.includes('Math.ceil(dados.registros.length / 10)')],
  ['Configurações incluem usuários e permissões',config.includes('Usuários e acessos')&&config.includes('PERMISSÕES POR ABA E OPERAÇÃO')],
  ['Configurações simulam acesso por filial',config.includes('FILIAIS PERMITIDAS')&&config.includes('localStorage')],
  ['Importações preservam os seis modelos',importacoes.includes('modelos.map')],
