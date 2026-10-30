@@ -1,0 +1,34 @@
+name: Validar pull request
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validar-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+      - name: Verificar TypeScript
+        run: npm run typecheck
+      - name: Testar regras e exportacao XLSX
+        run: npm run test:rules
+      - name: Compilar sistema
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DEPLOY_TARGET: github-pages
+          NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
