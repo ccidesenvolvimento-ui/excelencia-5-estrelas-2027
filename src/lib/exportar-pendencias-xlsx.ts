@@ -143,7 +143,6 @@ function preencherDetalhes(planilha: Planilha, p: ParametrosRelatorioPendencias)
   titulo(planilha, 5, "I", `COMPETÊNCIA: ${p.filtros.competencia}    |    SEGMENTO: ${p.filtros.segmento}    |    FILIAL: ${p.filtros.filial}`, 27);
   titulo(planilha, 6, "I", `PENDÊNCIA: ${p.filtros.tipo}    |    BUSCA: ${p.filtros.pesquisa}    |    TOTAL: ${p.linhas.length}`, 27);
   const linhaCabecalho = planilha.getRow(8);
-  linhaCabecalho.values = [undefined, ...COLUNAS];
   faixa(planilha, 8, 9, CORES.cabecalho, CORES.branco, 34);
   for (let i = 0; i < COLUNAS.length; i++) {
     linhaCabecalho.getCell(i + 1).value = COLUNAS[i];
@@ -157,7 +156,10 @@ function preencherDetalhes(planilha: Planilha, p: ParametrosRelatorioPendencias)
       linha.fonteDirigibilidade, linha.situacao,
     ];
     const row = planilha.getRow(r);
-    row.values = [undefined, ...valores];
+    // As células do ExcelJS começam em 1; preenche sem deslocar as colunas.
+    valores.forEach((valor, indiceColuna) => {
+      row.getCell(indiceColuna + 1).value = valor;
+    });
     row.height = linha.tipos.length > 2 ? 42 : 30;
     row.eachCell({ includeEmpty: true }, (celula, coluna) => {
       celula.fill = fundo(indice % 2 ? CORES.claro : CORES.branco);
