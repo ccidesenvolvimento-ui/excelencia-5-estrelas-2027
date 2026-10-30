@@ -11,8 +11,9 @@
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
-    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs",
-    "test:ui": "node scripts/testar-interface-v06.cjs"
+    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs",
+    "test:ui": "node scripts/testar-interface-v06.cjs",
+    "test:xlsx": "node scripts/testar-exportacao-pendencias-xlsx.cjs"
   },
   "dependencies": {
     "next": "16.4.3",
@@ -20,7 +21,8 @@
     "react-dom": "19.3.1",
     "@supabase/supabase-js": "2.118.0",
     "@supabase/ssr": "0.12.7",
-    "jszip": "^3.10.2"
+    "jszip": "^3.10.2",
+    "exceljs": "4.4.0"
   },
   "devDependencies": {
     "typescript": "^5.9.0",
