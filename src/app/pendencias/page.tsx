@@ -4,10 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AvisoDemo } from "@/components/Elementos";
 import { categorias, meses, pessoas, ranking, type Avaliacao } from "@/lib/dados-demo";
-import { exportarCsv } from "@/lib/exportar";
+import { exportarPendenciasXlsx, type LinhaPendenciaExcel, type TipoEstrela } from "@/lib/exportar-pendencias-xlsx";
 import { carregarFontesDemo, fonteFilial, type FonteDirigibilidade } from "@/lib/fontes-dirigibilidade";
 import { atendeTipoPendencia, identificarPendencias, nomesPendencia, opcoesPendencia, rotulosPendencias, type TipoPendencia } from "@/lib/tipos-pendencia";
 import "./pendencias.css";
+import "./exportacao-xlsx.css";
 
 type Ordenar = "nome" | "matricula" | "filial" | "segmento" | "pendencias";
 const PALETA: Record<Exclude<TipoPendencia, "">, string> = {
@@ -31,6 +32,8 @@ export default function Pendencias() {
   const [porPagina, setPorPagina] = useState(8);
   const [detalhe, setDetalhe] = useState<Avaliacao | null>(null);
   const [fontes, setFontes] = useState<Record<string, FonteDirigibilidade>>({});
+  const [exportando, setExportando] = useState(false);
+  const [erroExportacao, setErroExportacao] = useState("");
 
   useEffect(() => {
     const atualizar = () => setFontes(carregarFontesDemo());
@@ -77,22 +80,55 @@ export default function Pendencias() {
   function limpar() {
     setMes(3); setTipo(""); setCategoria(""); setFilial(""); setBusca("");
     setPagina(1); setOrdenacao("nome"); setDirecao("asc");
+    setErroExportacao("");
   }
   function ordenar(coluna: Ordenar) {
     if (ordenacao === coluna) setDirecao(v => v === "asc" ? "desc" : "asc");
     else { setOrdenacao(coluna); setDirecao("asc"); }
     setPagina(1);
   }
-  function exportar() {
-    exportarCsv(`pendencias_${meses[mes].toLowerCase()}_2027_DEMO.csv`, [
-      ["Nome", "Matrícula", "Filial", "Segmento", "Competência", "Pendências", "Fonte configurada de Dirigibilidade", "Situação"],
-      ...faltantes.map(r => [
-        r.pessoa.nome, r.pessoa.matricula, r.pessoa.filial, r.pessoa.categoria ?? "", `${meses[mes]}/2027`,
-        rotulosPendencias(r).join(" | "),
-        r.pessoa.tipo === "Motorista" && identificarPendencias(r).includes("sem-dirigibilidade") ? fonteFilial(r.pessoa.filial, fontes) ?? "Não definida" : "—",
-        "Pendente",
-      ]),
-    ]);
+  async function exportar() {
+    if (exportando) return;
+    setErroExportacao("");
+    setExportando(true);
+    try {
+      const competencia = `${meses[mes]}/2027`;
+      const linhas: LinhaPendenciaExcel[] = faltantes.map(r => {
+        const codigos = identificarPendencias(r);
+        return {
+          nome: r.pessoa.nome,
+          matricula: r.pessoa.matricula,
+          filial: r.pessoa.filial,
+          segmento: r.pessoa.categoria ?? "",
+          competencia,
+          pendencias: rotulosPendencias(r),
+          tipos: codigos.map(c => PALETA[c] as TipoEstrela),
+          fonteDirigibilidade: r.pessoa.tipo === "Motorista" && codigos.includes("sem-dirigibilidade")
+            ? fonteFilial(r.pessoa.filial, fontes) ?? "Não definida"
+            : "—",
+          situacao: "Pendente",
+        };
+      });
+      const ordenacaoTexto: Record<Ordenar, string> = {
+        nome: "Nome", matricula: "Matrícula", filial: "Filial", segmento: "Segmento", pendencias: "Quantidade de pendências",
+      };
+      await exportarPendenciasXlsx({
+        nomeArquivo: `pendencias_${meses[mes].toLowerCase()}_2027_DEMO.xlsx`,
+        linhas,
+        filtros: {
+          competencia,
+          segmento: categoria || "Todos os segmentos",
+          filial: filial || "Todas as filiais",
+          tipo: opcoesPendencia.find(op => op.valor === tipo)?.titulo ?? "Todas as pendências",
+          pesquisa: busca.trim() || "Sem filtro",
+          ordenacao: `${ordenacaoTexto[ordenacao]} · ${direcao === "asc" ? "crescente" : "decrescente"}`,
+        },
+      });
+    } catch (erro) {
+      setErroExportacao(erro instanceof Error ? `Não foi possível gerar o Excel: ${erro.message}` : "Não foi possível gerar o arquivo Excel. Tente novamente.");
+    } finally {
+      setExportando(false);
+    }
   }
 
   return <main className="cp-pagina">
@@ -129,8 +165,11 @@ export default function Pendencias() {
     <section className="cp-card cp-registros" aria-labelledby="cp-titulo-registros">
       <div className="cp-tabela-cabecalho">
         <div className="cp-agrupamento"><span className="cp-secao-icone"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></span><h2 id="cp-titulo-registros">Colaboradores com pendências</h2><span className="cp-contador">{faltantes.length}</span></div>
-        <button type="button" className="cp-btn cp-btn-exportar" onClick={exportar}>↓ <span>Exportar CSV</span></button>
+        <button type="button" className="cp-btn cp-btn-exportar" onClick={exportar} disabled={exportando} aria-busy={exportando}>
+          <span aria-hidden="true">↓</span> <span>{exportando ? "Gerando Excel..." : "Exportar Excel (.xlsx)"}</span>
+        </button>
       </div>
+      {erroExportacao && <p className="cp-erro-exportacao" role="alert">{erroExportacao}</p>}
       <div className="cp-tabela-area"><table className="cp-tabela"><thead><tr>
         {([
           ["nome", "Nome"], ["matricula", "Matrícula"], ["filial", "Filial"], ["segmento", "Segmento"], ["pendencias", "Pendência"],

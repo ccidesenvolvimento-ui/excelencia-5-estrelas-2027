@@ -1,0 +1,3 @@
+/* v1.0 — feedback da exportação Excel. */
+.cp-btn-exportar:disabled{opacity:.65;cursor:progress;background:#0b547d}
+.cp-erro-exportacao{margin:12px 20px;padding:12px 15px;border-radius:8px;color:#ffe0e2;background:#64263b;border:1px solid #e16685;font-size:12px}
