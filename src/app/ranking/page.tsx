@@ -17,126 +17,78 @@ type RelatorioVisualProps = {
   ordem:Ordem;
   busca:string;
   limite:number;
-  listaTotal:number;
-  elegiveisTotal:number;
-  pendentes:number;
+  participantes:number;
+  elegiveis:number;
   relatorio:Avaliacao[];
   colunas:string[];
   geradoEm:string;
-  scoreMedio:number|null;
-  melhorScore:number|null;
 };
 
 const nomePeriodo = (periodo:Periodo,mes:number) => `${periodos.find(p=>p.id===periodo)?.nome??periodo}${periodo==="mensal" ? ` · ${meses[mes]}/2027`:" · 2027"}`;
 const textoOrdenacao = (ordem:Ordem) => ordem==="maior" ? "Score: maior primeiro" : "Score: menor primeiro";
-const medalhas = ["Ouro","Prata","Bronze"] as const;
-const estilosMedalha = ["ouro","prata","bronze"] as const;
+const medalhas = ["1º lugar","2º lugar","3º lugar"] as const;
 
-function RelatorioVisual({base,categoria,periodo,periodoTexto,contexto,filial,ordem,busca,limite,listaTotal,elegiveisTotal,pendentes,relatorio,colunas,geradoEm,scoreMedio,melhorScore}:RelatorioVisualProps){
-  const topTres=relatorio.filter(item=>item.posicao!==null && item.posicao<=3).sort((a,b)=>(a.posicao??0)-(b.posicao??0));
+function RelatorioVisual({base,categoria,periodo,periodoTexto,contexto,filial,ordem,busca,limite,participantes,elegiveis,relatorio,colunas,geradoEm}:RelatorioVisualProps){
+  const topTres=relatorio.slice(0,3);
   return <div className="mod-report-page">
-    <section className="mod-report-hero">
-      <div className="mod-report-branding">
-        <div className="mod-report-simbolo"><img src={`${base}/estrela-oficial-5-estrelas.png`} alt="Símbolo do Programa 5 Estrelas"/></div>
-        <div className="mod-report-brand-copy">
-          <img className="mod-report-logo" src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas 2027"/>
-          <span className="mod-report-kicker">Relatório visual de ranking</span>
-          <h3>{categoria} · Top {limite}</h3>
-          <p>{contexto}</p>
+    <section className="mod-report-hero compact">
+      <div className="mod-report-hero-main">
+        <div className="mod-report-branding compact">
+          <div className="mod-report-simbolo"><img src={`${base}/estrela-oficial-5-estrelas.png`} alt="Símbolo do Programa 5 Estrelas"/></div>
+          <div className="mod-report-brand-copy">
+            <img className="mod-report-logo" src={`${base}/marca-programa.png`} alt="Programa 5 Estrelas 2027"/>
+            <span className="mod-report-kicker">Relatório visual de ranking</span>
+            <h3>{categoria} · Top {limite}</h3>
+            <p>{periodoTexto} · {filial||"Todas as filiais"}</p>
+          </div>
+        </div>
+        <div className="mod-report-hero-tags">
+          <span className="mod-report-badge">DEMO · NÃO OFICIAL</span>
+          <span className="mod-report-chip">{textoOrdenacao(ordem)}</span>
+          {busca && <span className="mod-report-chip">Busca: {busca}</span>}
         </div>
       </div>
-      <div className="mod-report-hero-side">
-        <span className="mod-report-badge">DEMO · NÃO OFICIAL</span>
-        <strong>Classificação e desempenho</strong>
-        <small>Gerado em {geradoEm}</small>
+      <div className="mod-report-meta-stack">
+        <div className="mod-report-meta-box"><span>Participantes</span><strong>{participantes}</strong></div>
+        <div className="mod-report-meta-box destaque"><span>Elegíveis</span><strong>{elegiveis}</strong></div>
+        <div className="mod-report-meta-box mini"><span>Gerado em</span><strong>{geradoEm}</strong></div>
       </div>
     </section>
 
-    <section className="mod-report-summary-grid">
-      <article className="mod-report-summary-card">
-        <span>Participantes visíveis</span>
-        <strong>{listaTotal}</strong>
-        <small>Registros encontrados para os filtros atuais</small>
-      </article>
-      <article className="mod-report-summary-card destaque">
-        <span>Elegíveis no relatório</span>
-        <strong>{relatorio.length}</strong>
-        <small>Posições oficiais até o Top {limite}</small>
-      </article>
-      <article className="mod-report-summary-card">
-        <span>Score médio do recorte</span>
-        <strong>{formatarNota(scoreMedio)}</strong>
-        <small>Média dos elegíveis exibidos na saída</small>
-      </article>
-      <article className="mod-report-summary-card">
-        <span>Melhor score</span>
-        <strong>{formatarNota(melhorScore)}</strong>
-        <small>Maior resultado elegível encontrado</small>
-      </article>
-    </section>
-
-    <section className="mod-report-meta-grid">
-      <div className="mod-report-meta-item"><span>Período</span><strong>{periodoTexto}</strong></div>
-      <div className="mod-report-meta-item"><span>Segmento</span><strong>{categoria}</strong></div>
-      <div className="mod-report-meta-item"><span>Filial</span><strong>{filial||"Todas as filiais"}</strong></div>
-      <div className="mod-report-meta-item"><span>Ordenação</span><strong>{textoOrdenacao(ordem)}</strong></div>
-    </section>
-
-    <section className="mod-report-section">
-      <div className="mod-report-section-head">
-        <div>
-          <span className="mod-sobre-titulo">RESUMO EXECUTIVO</span>
-          <h4>Leitura do recorte aplicado</h4>
-        </div>
-        <p>Este relatório usa os mesmos filtros do ranking. Filtrar por nome ou filial reduz a visualização, mas não recalcula posições oficiais fora desse recorte.</p>
-      </div>
-      <div className="mod-report-note-grid">
-        <article className="mod-report-note">
-          <strong>Visão do segmento</strong>
-          <p>{elegiveisTotal} colaboradores elegíveis e {pendentes} pendentes neste segmento, considerando os filtros ativos.</p>
-        </article>
-        <article className="mod-report-note">
-          <strong>Critério de saída</strong>
-          <p>Somente elegíveis com posição oficial entram na saída. O relatório destaca até o Top {limite} do segmento selecionado.</p>
-        </article>
-        <article className="mod-report-note">
-          <strong>Busca aplicada</strong>
-          <p>{busca ? `Filtro de colaborador ativo: ${busca}.` : "Nenhum filtro por colaborador foi aplicado neste relatório."}</p>
-        </article>
-      </div>
-    </section>
-
-    {!!topTres.length&&<section className="mod-report-section">
-      <div className="mod-report-section-head">
+    {!!topTres.length && <section className="mod-report-section slim">
+      <div className="mod-report-section-head compact">
         <div>
           <span className="mod-sobre-titulo">DESTAQUES</span>
           <h4>Pódio do ranking</h4>
         </div>
-        <p>Os melhores colocados do recorte oficial aparecem em destaque para facilitar leitura gerencial e apresentação executiva.</p>
       </div>
-      <div className="mod-report-podium">
-        {topTres.map(registro=><article key={registro.pessoa.id} className={`mod-report-podium-card ${estilosMedalha[(registro.posicao??1)-1]??""}`}>
-          <div className="mod-report-podium-topo">
-            <span className="mod-report-podium-medalha">{medalhas[(registro.posicao??1)-1]??`${registro.posicao}º lugar`}</span>
+      <div className="mod-report-podium compact">
+        {topTres.map((registro,indice)=><article key={registro.pessoa.id} className={`mod-report-podium-card card-${indice+1}`}>
+          <div className="mod-report-podium-head">
+            <span>{medalhas[indice]??`${registro.posicao}º lugar`}</span>
             <strong>{registro.posicao}º</strong>
           </div>
           <h5>{registro.pessoa.nome}</h5>
-          <p>{registro.pessoa.filial} · Matrícula {registro.pessoa.matricula}</p>
-          <div className="mod-report-podium-score">
-            <span>Score médio</span>
-            <b>{formatarNota(registro.score)}</b>
-          </div>
+          <p>{registro.pessoa.filial} · {registro.pessoa.matricula}</p>
+          <div className="mod-report-podium-score"><small>Score médio</small><b>{formatarNota(registro.score)}</b></div>
         </article>)}
       </div>
     </section>}
 
-    <section className="mod-report-section">
-      <div className="mod-report-section-head">
+    <section className="mod-report-section slim">
+      <div className="mod-report-section-head compact">
         <div>
-          <span className="mod-sobre-titulo">DETALHAMENTO</span>
-          <h4>Classificação completa do relatório</h4>
+          <span className="mod-sobre-titulo">CLASSIFICAÇÃO</span>
+          <h4>Top {limite} oficial do recorte</h4>
         </div>
-        <p>As colunas seguem a lógica da tela principal: ciclos mensais exibem as cinco estrelas; anual mostra a evolução por mês e o score médio consolidado.</p>
+      </div>
+      <div className="mod-relatorio-topo">
+        <div className="mod-relatorio-topo-esq">
+          <span className="mod-report-chip">{categoria}</span>
+          <span className="mod-report-chip">{periodoTexto}</span>
+          <span className="mod-report-chip">{filial||"Todas as filiais"}</span>
+        </div>
+        <p>Somente participantes elegíveis com posição oficial aparecem na saída visual.</p>
       </div>
       <div className="tabela-scroll mod-relatorio-local mod-relatorio-tematico">
         <table className="tabela">
@@ -167,15 +119,9 @@ function RelatorioVisual({base,categoria,periodo,periodoTexto,contexto,filial,or
       </div>
     </section>
 
-    <section className="mod-report-footer-grid">
-      <article className="mod-report-footer-card">
-        <strong>Observações importantes</strong>
-        <p>Pendentes não entram no ranking, inelegíveis não recebem posição oficial e este ambiente continua marcado como demonstração, com dados fictícios.</p>
-      </article>
-      <article className="mod-report-footer-card">
-        <strong>Uso recomendado</strong>
-        <p>Utilize a opção “Salvar como PDF” para gerar uma versão visual para apresentação. O CSV permanece disponível para tratamento em Excel.</p>
-      </article>
+    <section className="mod-report-footer-line">
+      <span>Dados fictícios gerados para testes de interface e regras de negócio.</span>
+      <span>Programa Excelência 5 Estrelas 2027 · {contexto}</span>
     </section>
   </div>;
 }
@@ -188,7 +134,7 @@ export default function Ranking(){
  const [ordem,setOrdem]=useState<Ordem>("maior");
  const [busca,setBusca]=useState("");
  const [relatorioAberto,setRelatorioAberto]=useState(false);
- const [limite,setLimite]=useState(20);
+ const [limite,setLimite]=useState(10);
  const base=process.env.NEXT_PUBLIC_BASE_PATH ?? "";
  const filiais=useMemo(()=>[...new Set(pessoas.filter(p=>p.categoria===categoria).map(p=>p.filial))].sort((a,b)=>a.localeCompare(b,"pt-BR")),[categoria]);
  const todos=useMemo(()=>ranking(periodo,mes),[periodo,mes]);
@@ -201,13 +147,10 @@ export default function Ranking(){
  const colunas=periodo==="anual"?meses.slice(categoria==="Sucro"?2:0,categoria==="Sucro"?11:12):estrelas.map(e=>rotuloEstrela(e,categoria));
  const periodoTexto=nomePeriodo(periodo,mes);
  const contexto=`${periodoTexto} · ${categoria} · ${filial||"Todas as filiais"}`;
- const scoreMedioRelatorio=useMemo(()=>relatorio.length?Math.round(relatorio.reduce((soma,item)=>soma+(item.score??0),0)/relatorio.length*100)/100:null,[relatorio]);
- const melhorScore=relatorio.length?Math.max(...relatorio.map(item=>item.score??0)):null;
- const [geradoEm,setGeradoEm]=useState("Aguardando geração");
+ const geradoEm=useMemo(()=>new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(new Date()),[periodoTexto,categoria,filial,ordem,busca,limite,relatorio.length]);
 
  useEffect(()=>{
   if(!relatorioAberto)return;
-  setGeradoEm(new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(new Date()));
   const tecla=(e:KeyboardEvent)=>{if(e.key==="Escape")setRelatorioAberto(false)};
   window.addEventListener("keydown",tecla);
   return ()=>window.removeEventListener("keydown",tecla);
@@ -240,7 +183,7 @@ export default function Ranking(){
      <div className="campo"><label htmlFor="rank-busca">Colaborador</label><input id="rank-busca" type="search" placeholder="Nome ou matrícula" value={busca} onChange={e=>setBusca(e.target.value)}/></div>
    </div>
    <div className="mod-grid-estatisticas">
-      <div className="mod-estatistica"><small>Visíveis no ranking</small><strong>{lista.length}</strong><span>Para os filtros atuais</span></div>
+      <div className="mod-estatistica"><small>Visíveis no ranking</small><strong>{lista.length}</strong><span>Participantes para os filtros atuais</span></div>
       <div className="mod-estatistica verde"><small>Elegíveis</small><strong>{elegiveis.length}</strong><span>Com posição oficial</span></div>
       <div className="mod-estatistica vermelho"><small>Inelegíveis</small><strong>{inelegiveis.length}</strong><span>Sem posição</span></div>
       <div className="mod-estatistica amarelo"><small>Pendentes</small><strong>{pendentes}</strong><span>Não entram no ranking</span></div>
@@ -253,15 +196,15 @@ export default function Ranking(){
       </tbody></table></div>
       <p className="nota-rodape">Ciclos: médias dos cinco pilares. Anual: pontuações mensais e Score Médio. O segmento Sucro usa mar–nov. A posição não muda ao filtrar ou inverter a ordenação. Férias ainda não são estimadas nesta demonstração.</p>
    </section>
-   {relatorioAberto&&<div className="mod-report-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setRelatorioAberto(false)}}><div className="mod-report-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio"><header><div><div className="mod-sobre-titulo">RELATÓRIO / PRÉVIA DEMONSTRATIVA</div><h2 id="titulo-relatorio">Relatório visual de Ranking</h2><p>Agora a saída já nasce alinhada à identidade do Programa 5 Estrelas, pronta para apresentação e exportação em PDF pelo navegador.</p></div><button className="mod-fechar" aria-label="Fechar prévia" type="button" onClick={()=>setRelatorioAberto(false)}>×</button></header>
-       <div className="mod-report-filtros"><div className="campo"><label htmlFor="top-n">Limite Top N</label><input id="top-n" min={1} max={500} type="number" value={limite} onChange={e=>setLimite(Math.max(1,Math.min(500,Number(e.target.value)||1)))}/></div><span className="mod-chip">{periodoTexto}</span><span className="mod-chip">{categoria}</span><span className="mod-chip">{filial||"Todas as filiais"}</span><span className="mod-chip">{textoOrdenacao(ordem)}</span>{busca&&<span className="mod-chip">Busca: {busca}</span>}</div>
-       <div className="mod-resumo-filtro"><strong>{relatorio.length} participantes elegíveis nesta prévia.</strong> O layout abaixo representa a identidade visual do relatório e não apenas uma listagem simples.</div>
-       <RelatorioVisual base={base} categoria={categoria} periodo={periodo} periodoTexto={periodoTexto} contexto={contexto} filial={filial} ordem={ordem} busca={busca} limite={limite} listaTotal={lista.length} elegiveisTotal={elegiveis.length} pendentes={pendentes} relatorio={relatorio} colunas={colunas} geradoEm={geradoEm} scoreMedio={scoreMedioRelatorio} melhorScore={melhorScore}/>
-       <p className="mod-report-watermark">Demonstração não oficial. O botão “Salvar como PDF” usa a impressão do navegador e já aplica esta composição visual como base do documento.</p>
+   {relatorioAberto&&<div className="mod-report-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setRelatorioAberto(false)}}><div className="mod-report-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio"><header><div><div className="mod-sobre-titulo">RELATÓRIO / PRÉVIA DEMONSTRATIVA</div><h2 id="titulo-relatorio">Relatório visual de Ranking</h2><p>Saída visual em padrão premium, com o mesmo clima do sistema e pronta para salvar em PDF pelo navegador.</p></div><button className="mod-fechar" aria-label="Fechar prévia" type="button" onClick={()=>setRelatorioAberto(false)}>×</button></header>
+       <div className="mod-report-filtros"><div className="campo"><label htmlFor="top-n">Limite Top N</label><input id="top-n" min={1} max={500} type="number" value={limite} onChange={e=>setLimite(Math.max(1,Math.min(500,Number(e.target.value)||1)))}/></div><span className="mod-chip">{periodoTexto}</span><span className="mod-chip">{categoria}</span><span className="mod-chip">{filial||"Todas as filiais"}</span>{busca&&<span className="mod-chip">Busca: {busca}</span>}</div>
+       <div className="mod-resumo-filtro"><strong>{relatorio.length} participantes elegíveis nesta prévia.</strong> O PDF agora segue o padrão escuro e visual do restante do sistema.</div>
+       <RelatorioVisual base={base} categoria={categoria} periodo={periodo} periodoTexto={periodoTexto} contexto={contexto} filial={filial} ordem={ordem} busca={busca} limite={limite} participantes={lista.length} elegiveis={elegiveis.length} relatorio={relatorio} colunas={colunas} geradoEm={geradoEm}/>
+       <p className="mod-report-watermark">Demonstração não oficial. Se o navegador mostrar a opção, mantenha a impressão com “gráficos em segundo plano” ativada para preservar o visual completo.</p>
        <div className="mod-report-botao"><button className="botao botao-claro" type="button" onClick={()=>setRelatorioAberto(false)}>Voltar ao ranking</button><button className="botao botao-secundario" type="button" onClick={csv}>↓ Exportar CSV</button><button className="botao" type="button" onClick={imprimir}>▤ Salvar como PDF</button></div>
        </div></div>}
    <section id="relatorio-impressao" className="mod-report-print" aria-label="Relatório pronto para impressão">
-      <RelatorioVisual base={base} categoria={categoria} periodo={periodo} periodoTexto={periodoTexto} contexto={contexto} filial={filial} ordem={ordem} busca={busca} limite={limite} listaTotal={lista.length} elegiveisTotal={elegiveis.length} pendentes={pendentes} relatorio={relatorio} colunas={colunas} geradoEm={geradoEm} scoreMedio={scoreMedioRelatorio} melhorScore={melhorScore}/>
+      <RelatorioVisual base={base} categoria={categoria} periodo={periodo} periodoTexto={periodoTexto} contexto={contexto} filial={filial} ordem={ordem} busca={busca} limite={limite} participantes={lista.length} elegiveis={elegiveis.length} relatorio={relatorio} colunas={colunas} geradoEm={geradoEm}/>
    </section>
  </>;
 }
