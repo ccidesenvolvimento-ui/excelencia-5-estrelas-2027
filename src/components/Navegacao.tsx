@@ -14,6 +14,7 @@ const itens: ItemMenu[] = [
   { url: "/rh0034", titulo: "Cadastro RH0034", icone: "rh" },
   { url: "/configuracoes", titulo: "Configurações", icone: "configuracoes" },
   { url: "/diagnostico", titulo: "Testes e erros", icone: "diagnostico" },
+  { url: "/motorista", titulo: "Portal do motorista", icone: "rh" },
 ];
 const CHAVE_MENU = "excelencia-5-estrelas-sidebar-modo-v05";
 type ModoMenu = "flutuante" | "fixo";
@@ -47,6 +48,9 @@ export function Navegacao({ children }: { children: ReactNode }) {
     setExpansaoTemporaria(false);
     try { window.localStorage.setItem(CHAVE_MENU, proximo); } catch { /* armazenamento indisponível */ }
   }
+
+  // A rota pública tem experiência independente e mobile-first, sem o painel administrativo.
+  if(caminho === "/motorista" || caminho.startsWith("/motorista/") || (base && (caminho===`${base}/motorista` || caminho.startsWith(`${base}/motorista/`)))) return <>{children}</>;
 
   return <div className={`app-shell ${flutuante ? "nav-recolhida" : "nav-fixa"} ${flutuante && expansaoTemporaria ? "nav-hover" : ""}`}>
     <aside
