@@ -1,5 +1,5 @@
 // Testes estáticos de integração da navegação e exportações, sem dependências externas.
-// Atualização v1.0.1: pendências são exportadas em XLSX, não CSV.
+// Atualização v1.1.2: valida a exportação XLSX com ExcelJS e a lista filtrada.
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.join(__dirname, '..');
@@ -32,9 +32,10 @@ const resultados = [
     pendencias.includes('const linhas: LinhaPendenciaExcel[] = faltantes.map') &&
     pendencias.includes('await exportarPendenciasXlsx(') &&
     pendencias.includes('Exportar Excel (.xlsx)') &&
-    exportadorPendencias.includes('criarFolhaResumo(') &&
-    exportadorPendencias.includes('criarFolhaPendencias(') &&
-    Boolean(pacote.dependencies && pacote.dependencies.jszip)
+    exportadorPendencias.includes('criarBufferPendenciasXlsx(') &&
+    exportadorPendencias.includes('new ExcelJS.Workbook()') &&
+    exportadorPendencias.includes('livro.xlsx.writeBuffer()') &&
+    Boolean(pacote.dependencies && pacote.dependencies.exceljs)
  ],
  ['Design transversal está presente', css.includes('.cabecalho-premium') && css.includes('.mod-grid-estatisticas')],
  ['Rotas antigas encaminham para destinos novos', read('src/app/painel/page.tsx').includes('router.replace("/")') && read('src/app/relatorios/page.tsx').includes('router.replace("/ranking")') && read('src/app/usuarios/page.tsx').includes('router.replace("/configuracoes#usuarios")')]
