@@ -31,6 +31,10 @@ const server = http.createServer((req,res)=>{
   assert.equal(original.length,12);assert.ok(original.every(x=>/^\d+,\d{2}$/.test(x)));
   const boxes=await labels.evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}}));
   for(let i=1;i<boxes.length;i++)assert.ok(boxes[i].left>boxes[i-1].right,'Rótulos não se sobrepõem');
+  if(nome==='desktop'){
+   const area=await chart.boundingBox();
+   assert.ok(boxes.every(b=>b.left>=area.x&&b.right<=area.x+area.width),'Os 12 rótulos cabem no desktop');
+  }
   const scores=await page.locator('[class*="segmentoGrafico"] > strong').allTextContents();
   const values=scores.filter(x=>x!=='—').map(x=>Number(x.replace(',','.')));
   assert.deepEqual(values,[...values].sort((a,b)=>b-a));
@@ -71,20 +75,16 @@ const server = http.createServer((req,res)=>{
   console.log(`✓ ${nome} ${width}x${height}: filtros, ordem, rótulos sem colisão, configurações, detalhes e XLSX.`);
   await page.close();
  }
- const modelo=new ExcelJS.Workbook();await modelo.xlsx.readFile('public/modelos/Modelo_Dirigibilidade_2027.xlsx');
- assert.ok(modelo.worksheets.some(ws=>JSON.stringify(ws.getSheetValues()).includes('TIPO DE DADO')));
+ // O modelo original usa prefixos XML válidos que o leitor ExcelJS não suporta.
+ const zip=await require('jszip').loadAsync(fs.readFileSync('public/modelos/Modelo_Dirigibilidade_2027.xlsx'));
+ const {SaxesParser}=require('saxes');
+ let temFonte=false;
+ for(const file of zip.file(/^xl\/worksheets\/sheet\d+\.xml$/)){
+  const parser=new SaxesParser({xmlns:true});
+  parser.on('text',text=>{if(text==='TIPO DE DADO')temFonte=true;});
+  parser.write(await file.async('string')).close();
+ }
+ assert.ok(temFonte,'Modelo mantém a coluna TIPO DE DADO');
  console.log('✓ Modelo Dirigibilidade mantém coluna TIPO DE DADO.');
-  }catch(error){
-  // Em falhas de hidratação, a versão de desenvolvimento fornece o diff real.
-  const {spawn}=require('node:child_process');
-  const dev=spawn(process.execPath,['node_modules/next/dist/bin/next','dev','--hostname','127.0.0.1','-p','4175'],{env:{...process.env,NEXT_PUBLIC_DEPLOY_TARGET:'github-pages',NEXT_PUBLIC_BASE_PATH:base},stdio:'pipe'});
-  try{
-   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Timeout no diagnóstico')),30000);dev.stdout.on('data',b=>{if(b.toString().includes('Ready')){clearTimeout(timer);resolve();}});dev.once('error',reject);});
-   const diagnostic=await browser.newPage();
-   diagnostic.on('console',m=>{if(m.type()==='error')console.error('DIAGNÓSTICO',m.text());});
-   diagnostic.on('pageerror',e=>console.error('DIAGNÓSTICO',diagnostic.url(),e.message));
-   for(const route of ['/','/configuracoes/','/pendencias/']){await diagnostic.goto(`http://127.0.0.1:4175${base}${route}`);await diagnostic.waitForLoadState('networkidle');}
-  }catch(diagnosticError){console.error(diagnosticError);}finally{dev.kill();}
-  throw error;
- }finally{await browser.close();server.close();}
+  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
