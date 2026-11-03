@@ -1,4 +1,4 @@
-/* Regressão v0.9: pendências, tipo único e fonte configurada por filial. */
+/* Regressão v0.9: pendências, tipo único e fonte da avaliação. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -34,9 +34,8 @@ assert.ok(d.pessoas.every(x=>['Motorista','Operador'].includes(x.tipo)));
 assert.equal(d.pessoas.some(x=>x.id==='m018'),false);
 assert.equal(d.pessoas.some(x=>x.id==='m038'),true);
 assert.equal(d.ranking('mensal',3).filter(r=>r.pessoa.categoria==='Florestal'&&r.posicao!==null&&r.posicao<=20).length,20);
-assert.equal(fontes.fonteFilial('Contagem',fontes.FONTES_DEMO_INICIAIS),'IDT');
-const alteradas={...fontes.FONTES_DEMO_INICIAIS,Contagem:'Maxtrack'};
-assert.equal(fontes.fonteFilial('Contagem',alteradas),'Maxtrack');
-assert.equal(fontes.fonteFilial('Contagem',{}),null);
-assert.deepEqual(fontes.validarFontes({Contagem:'IDT',Jataí:'Outra',Lavras:'Gobrax'}),{Contagem:'IDT',Lavras:'Gobrax'});
-console.log('✓ v0.9: 17 verificações de opções, tipos, filtros, fonte por filial, regressão do Top 20 e elenco.');
+assert.equal(fontes.fonteDaAvaliacao({pessoa:{tipo:'Motorista'},fonteDirigibilidade:'IDT'}),'IDT');
+assert.equal(fontes.fonteDaAvaliacao({pessoa:{tipo:'Motorista'},fonteDirigibilidade:'Maxtrack'}),'Maxtrack');
+assert.equal(fontes.fonteDaAvaliacao({pessoa:{tipo:'Motorista'}}),'Não informada');
+assert.equal(fontes.fonteDaAvaliacao({pessoa:{tipo:'Operador'}}),'Critério próprio dos operadores');
+console.log('✓ v0.9: 17 verificações de opções, tipos, filtros, fonte da avaliação, regressão do Top 20 e elenco.');

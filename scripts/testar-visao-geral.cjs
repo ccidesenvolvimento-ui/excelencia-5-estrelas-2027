@@ -1,0 +1,44 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('typescript');
+require.extensions['.ts'] = (mod, file) => mod._compile(ts.transpileModule(fs.readFileSync(file, 'utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,file);
+const d = require('../src/lib/dados-demo.ts');
+const v = require('../src/lib/indicadores-visao-geral.ts');
+const fonte = require('../src/lib/fontes-dirigibilidade.ts');
+const registro = (categoria, score, status='Elegível') => ({pessoa:{categoria},score,status});
+const amostra = [registro('Florestal',100),registro('Florestal',0,'Inelegível'),registro('Florestal',null,'Pendente'),registro('Bebidas',80),registro('Sucro',null,'Pendente'),registro('Mineração',0,'Inelegível')];
+const ordenados = v.mediasPorSegmento(amostra);
+assert.deepEqual(ordenados.slice(0,3).map(x=>[x.nome,x.media]), [['Bebidas',80],['Florestal',50],['Mineração',0]]);
+assert.ok(ordenados.slice(3).every(x=>x.media===null));
+assert.equal(ordenados.find(x=>x.nome==='Florestal').avaliados,2);
+assert.deepEqual(v.mediasPorSegmento(amostra,'Florestal').map(x=>x.media),[50]);
+assert.equal(v.mediaCompleta(amostra),45);
+assert.equal(v.mediaCompleta([registro('Bebidas',0,'Inelegível')]),0);
+assert.equal(v.mediaCompleta([registro('Bebidas',null,'Pendente')]),null);
+assert.equal(v.mediaCompleta([]),null);
+assert.equal(v.mediaCompleta([registro('Bebidas',undefined),registro('Bebidas',NaN),registro('Bebidas',100)]),100);
+let meses=[];
+assert.deepEqual(v.evolucaoGeral(i=>{meses.push(i);return i===0?amostra:[]}),[45,...Array(11).fill(null)]);
+assert.deepEqual(meses,Array.from({length:12},(_,i)=>i));
+const serie = v.evolucaoGeral();
+for(let i=0;i<12;i++){
+ const completos=d.ranking('mensal',i).filter(r=>r.status!=='Pendente'&&r.score!==null);
+ assert.equal(serie[i],completos.reduce((s,r)=>s+r.score,0)/completos.length);
+ const filtrados=d.ranking('mensal',i).filter(r=>r.pessoa.filial==='Lavras');
+ v.mediasPorSegmento(filtrados,'Florestal');
+ assert.deepEqual(v.evolucaoGeral(),serie);
+}
+assert.equal(d.formatarNota(89.5),'89,50');
+// Duas avaliações na mesma filial podem ter fontes distintas; não há fallback por filial.
+for(const f of ['IDT','Gobrax','Maxtrack']) assert.equal(fonte.fonteDaAvaliacao({pessoa:{tipo:'Motorista',filial:'Lavras'},fonteDirigibilidade:f}),f);
+global.window={localStorage:{getItem(){throw Error('Configuração antiga não deve ser lida')}}};
+assert.equal(fonte.fonteDaAvaliacao({pessoa:{tipo:'Motorista',filial:'Lavras'}}),'Não informada');
+delete global.window;
+const home=fs.readFileSync('src/app/page.tsx','utf8');
+const config=fs.readFileSync('src/app/configuracoes/page.tsx','utf8');
+const pend=fs.readFileSync('src/app/pendencias/page.tsx','utf8');
+assert.ok(home.includes('const evolucao = evolucaoGeral();'));
+assert.ok(!config.includes('ConfiguracaoFontes')&&!config.includes('#fontes-dirigibilidade'));
+assert.ok(!pend.includes('fonteFilial')&&!pend.includes('#fontes-dirigibilidade'));
+assert.ok(config.includes('Pesos dos cinco pilares')&&config.includes('Usuários e acessos')&&config.includes('Segurança e auditoria'));
+console.log('✓ Visão Geral: ordenação, ausências, zero, inelegíveis, 12 médias gerais, filtros independentes e fonte por avaliação.');
