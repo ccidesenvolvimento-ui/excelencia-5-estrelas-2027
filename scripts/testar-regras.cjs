@@ -26,5 +26,46 @@ const checks = [
   ['Notas 0 a 100', () => assert.ok(d.pessoas.every(p=>Array.from({length:12},(_,mes)=>Object.values(d.notasDe(p,mes)).every(n=>n>=0&&n<=100)).every(Boolean)))],
   ['Top 20 da amostra de abril', () => {const t=d.ranking('mensal',3).filter(r=>r.pessoa.categoria==='Florestal'&&r.posicao!==null&&r.posicao<=20);assert.equal(t.length,20)}],
   ['Posições calculadas por categoria', () => {const a=d.ranking('mensal',0).filter(r=>r.pessoa.categoria==='Florestal'&&r.status==='Elegível');assert.equal(new Set(a.map(r=>r.posicao)).size,a.length)}],
+  ['Desempate prioriza admissão mais antiga', () => {
+    const antigo = { pessoa: { ...pessoa('m001'), dataAdmissao: '2010-01-15' }, score: 90 };
+    const novo = { pessoa: { ...pessoa('m002'), dataAdmissao: '2020-01-15' }, score: 90 };
+    const resultado = [novo, antigo].sort(d.compararRanking);
+    assert.deepEqual(resultado.map(r => r.pessoa.id), ['m001', 'm002']);
+  }],
+
+  ['Maior score tem prioridade sobre tempo de casa', () => {
+    const antigo = { pessoa: { ...pessoa('m001'), dataAdmissao: '2010-01-15' }, score: 85 };
+    const novo = { pessoa: { ...pessoa('m002'), dataAdmissao: '2020-01-15' }, score: 95 };
+    const resultado = [antigo, novo].sort(d.compararRanking);
+    assert.deepEqual(resultado.map(r => r.pessoa.id), ['m002', 'm001']);
+  }],
+
+  ['Admissão ausente não vence empate', () => {
+    const semData = { pessoa: { ...pessoa('m001'), dataAdmissao: null }, score: 90 };
+    const comData = { pessoa: { ...pessoa('m002'), dataAdmissao: '2018-01-15' }, score: 90 };
+    const resultado = [semData, comData].sort(d.compararRanking);
+    assert.deepEqual(resultado.map(r => r.pessoa.id), ['m002', 'm001']);
+  }],
+
+  ['Admissões iguais possuem desempate estável', () => {
+    const a = { pessoa: { ...pessoa('m001'), dataAdmissao: '2015-01-15' }, score: 90 };
+    const b = { pessoa: { ...pessoa('m002'), dataAdmissao: '2015-01-15' }, score: 90 };
+    assert.ok(d.compararRanking(a, b) < 0);
+    assert.ok(d.compararRanking(b, a) > 0);
+  }],
+
+  ['Ranking mensal, ciclos e anual respeitam a classificação', () => {
+    for (const periodo of d.periodos.map(p => p.id)) {
+      const lista = d.ranking(periodo, 3).filter(r =>
+        r.pessoa.categoria === 'Florestal' && r.status === 'Elegível'
+      );
+      assert.ok(lista.length > 1);
+      for (let i = 1; i < lista.length; i++) {
+        assert.ok(d.compararRanking(lista[i - 1], lista[i]) <= 0);
+        assert.equal(lista[i].posicao, i + 1);
+      }
+    }
+  }],
+
 ];
 let failed=0;for(const [label,run] of checks){try{run();console.log('✓',label)}catch(e){failed++;console.error('✗',label,e.message)}}console.log(`\n${checks.length-failed}/${checks.length} verificações aprovadas`);if(failed)process.exit(1);
