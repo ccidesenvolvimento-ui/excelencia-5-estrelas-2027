@@ -14,7 +14,7 @@ export function rotuloEstrela(e:Estrela,categoria:Categoria|null):string {
  if(categoria==="Operadores de Máquinas e Tratores") {if(e==="dirigibilidade")return "Eficiência Operacional";if(e==="jornada")return "Conservação/Operação";}
  return rotulos[e];
 }
-export type Pessoa = { id:string; nome:string; matricula:string; empresa:string; filial:string; categoria:Categoria|null; funcao:string; situacao:"Ativo"|"Férias"|"Desligado"; tipo:"Motorista"|"Operador" };
+export type Pessoa = { id:string; nome:string; matricula:string; empresa:string; filial:string; categoria:Categoria|null; funcao:string; situacao:"Ativo"|"Férias"|"Desligado"; tipo:"Motorista"|"Operador"; dataAdmissao?:string|null };
 export const pessoas:Pessoa[] = [
 ["m001","Ana Ribeiro","F001","E01","Lavras",0,"Motorista","Ativo","Motorista"],
 ["m002","Bruno Lima","F002","E01","Lavras",0,"Motorista","Ativo","Motorista"],
@@ -57,7 +57,10 @@ export const pessoas:Pessoa[] = [
 ].map(([id,nome,matricula,empresa,filial,categoria,funcao,situacao,tipo])=>({
  id:String(id),nome:String(nome),matricula:String(matricula),empresa:String(empresa),filial:String(filial),
  categoria:typeof categoria==="number"?categorias[categoria]:null,funcao:String(funcao),
- situacao:situacao as Pessoa["situacao"],tipo:tipo as Pessoa["tipo"]
+ situacao:situacao as Pessoa["situacao"],tipo:tipo as Pessoa["tipo"],
+ // Datas sintéticas exclusivamente para a demonstração pública.
+ // Em produção, a data oficial deverá ser importada da RH0034.
+ dataAdmissao: `${2004 + (Number(String(id).slice(1)) * 7) % 20}-${String(1 + Number(String(id).slice(1)) % 12).padStart(2,"0")}-15`
 }));
 export type Notas = Partial<Record<Estrela,number>>;
 export const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -103,12 +106,32 @@ export function avaliarPessoa(pessoa:Pessoa,periodo:Periodo,mes=0):Avaliacao{
  const notas:Object=Object.fromEntries(estrelas.map(e=>[e,amostras.every(n=>n[e]!==undefined)?Math.round(amostras.reduce((s,n)=>s+(n[e]??0),0)/amostras.length*100)/100:undefined]));
  return {pessoa,notas:notas as Notas,score,status:faltantes.length?"Pendente":inseguro?"Inelegível":"Elegível",posicao:null,faltantes,mensais};
 }
+/** Prioridade oficial: score > admissão mais antiga > chave estável. */
+export function compararRanking(a:Avaliacao,b:Avaliacao,scoreCrescente=false):number {
+  const scoreA=a.score??-1;
+  const scoreB=b.score??-1;
+  const diferenca=scoreCrescente?scoreA-scoreB:scoreB-scoreA;
+  if(diferenca!==0)return diferenca;
+
+  // Datas ISO AAAA-MM-DD podem ser comparadas lexicalmente.
+  const dataA=a.pessoa.dataAdmissao??null;
+  const dataB=b.pessoa.dataAdmissao??null;
+
+  if(dataA&&dataB&&dataA!==dataB)return dataA.localeCompare(dataB);
+  if(dataA&&!dataB)return -1;
+  if(!dataA&&dataB)return 1;
+
+  // Se ambos tiverem a mesma admissão, desempate apenas técnico.
+  return a.pessoa.empresa.localeCompare(b.pessoa.empresa,"pt-BR")
+    || a.pessoa.matricula.localeCompare(b.pessoa.matricula,"pt-BR",{numeric:true})
+    || a.pessoa.id.localeCompare(b.pessoa.id,"pt-BR",{numeric:true});
+}
 /** Posições são calculadas por segmento ANTES de aplicar filtros de filial. */
 export function ranking(periodo:Periodo,mes:number):Avaliacao[]{
  const registros=pessoas.filter(p=>p.categoria!==null&&p.situacao!=="Desligado"&&!(periodo==="mensal"&&p.categoria==="Sucro"&&(mes<2||mes>10))).map(p=>avaliarPessoa(p,periodo,mes));
  const resultado:Avaliacao[]=[];
  for(const categoria of categorias){
-   const setor=registros.filter(r=>r.pessoa.categoria===categoria).sort((a,b)=>(b.score??-1)-(a.score??-1));
+   const setor=registros.filter(r=>r.pessoa.categoria===categoria).sort(compararRanking);
    let pos=0;
    for(const r of setor){if(r.status==="Elegível")r.posicao=++pos; resultado.push(r);}
  }
