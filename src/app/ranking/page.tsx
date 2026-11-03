@@ -2,7 +2,7 @@
 
 import {useEffect,useMemo,useRef,useState} from "react";
 import {AvisoDemo,Cabecalho,Estado,BlocoTitulo} from "@/components/Elementos";
-import {categorias,meses,periodos,pessoas,ranking,formatarNota,estrelas,rotuloEstrela,type Periodo,type Categoria} from "@/lib/dados-demo";
+import {categorias,meses,periodos,pessoas,ranking,compararRanking,formatarNota,estrelas,rotuloEstrela,type Periodo,type Categoria} from "@/lib/dados-demo";
 import {exportarCsv} from "@/lib/exportar";
 import {renderizarPaginasRelatorio, baixarPDFDireto, type DadosRankingPDF} from "@/lib/relatorio-ranking-pdf";
 
@@ -29,7 +29,7 @@ export default function Ranking(){
  const todos=useMemo(()=>ranking(periodo,mes),[periodo,mes]);
  const doSegmento=todos.filter(r=>r.pessoa.categoria===categoria);
  const pendentes=doSegmento.filter(r=>r.status==="Pendente" && (!filial||r.pessoa.filial===filial)).length;
- const lista=useMemo(()=>todos.filter(r=>r.pessoa.categoria===categoria && r.status!=="Pendente" && (!filial||r.pessoa.filial===filial) && `${r.pessoa.nome} ${r.pessoa.matricula}`.toLocaleLowerCase("pt-BR").includes(busca.toLocaleLowerCase("pt-BR"))).sort((a,b)=>ordem==="maior"?(b.score??0)-(a.score??0):(a.score??0)-(b.score??0)),[todos,categoria,filial,busca,ordem]);
+ const lista=useMemo(()=>todos.filter(r=>r.pessoa.categoria===categoria && r.status!=="Pendente" && (!filial||r.pessoa.filial===filial) && `${r.pessoa.nome} ${r.pessoa.matricula}`.toLocaleLowerCase("pt-BR").includes(busca.toLocaleLowerCase("pt-BR"))).sort((a,b)=>compararRanking(a,b,ordem==="menor")),[todos,categoria,filial,busca,ordem]);
  const elegiveis=lista.filter(r=>r.status==="Elegível");
  const inelegiveis=lista.filter(r=>r.status==="Inelegível");
  const relatorio=useMemo(()=>lista.filter(r=>r.status==="Elegível" && r.posicao!==null && r.posicao<=limite),[lista,limite]);
