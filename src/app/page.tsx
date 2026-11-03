@@ -184,7 +184,7 @@ export default function VisaoGeral() {
               <defs><linearGradient id="grafico-degradado" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#49beff" stopOpacity=".25"/><stop offset="1" stopColor="#49beff" stopOpacity="0"/></linearGradient></defs>
               <path d="M24 23 H706 M24 82 H706 M24 141 H706" stroke="#31516d" strokeWidth="1" strokeDasharray="5 8" fill="none"/>
               {linha && <><path d={`${linha} L706 156 L24 156 Z`} fill="url(#grafico-degradado)"/><path d={linha} fill="none" stroke="#51caff" strokeWidth="3" vectorEffect="non-scaling-stroke"/></>}
-              {evolucao.map((v, i) => v === null ? null : <g key={meses[i]}><text className={estilo.graficoValor} x={24 + i * 62} y={141 - v * 1.18 - 12} textAnchor="middle">{formatarNota(v)}</text><circle cx={24 + i * 62} cy={141 - v * 1.18} r="4.2" fill="#071c31" stroke="#67d4ff" strokeWidth="2.5"><title>{meses[i]}: {formatarNota(v)}</title></circle></g>)}
+              {evolucao.map((v, i) => v === null ? null : <g key={meses[i]}><text className={estilo.graficoValor} x={24 + i * 62} y={141 - v * 1.18 - 12} textAnchor="middle">{formatarNota(v)}</text><circle cx={24 + i * 62} cy={141 - v * 1.18} r="4.2" fill="#071c31" stroke="#67d4ff" strokeWidth="2.5"><title>{`${meses[i]}: ${formatarNota(v)}`}</title></circle></g>)}
             </svg>
           </div>
           <div className={estilo.graficoMeses}>{meses.map(m => <span key={m}>{m}</span>)}</div>
