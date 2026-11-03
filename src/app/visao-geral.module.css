@@ -40,3 +40,9 @@
 @media(max-width:730px){.cabecalho{align-items:flex-start}.botaoPrincipal{width:100%;justify-content:center}.titulo{font-size:34px}.filtrosLabel{flex-basis:100%;padding-bottom:3px}.filtroLongo{flex-basis:100%}.resumo{gap:10px}.metrica{padding:16px 14px;min-height:143px}.metricaTitulo{font-size:11px}.metricaNumero{font-size:32px}.metricaDescricao{font-size:10px}.colunaDireita{display:flex}.graficoSituacao{justify-content:space-around;gap:20px}.gradeAtalhos{grid-template-columns:1fr}.atalhosCabecalho>span{display:none}.graficoMeses span{font-size:8px}}
 @media(max-width:450px){.resumo{grid-template-columns:1fr 1fr}.metricaIcone{width:29px;height:29px}.metricaNumero{font-size:29px}.metricaDescricao{line-height:1.4}.painel{padding:17px}.segmentoTitulo strong{font-size:11px}.graficoSituacao{gap:10px}.anel{width:121px;height:121px;min-width:121px}.anelCentro strong{font-size:26px}.legendaSituacao{gap:12px}.legendaSituacao>div{font-size:10px}.alertaDemo{align-items:flex-start}.graficosMeses span{font-size:7px}}
 @media print{.pagina{color:#111}.filtros,.botaoPrincipal,.alertaDemo,.atalhosSecao{display:none}.metrica,.painel{color:#111!important;background:#fff!important;break-inside:avoid}}
+
+/* Mantém espaço para 12 rótulos legíveis, sem comprimir ou sobrepor no celular. */
+.graficoRolagem{overflow-x:auto;overscroll-behavior-x:contain;padding:3px 0 10px}
+.graficoRolagem:focus-visible{outline:2px solid #8fddff;outline-offset:2px}
+.graficoConteudo{min-width:730px}
+.graficoValor{fill:#d9f5ff;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
