@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { AvisoDemo } from "@/components/Elementos";
 import { categorias, meses, pessoas, ranking, type Avaliacao } from "@/lib/dados-demo";
 import { exportarPendenciasXlsx, type LinhaPendenciaExcel, type TipoEstrela } from "@/lib/exportar-pendencias-xlsx";
-import { carregarFontesDemo, fonteFilial, type FonteDirigibilidade } from "@/lib/fontes-dirigibilidade";
+import { fonteDaAvaliacao } from "@/lib/fontes-dirigibilidade";
 import { atendeTipoPendencia, identificarPendencias, nomesPendencia, opcoesPendencia, rotulosPendencias, type TipoPendencia } from "@/lib/tipos-pendencia";
 import "./pendencias.css";
 import "./exportacao-xlsx.css";
@@ -31,20 +30,9 @@ export default function Pendencias() {
   const [pagina, setPagina] = useState(1);
   const [porPagina, setPorPagina] = useState(8);
   const [detalhe, setDetalhe] = useState<Avaliacao | null>(null);
-  const [fontes, setFontes] = useState<Record<string, FonteDirigibilidade>>({});
   const [exportando, setExportando] = useState(false);
   const [erroExportacao, setErroExportacao] = useState("");
 
-  useEffect(() => {
-    const atualizar = () => setFontes(carregarFontesDemo());
-    atualizar();
-    window.addEventListener("storage", atualizar);
-    window.addEventListener("fontes-dirigibilidade-demo-alteradas", atualizar);
-    return () => {
-      window.removeEventListener("storage", atualizar);
-      window.removeEventListener("fontes-dirigibilidade-demo-alteradas", atualizar);
-    };
-  }, []);
   useEffect(() => {
     if (!detalhe) return;
     const fechar = (e: KeyboardEvent) => { if (e.key === "Escape") setDetalhe(null); };
@@ -104,7 +92,7 @@ export default function Pendencias() {
           pendencias: rotulosPendencias(r),
           tipos: codigos.map(c => PALETA[c] as TipoEstrela),
           fonteDirigibilidade: r.pessoa.tipo === "Motorista" && codigos.includes("sem-dirigibilidade")
-            ? fonteFilial(r.pessoa.filial, fontes) ?? "Não definida"
+            ? fonteDaAvaliacao(r)
             : "—",
           situacao: "Pendente",
         };
@@ -137,7 +125,7 @@ export default function Pendencias() {
       <h1>Central de Pendências</h1>
       <p>Acompanhe os colaboradores com avaliações incompletas e identifique os cinco critérios do Programa Excelência 5 Estrelas.</p>
     </div>
-    <AvisoDemo texto="Ambiente público de demonstração: apenas nomes e notas fictícios. Não utilize arquivos corporativos reais. As fontes configuradas por filial são exemplos locais, sem conexão com o RH ou o banco de dados."/>
+    <AvisoDemo texto="Ambiente público de demonstração: apenas nomes e notas fictícios. Não utilize arquivos corporativos reais. Não há importação real nem conexão com o RH ou o banco de dados."/>
 
     <section className="cp-card cp-filtros" aria-labelledby="cp-titulo-filtros">
       <div className="cp-secao-cabecalho"><span className="cp-secao-icone"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 5h16l-6.5 7.5V20l-3-2v-5.5z"/></svg></span><h2 id="cp-titulo-filtros">Filtros</h2></div>
@@ -157,7 +145,7 @@ export default function Pendencias() {
         <label className="cp-campo cp-busca"><span>Nome ou matrícula</span><input type="search" placeholder="Pesquisar colaborador" value={busca} onChange={e => {setBusca(e.target.value);setPagina(1);}}/></label>
       </div>
       <div className="cp-rodape-filtros">
-        <p><span className="cp-info">i</span> A fonte da Dirigibilidade é definida por filial em <Link href="/configuracoes#fontes-dirigibilidade">Configurações</Link>.</p>
+        <p><span className="cp-info">i</span> A fonte da Dirigibilidade será obtida da coluna correspondente na planilha importada.</p>
         <button type="button" className="cp-btn cp-btn-limpar" onClick={limpar}>↻ <span>Limpar filtros</span></button>
       </div>
     </section>
@@ -199,7 +187,7 @@ export default function Pendencias() {
     {detalhe && <div className="cp-modal-fundo" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setDetalhe(null); }}><div className="cp-modal" role="dialog" aria-modal="true" aria-labelledby="cp-dialog-titulo">
       <div className="cp-modal-top"><div><span className="cp-kicker">DETALHES DA AVALIAÇÃO</span><h2 id="cp-dialog-titulo">{detalhe.pessoa.nome}</h2><p>Matrícula {detalhe.pessoa.matricula} · {detalhe.pessoa.filial} · {meses[mes]}/2027</p></div><button type="button" aria-label="Fechar detalhes" onClick={() => setDetalhe(null)}>×</button></div>
       <div className="cp-etiquetas cp-modal-etiquetas">{identificarPendencias(detalhe).map(c => <span key={c} className={`cp-etiqueta cp-${PALETA[c]}`}>{nomesPendencia[c]}</span>)}</div>
-      {identificarPendencias(detalhe).includes("sem-dirigibilidade") && <div className="cp-detalhe-fonte"><strong>Fonte de Dirigibilidade da filial:</strong> {detalhe.pessoa.tipo === "Operador" ? "Critério próprio dos operadores" : fonteFilial(detalhe.pessoa.filial, fontes) ?? "Não definida em Configurações"}</div>}
+      {identificarPendencias(detalhe).includes("sem-dirigibilidade") && <div className="cp-detalhe-fonte"><strong>Fonte de Dirigibilidade:</strong> {fonteDaAvaliacao(detalhe)}</div>}
       <p className="cp-modal-aviso">Este é um registro fictício. Não existe edição de notas nem importação real nesta demonstração.</p>
       <button type="button" className="cp-btn cp-btn-fechar" onClick={() => setDetalhe(null)}>Fechar</button>
     </div></div>}
