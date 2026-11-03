@@ -44,5 +44,5 @@
 /* Mantém espaço para 12 rótulos legíveis, sem comprimir ou sobrepor no celular. */
 .graficoRolagem{overflow-x:auto;overscroll-behavior-x:contain;padding:3px 0 10px}
 .graficoRolagem:focus-visible{outline:2px solid #8fddff;outline-offset:2px}
-.graficoConteudo{min-width:730px}
+.graficoConteudo{min-width:600px}
 .graficoValor{fill:#d9f5ff;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
