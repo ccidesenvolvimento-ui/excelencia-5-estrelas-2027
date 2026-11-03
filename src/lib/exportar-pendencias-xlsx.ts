@@ -121,7 +121,7 @@ function preencherResumo(planilha: Planilha, p: ParametrosRelatorioPendencias) {
     "Uma linha na aba Pendências representa um colaborador, mesmo que possua várias notas ausentes.",
     "A exportação inclui todos os resultados filtrados, independentemente da página exibida no sistema.",
     "Nota ausente gera pendência; nota zero gera inelegibilidade. Dados fictícios de demonstração.",
-    "IDT, Gobrax ou Maxtrack são fontes configuráveis por filial, não tipos adicionais de pendência.",
+    "A fonte da Dirigibilidade será obtida da planilha importada, não de configuração por filial.",
   ];
   notas.forEach((nota, indice) => {
     const numero = 25 + indice;

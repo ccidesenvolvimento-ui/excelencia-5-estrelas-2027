@@ -1,3 +1,4 @@
+import type { FonteDirigibilidade } from "./fontes-dirigibilidade";
 /** Dados completamente fictícios. PROIBIDO usá-los para premiação ou decisões de RH. */
 export const categorias = [
   "Florestal", "Sucro", "Mineração", "Bebidas",
@@ -73,8 +74,8 @@ export function notasDe(p:Pessoa,mes:number):Notas {
  // Casos de teste exclusivamente fictícios para exercitar os filtros da Central de Pendências.
  if(mes===3){
    if(p.id==="m006") delete notas.seguranca; // Segurança ausente (diferente de nota zero).
-   if(p.id==="m008") delete notas.dirigibilidade; // Bebidas: fonte IDT.
-   if(p.id==="m010") delete notas.dirigibilidade; // Fonte Maxtrack atribuída apenas na simulação.
+   if(p.id==="m008") delete notas.dirigibilidade; // Bebidas: fonte será informada na planilha.
+   if(p.id==="m010") delete notas.dirigibilidade; // Fonte não informada nesta demonstração.
    if(p.id==="m015") delete notas.dirigibilidade; // Operadores: Eficiência Operacional.
    if(p.id==="m016") delete notas.jornada; // Operadores: Conservação/Operação.
    if(p.id==="m019") return {}; // Simula mês sem nenhuma avaliação recebida.
@@ -91,7 +92,7 @@ export function mesesPeriodo(categoria:Categoria,periodo:Periodo,mes:number):num
  const idx=Number(periodo.slice(-1))-1;
  return categoria==="Sucro"?Array.from({length:3},(_,i)=>2+idx*3+i):Array.from({length:4},(_,i)=>idx*4+i);
 }
-export type Avaliacao={pessoa:Pessoa;notas:Notas;score:number|null;status:"Elegível"|"Inelegível"|"Pendente";posicao:number|null;faltantes:string[];mensais:(number|null)[]};
+export type Avaliacao={pessoa:Pessoa;fonteDirigibilidade?:FonteDirigibilidade|null;notas:Notas;score:number|null;status:"Elegível"|"Inelegível"|"Pendente";posicao:number|null;faltantes:string[];mensais:(number|null)[]};
 export function avaliarPessoa(pessoa:Pessoa,periodo:Periodo,mes=0):Avaliacao{
  const indices=pessoa.categoria?mesesPeriodo(pessoa.categoria,periodo,mes):[];
  const amostras=indices.map(i=>notasDe(pessoa,i));
