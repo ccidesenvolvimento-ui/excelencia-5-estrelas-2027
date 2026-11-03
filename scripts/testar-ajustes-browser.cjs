@@ -23,7 +23,7 @@ const server = http.createServer((req,res)=>{
  try{
  for(const [nome,width,height] of [['desktop',1440,1000],['celular',390,844],['celular-320',320,740]]){
   const page=await browser.newPage({viewport:{width,height}});
-  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const errors=[];page.on('pageerror',e=>errors.push(page.url()+': '+e.message));
   await page.goto(`http://127.0.0.1:4173${base}/`);await page.waitForLoadState('networkidle');
   const chart=page.locator('section[aria-labelledby="evolucaoTitulo"]');
   const labels=chart.locator('svg text');
@@ -74,5 +74,17 @@ const server = http.createServer((req,res)=>{
  const modelo=new ExcelJS.Workbook();await modelo.xlsx.readFile('public/modelos/Modelo_Dirigibilidade_2027.xlsx');
  assert.ok(modelo.worksheets.some(ws=>JSON.stringify(ws.getSheetValues()).includes('TIPO DE DADO')));
  console.log('✓ Modelo Dirigibilidade mantém coluna TIPO DE DADO.');
+  }catch(error){
+  // Em falhas de hidratação, a versão de desenvolvimento fornece o diff real.
+  const {spawn}=require('node:child_process');
+  const dev=spawn(process.execPath,['node_modules/next/dist/bin/next','dev','--hostname','127.0.0.1','-p','4175'],{env:{...process.env,NEXT_PUBLIC_DEPLOY_TARGET:'github-pages',NEXT_PUBLIC_BASE_PATH:base},stdio:'pipe'});
+  try{
+   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Timeout no diagnóstico')),30000);dev.stdout.on('data',b=>{if(b.toString().includes('Ready')){clearTimeout(timer);resolve();}});dev.once('error',reject);});
+   const diagnostic=await browser.newPage();
+   diagnostic.on('console',m=>{if(m.type()==='error')console.error('DIAGNÓSTICO',m.text());});
+   diagnostic.on('pageerror',e=>console.error('DIAGNÓSTICO',diagnostic.url(),e.message));
+   for(const route of ['/','/configuracoes/','/pendencias/']){await diagnostic.goto(`http://127.0.0.1:4175${base}${route}`);await diagnostic.waitForLoadState('networkidle');}
+  }catch(diagnosticError){console.error(diagnosticError);}finally{dev.kill();}
+  throw error;
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
