@@ -19,7 +19,7 @@ Exatamente 8: Florestal; Sucro; Mineração; Bebidas; Rodoviário – Cavalo Mec
 - Nunca tratar nota vazia como zero. Valor 0 é legítimo e eliminatório.
 - Manter dados de origem, usuário, competência e evidências da validação.
 - A coluna FILIAL substituiu OPERAÇÃO no modelo das notas.
-- Dirigibilidade terá coluna `TIPO DE DADO`: `Gobrax`, `Max Track` ou `IDT`. O sistema deverá determinar a fonte correta pela **filial**, conforme configuração vigente, com possibilidade de alteração futura por administrador autorizado e trilha de auditoria.
+- Dirigibilidade mantém a coluna `TIPO DE DADO`: `Gobrax`, `Max Track` ou `IDT`. Na futura importação, a fonte será validada e obtida dessa coluna por avaliação, sem configuração manual por filial. A demonstração não importa linhas reais.
 
 ## Segurança
 

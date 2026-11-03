@@ -1,6 +1,6 @@
 # Programa Excelência 5 Estrelas 2027
 
-**Versão 0.9 — Central de Pendências redesenhada e Dirigibilidade parametrizada por filial, para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
+**Versão 0.9 — Central de Pendências redesenhada e fonte da Dirigibilidade prevista na planilha de importação, para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
 
 ## O que funciona nesta versão
 
@@ -12,7 +12,7 @@
 - Download dos seis modelos oficiais XLSX em **Importações**. Verificação local de nome/extensão/tamanho (não lê nem importa as linhas do Excel).
 - RH0034 fictícia e simulação de classificação local (`localStorage`), sem afetar a base de notas ou persistir no servidor.
 - Relatório integrado ao Ranking, respeitando período, segmento, filial, pesquisa, ordenação e posições oficiais Top N (CSV e PDF direto no navegador, com prévia em páginas).
-- Configurações com abas Regras, Usuários e Acessos e Segurança; simulação LOCAL de perfis, permissões, filiais e fonte de Dirigibilidade por filial (não são parâmetros corporativos reais).
+- Configurações com abas Regras, Usuários e Acessos e Segurança; simulação LOCAL de perfis, permissões, filiais (não são parâmetros corporativos reais).
 - Testes básicos da lógica + relato de erros baixável ou abertura de Issue no GitHub.
 - Compilação para **GitHub Pages** com workflow `.github/workflows/github-pages.yml`.
 - Migração **inicial, ainda não aplicada**, de Supabase/PostgreSQL com RLS fechado por padrão.

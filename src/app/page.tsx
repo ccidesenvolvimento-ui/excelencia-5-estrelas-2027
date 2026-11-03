@@ -9,9 +9,9 @@ import {
   periodos,
   pessoas,
   ranking,
-  type Categoria,
   type Periodo,
 } from "@/lib/dados-demo";
+import { mediasPorSegmento, evolucaoGeral } from "@/lib/indicadores-visao-geral";
 import estilo from "./visao-geral.module.css";
 
 type IconeNome = "pessoas" | "check" | "alerta" | "pendente" | "seta" | "ranking" | "arquivo" | "rh" | "chart";
@@ -100,21 +100,9 @@ export default function VisaoGeral() {
   const distElegiveis = total ? elegiveis.length / total * 100 : 0;
   const distInelegiveis = total ? inelegiveis.length / total * 100 : 0;
 
-  const mediasSegmento = useMemo(() => categorias
-    .filter(c => categoria === "Todas" || categoria === c)
-    .map(c => {
-      const casos = registros.filter(r => r.pessoa.categoria === c && r.score !== null);
-      const media = casos.length ? casos.reduce((s, r) => s + (r.score ?? 0), 0) / casos.length : null;
-      return { nome: c, media, avaliados: casos.length };
-    }), [categoria, registros]);
-
-  const evolucao = useMemo(() => meses.map((_, i) => {
-    const registrosMes = ranking("mensal", i).filter(r =>
-      (categoria === "Todas" || r.pessoa.categoria === categoria) &&
-      (filial === "Todas" || r.pessoa.filial === filial) && r.score !== null
-    );
-    return registrosMes.length ? registrosMes.reduce((s, r) => s + (r.score ?? 0), 0) / registrosMes.length : null;
-  }), [categoria, filial]);
+  const mediasSegmento = useMemo(() => mediasPorSegmento(registros, categoria), [categoria, registros]);
+  // Série da empresa inteira: não recebe os filtros dos demais cards.
+  const evolucao = evolucaoGeral();
 
   const foraDeClassificacao = pessoas.filter(p => p.categoria === null).length;
   const emFerias = pessoas.filter(p => p.situacao === "Férias" && p.categoria &&
@@ -187,17 +175,20 @@ export default function VisaoGeral() {
 
       <div className={estilo.segundaLinha}>
         <section className={estilo.painel} aria-labelledby="evolucaoTitulo">
-          <div className={estilo.painelCabecalho}><div><div className={estilo.painelTag}>TENDÊNCIA DO ANO · SIMULAÇÃO</div><h2 id="evolucaoTitulo">Evolução mensal do score</h2><p>Média entre participantes com avaliações completas em cada mês.</p></div></div>
+          <div className={estilo.painelCabecalho}><div><div className={estilo.painelTag}>TENDÊNCIA DO ANO · SIMULAÇÃO</div><h2 id="evolucaoTitulo">Evolução mensal do score</h2><p>Resultado geral da empresa em 2027, independente dos filtros: média mensal das avaliações completas, elegíveis e inelegíveis.</p></div></div>
+          <div className={estilo.graficoRolagem} tabIndex={0} role="region" aria-label="Evolução geral da empresa de janeiro a dezembro; role horizontalmente em telas pequenas">
+          <div className={estilo.graficoConteudo}>
           <div className={estilo.graficoLinha}>
             <div className={estilo.graficoEscala}><span>100</span><span>75</span><span>50</span></div>
-            <svg viewBox="0 0 730 170" preserveAspectRatio="none" role="img" aria-label="Gráfico ilustrativo da média mensal de notas em 2027">
+            <svg viewBox="0 0 730 170" preserveAspectRatio="none" role="img" aria-label="Score médio geral da empresa, janeiro a dezembro de 2027">
               <defs><linearGradient id="grafico-degradado" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#49beff" stopOpacity=".25"/><stop offset="1" stopColor="#49beff" stopOpacity="0"/></linearGradient></defs>
               <path d="M24 23 H706 M24 82 H706 M24 141 H706" stroke="#31516d" strokeWidth="1" strokeDasharray="5 8" fill="none"/>
               {linha && <><path d={`${linha} L706 156 L24 156 Z`} fill="url(#grafico-degradado)"/><path d={linha} fill="none" stroke="#51caff" strokeWidth="3" vectorEffect="non-scaling-stroke"/></>}
-              {evolucao.map((v, i) => v === null ? null : <circle key={meses[i]} cx={24 + i * 62} cy={141 - v * 1.18} r="4.2" fill="#071c31" stroke="#67d4ff" strokeWidth="2.5"><title>{meses[i]}: {formatarNota(v)}</title></circle>)}
+              {evolucao.map((v, i) => v === null ? null : <g key={meses[i]}><text className={estilo.graficoValor} x={24 + i * 62} y={141 - v * 1.18 - 12} textAnchor="middle">{formatarNota(v)}</text><circle cx={24 + i * 62} cy={141 - v * 1.18} r="4.2" fill="#071c31" stroke="#67d4ff" strokeWidth="2.5"><title>{`${meses[i]}: ${formatarNota(v)}`}</title></circle></g>)}
             </svg>
           </div>
           <div className={estilo.graficoMeses}>{meses.map(m => <span key={m}>{m}</span>)}</div>
+          </div></div>
         </section>
 
         <section className={estilo.painel} aria-labelledby="atencaoTitulo">
