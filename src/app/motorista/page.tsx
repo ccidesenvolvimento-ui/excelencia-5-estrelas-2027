@@ -137,7 +137,7 @@ export default function PortalMotorista(){
          <div className={styles.exemplo}>Teste com uma matrícula fictícia, como <button type="button" onClick={()=>{setCampo("F004");setErro("")}}>F004</button>.</div>
        </section>
      </>:<>
-       <section className={styles.perfilTopo}>
+       <section className={styles.perfilTopo} {...efeitoInformativo}>
          <div className={styles.identidade}>
            <div className={styles.avatar} aria-hidden="true">{iniciais}</div>
            <div className={styles.perfilNome}><span className={styles.miniRotulo}>MEU PAINEL · 2027</span><h1>Olá, {pessoa.nome.split(" ")[0]}!</h1><p>{pessoa.nome}</p><div className={styles.identidadeChips}><span>Matrícula {pessoa.matricula}</span><span>{pessoa.categoria??"Segmento pendente"}</span><span>{pessoa.filial}</span></div></div>
