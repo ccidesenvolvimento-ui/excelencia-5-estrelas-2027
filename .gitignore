@@ -8,3 +8,7 @@ node_modules/
 supabase/.temp/
 supabase/.branches/
 .DS_Store
+
+# Exportação estática e evidências locais de navegador
+out/
+artifacts/

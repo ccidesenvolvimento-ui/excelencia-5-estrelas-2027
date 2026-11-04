@@ -71,7 +71,7 @@ O GitHub Pages aceita domínio próprio, com ajustes DNS em **Settings → Pages
 - **Configurações (`/configuracoes`)**: metodologia, categorias e ciclos; aba **Usuários e acessos** com perfis de teste, permissões e filiais; requisitos de autenticação e auditoria.
 - **Testes (`/diagnostico`)**: verificações e relato de erros.
 
-As URLs antigas `/painel`, `/relatorios` e `/usuarios` encaminham para `/`, `/ranking` e `/configuracoes#usuarios` para evitar links quebrados. Não aparecem mais no menu.
+As URLs antigas `/painel`, `/relatorios` e `/usuarios` encaminham para `/visao-geral`, `/ranking` e `/configuracoes#usuarios` para evitar links quebrados. Não aparecem mais no menu.
 
 ### Como atualizar por upload no GitHub
 
@@ -85,3 +85,50 @@ As URLs antigas `/painel`, `/relatorios` e `/usuarios` encaminham para `/`, `/ra
 ## Atualização da Central de Pendências v0.9
 
 Consulte `docs/INTERFACE_V09.md`. Nenhum arquivo de Ranking ou geração de PDF é substituído por esta atualização.
+
+### Entrada institucional e acesso corporativo (Issue #10)
+
+A rota `/` apresenta a entrada do programa, com caminhos para `/login` (Área
+Corporativa) e `/motorista` (portal independente). A Visão Geral demonstrativa
+permanece disponível em `/visao-geral`; `/painel` encaminha para esse destino.
+O login corporativo é apenas uma interface de preparação: os campos e o botão
+permanecem desabilitados, nenhuma credencial é coletada e nenhuma sessão é
+simulada. O acesso à demonstração é explícito e usa somente dados fictícios.
+Dados reais exigirão autenticação e autorização no backend em uma etapa futura.
+A implantação estática no GitHub Pages continua sem API routes ou middleware.
+A composição visual usa os ativos oficiais e a descrição conceitual do teaser;
+o vídeo não foi inspecionado nesta implementação.
+
+O refinamento visual da segunda versão mantém a arte oficial sem alteração de
+forma, cores ou proporções. A profundidade vem de gradientes e iluminação da silhueta em CSS.
+Os cards têm spotlight para mouse, foco de teclado e reflexo breve na borda;
+o CTA da demonstração tem brilho ao hover. Não há animações infinitas, WebGL
+ou dependências adicionais. `prefers-reduced-motion` desativa animações,
+transições e o rastreamento do cursor. O login continua desabilitado.
+
+Para verificar as cinco larguras após o build estático, execute
+`npm run test:entrada` com Playwright e Chromium disponíveis. O executável local
+pode ser indicado por `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`; as capturas são
+salvas em `artifacts/entrada` (ou no diretório `ENTRADA_SCREENSHOTS`). O teste
+verifica também spotlight, foco visível, movimento reduzido e navegação.
+
+
+A home inclui uma abertura cinematográfica de 2 segundos: aproximação lateral,
+passagem com clarão único difuso e recuo até a caixa exata da estrela no layout.
+O clone temporário e a camada de luz não interceptam eventos. O estado final não
+usa polígonos, órbitas ou feixes. O login mantém somente uma entrada discreta.
+A abertura usa `sessionStorage` para ocorrer uma vez por sessão/aba; sem acesso
+a esse armazenamento, pode repetir em uma nova montagem. Rolagem, resize,
+desmontagem ou ativação de movimento reduzido encerram a abertura imediatamente.
+O hover da estrela usa perspectiva limitada a 5 graus e retorna suavemente ao
+sair. Movimento reduzido desativa flyby, clarão e inclinação. Para validar essa
+sequência no Chromium, execute `npm run test:cinema` após o build estático.
+
+
+No refinamento de escala, a estrela da home mede 500 px no desktop amplo
+(antes 360 px), com tamanhos menores por breakpoint. O hover amplia 7,5%,
+aumenta o halo em 18% e mantém a inclinação limitada a 5 graus. O fundo passou
+a azul-marinho quase preto, sem linhas decorativas e com luz concentrada no
+símbolo. O pico do flyby foi ampliado; no celular, a largura da passagem é
+limitada proporcionalmente à viewport. Os testes de cinema verificam escala,
+retorno, iluminação e ausência de sobreposição permanente com o título.

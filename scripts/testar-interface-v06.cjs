@@ -15,7 +15,7 @@ const importacoes = read('src/app/importacoes/page.tsx');
 const pacote = JSON.parse(read('package.json'));
 
 const resultados = [
- ['Menu contém as sete áreas principais', ['/','/ranking','/pendencias','/importacoes','/rh0034','/configuracoes','/diagnostico'].every(r => menu.includes(`url: "${r}"`))],
+ ['Menu contém as sete áreas principais', ['/visao-geral','/ranking','/pendencias','/importacoes','/rh0034','/configuracoes','/diagnostico'].every(r => menu.includes(`url: "${r}"`))],
  ['Painel não aparece no menu', !menu.includes('url: "/painel"')],
  ['Relatórios não aparecem como aba independente', !menu.includes('url: "/relatorios"')],
  ['Usuários não aparecem como aba independente', !menu.includes('url: "/usuarios"')],
@@ -38,7 +38,7 @@ const resultados = [
     Boolean(pacote.dependencies && pacote.dependencies.exceljs)
  ],
  ['Design transversal está presente', css.includes('.cabecalho-premium') && css.includes('.mod-grid-estatisticas')],
- ['Rotas antigas encaminham para destinos novos', read('src/app/painel/page.tsx').includes('router.replace("/")') && read('src/app/relatorios/page.tsx').includes('router.replace("/ranking")') && read('src/app/usuarios/page.tsx').includes('router.replace("/configuracoes#usuarios")')]
+ ['Rotas antigas encaminham para destinos novos', read('src/app/painel/page.tsx').includes('router.replace("/visao-geral")') && read('src/app/relatorios/page.tsx').includes('router.replace("/ranking")') && read('src/app/usuarios/page.tsx').includes('router.replace("/configuracoes#usuarios")')]
 ];
 for (const [label, ok] of resultados) console.log(`${ok ? '✓' : '✗'} ${label}`);
 const ok = resultados.filter(r => r[1]).length;
