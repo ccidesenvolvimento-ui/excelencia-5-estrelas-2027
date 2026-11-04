@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useMemo,useState,type FormEvent} from "react";
+import {useEffect,useMemo,useState,type FormEvent,type PointerEvent} from "react";
 import Link from "next/link";
 import {avaliacaoDaMatricula,buscarMotorista,normalizarMatricula,periodoDisponivel} from "@/lib/consulta-motorista";
 import {estrelas,formatarNota,meses,mesesPeriodo,periodos,pesos,rotuloEstrela,type Periodo,type Pessoa} from "@/lib/dados-demo";
@@ -24,6 +24,20 @@ function Icone({nome,tamanho=20}:{nome:"estrela"|"trofeu"|"grafico"|"check"|"seg
   };
   return <svg width={tamanho} height={tamanho} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={desenhos[nome]}/></svg>;
 }
+
+// Atualiza apenas variáveis CSS: sem renderização React ao mover o cursor.
+function iluminarCartao(evento:PointerEvent<HTMLElement>){
+ if(evento.pointerType!=="mouse" || !window.matchMedia("(hover: hover) and (pointer: fine)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+ const alvo=evento.currentTarget;
+ const rect=alvo.getBoundingClientRect();
+ alvo.style.setProperty("--info-x",`${evento.clientX-rect.left}px`);
+ alvo.style.setProperty("--info-y",`${evento.clientY-rect.top}px`);
+}
+function limparIluminacao(evento:PointerEvent<HTMLElement>){
+ evento.currentTarget.style.removeProperty("--info-x");
+ evento.currentTarget.style.removeProperty("--info-y");
+}
+const efeitoInformativo={onPointerMove:iluminarCartao,onPointerLeave:limparIluminacao};
 
 function AvisoDemo(){return <div className={styles.avisoDemo}><span className={styles.pontoDemo}/><span>AMBIENTE DE DEMONSTRAÇÃO · NOTAS FICTÍCIAS</span></div>;}
 
@@ -138,12 +152,12 @@ export default function PortalMotorista(){
          </div>
        </section>
        <section className={styles.resumo} aria-label="Resumo do resultado">
-         <article className={styles.cartaoScore}>
+         <article className={styles.cartaoScore} {...efeitoInformativo}>
            <div className={styles.cartaoCabecalho}><Icone nome="grafico" tamanho={21}/><span>SCORE MÉDIO</span></div>
            <div className={styles.pontuacao}>{formatarNota(score)}{score!==null&&<span>/ 100</span>}</div>
            <p>{nomePeriodo}</p>
          </article>
-         <article className={styles.cartaoPosicao}>
+         <article className={styles.cartaoPosicao} {...efeitoInformativo}>
            <div className={styles.cartaoCabecalho}><Icone nome="trofeu" tamanho={21}/><span>COLOCAÇÃO</span></div>
            <div className={styles.colocacao}>{avaliacao?.posicao!==null && avaliacao?.posicao!==undefined?`${avaliacao.posicao}º`:"—"}</div>
            <p>{pessoa.categoria?`Ranking de ${pessoa.categoria}`:"Sem segmento definido"}</p>
@@ -159,7 +173,7 @@ export default function PortalMotorista(){
              const nota=desempenhoDisponivel?avaliacao?.notas[estrela]:undefined;
              const nome=rotuloEstrela(estrela,pessoa.categoria);
              const percentual=Math.max(0,Math.min(100,nota??0));
-             return <article key={estrela} className={styles.estrelaCard}>
+             return <article key={estrela} className={styles.estrelaCard} {...efeitoInformativo}>
                <div className={styles.estrelaCardCabecalho}><span className={styles.numeroEstrela}>0{index+1}</span><Icone nome="estrela" tamanho={19}/></div>
                <h3>{nome}</h3><span className={styles.peso}>{Math.round(pesos[estrela]*100)}% do score</span>
                <div className={styles.valorEstrela}>{formatarNota(nota)}<small>{nota!==null&&nota!==undefined?" / 100":"Sem nota"}</small></div>
@@ -169,11 +183,11 @@ export default function PortalMotorista(){
            })}
          </div>
        </section>
-       {periodo!=="mensal" && avaliacao && pessoa.categoria && <section className={styles.evolucao}>
+       {periodo!=="mensal" && avaliacao && pessoa.categoria && <section className={styles.evolucao} {...efeitoInformativo}>
          <div className={styles.tituloSecao}><div><span className={styles.miniRotulo}>HISTÓRICO DO PERÍODO</span><h2>Notas por mês</h2></div></div>
          <div className={styles.mesesGrade}>{mesesPeriodo(pessoa.categoria,periodo,mes).map((numero,index)=><div className={styles.mesItem} key={numero}><span>{meses[numero]}</span><strong>{formatarNota(avaliacao.mensais[index])}</strong></div>)}</div>
        </section>}
-       <section className={styles.entenda}>
+       <section className={styles.entenda} {...efeitoInformativo}>
          <span className={styles.miniRotulo}>COMO FUNCIONA</span><h2>Entenda sua pontuação</h2>
          <p>O score combina Segurança (30%), Produtividade (25%), Dirigibilidade (20%), Jornada (15%) e Treinamentos (10%). A posição é calculada entre colaboradores elegíveis do mesmo segmento, mantendo a colocação do ranking principal.</p>
          <p>Notas em branco são pendências, não são zero. Nota zero gera inelegibilidade. As avaliações de ciclos e anual seguem os meses previstos para cada segmento.</p>
