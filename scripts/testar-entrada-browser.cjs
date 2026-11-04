@@ -115,9 +115,38 @@ const server = http.createServer((req, res) => {
     assert.notEqual(await card.evaluate(el => getComputedStyle(el).outlineStyle), 'none', 'Foco de teclado visível');
     await desktop.waitForFunction(() => !document.querySelector('[data-flyby]'));
     console.log('✓ Spotlight, limpeza ao sair, foco por teclado e entrada finita da estrela.');
+    await desktop.goto(`http://127.0.0.1:4174${base}/login/`);
+    const voltarLogin = desktop.getByRole('link', { name: /Voltar ao início/ });
+    await voltarLogin.hover();
+    const decorarLogin = await voltarLogin.locator('span').evaluate(el => ({
+      line:getComputedStyle(el).textDecorationLine,
+      offset:getComputedStyle(el).textUnderlineOffset,
+      thickness:getComputedStyle(el).textDecorationThickness
+    }));
+    assert.ok(decorarLogin.line.includes('underline'), 'Sublinhado do texto no login');
+    assert.equal(await voltarLogin.evaluate(el => getComputedStyle(el).textDecorationLine),'none','Seta não sublinhada no login');
+    await desktop.screenshot({path:path.join(output,'login-retorno-hover-1440.png'),fullPage:true,animations:'disabled'});
     await desktop.goto(`http://127.0.0.1:4174${base}/motorista/`);
+    const voltarPortal=desktop.getByRole('link', { name: 'Voltar ao início', exact: true });
+    await voltarPortal.hover();
+    const decorarPortal=await voltarPortal.locator('span').evaluate(el => ({
+      line:getComputedStyle(el).textDecorationLine,
+      offset:getComputedStyle(el).textUnderlineOffset,
+      thickness:getComputedStyle(el).textDecorationThickness
+    }));
+    assert.deepEqual(decorarPortal,decorarLogin,'Sublinhado do retorno idêntico nos dois cabeçalhos');
+    assert.equal(await voltarPortal.evaluate(el => getComputedStyle(el).textDecorationLine),'none','Seta não sublinhada no portal');
+    await desktop.screenshot({path:path.join(output,'motorista-retorno-hover-1440.png'),fullPage:true,animations:'disabled'});
     await desktop.getByLabel('Sua matrícula').fill('F004');
     await desktop.getByRole('button', { name: 'Consultar meu desempenho' }).click();
+    const perfil=desktop.locator('section').filter({has:desktop.getByRole('button',{name:'Trocar matrícula'})}).first();
+    assert.ok(await perfil.isVisible(),'Identificação do motorista preservada');
+    await perfil.hover({position:{x:140,y:85}});
+    assert.ok(await perfil.evaluate(el=>el.style.getPropertyValue('--info-x')),'Spotlight do perfil acompanha cursor');
+    assert.equal(await perfil.evaluate(el=>getComputedStyle(el).cursor),'default','Perfil não parece clicável');
+    await desktop.screenshot({path:path.join(output,'motorista-perfil-hover-1440.png'),fullPage:true,animations:'disabled'});
+    await desktop.mouse.move(0,0);
+    assert.equal(await perfil.evaluate(el=>el.style.getPropertyValue('--info-x')),'','Perfil retorna ao repouso');
     const informativo = desktop.locator('article').filter({ hasText: 'SCORE MÉDIO' }).first();
     assert.ok(await informativo.isVisible(), 'Card informativo preservado');
     await informativo.hover({position:{x:120,y:90}});
