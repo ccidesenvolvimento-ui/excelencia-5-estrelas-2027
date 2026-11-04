@@ -115,6 +115,17 @@ const server = http.createServer((req, res) => {
     assert.notEqual(await card.evaluate(el => getComputedStyle(el).outlineStyle), 'none', 'Foco de teclado visível');
     await desktop.waitForFunction(() => !document.querySelector('[data-flyby]'));
     console.log('✓ Spotlight, limpeza ao sair, foco por teclado e entrada finita da estrela.');
+    await desktop.goto(`http://127.0.0.1:4174${base}/motorista/`);
+    await desktop.getByLabel('Sua matrícula').fill('F004');
+    await desktop.getByRole('button', { name: 'Consultar meu desempenho' }).click();
+    const informativo = desktop.locator('article').filter({ hasText: 'SCORE MÉDIO' }).first();
+    assert.ok(await informativo.isVisible(), 'Card informativo preservado');
+    await informativo.hover({position:{x:120,y:90}});
+    assert.ok(await informativo.evaluate(el => el.style.getPropertyValue('--info-x')), 'Reflexo do card responde ao cursor');
+    assert.equal(await informativo.evaluate(el => getComputedStyle(el).cursor), 'default', 'Card não sugere clique');
+    await desktop.screenshot({path:path.join(output,'motorista-card-hover-1440.png'),fullPage:true,animations:'disabled'});
+    await desktop.mouse.move(0, 0);
+    assert.equal(await informativo.evaluate(el => el.style.getPropertyValue('--info-x')), '', 'Reflexo limpa após saída do cursor');
     await desktop.close();
   } finally { if (browser) await browser.close(); server.close(); }
 })().catch(e => { console.error(e); process.exitCode = 1; });

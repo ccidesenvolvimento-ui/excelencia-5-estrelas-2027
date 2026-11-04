@@ -185,3 +185,32 @@
 @media(prefers-reduced-motion:reduce){
   .voltarInicio,.botaoPrincipal{transition:none}
 }
+
+/* Issue #18: reflexo apenas nos cards informativos, sem sugerir clique. */
+@media(hover:hover) and (pointer:fine){
+  .cartaoScore,.cartaoPosicao,.estrelaCard,.evolucao,.entenda{
+    position:relative;
+    isolation:isolate;
+    cursor:default;
+    transition:border-color .3s ease,box-shadow .3s ease;
+  }
+  .cartaoScore::after,.cartaoPosicao::after,.estrelaCard::after,.evolucao::after,.entenda::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    background:radial-gradient(310px circle at var(--info-x,50%) var(--info-y,40%),#6fcfff1e,transparent 76%);
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .cartaoScore:hover,.cartaoPosicao:hover,.estrelaCard:hover,.evolucao:hover,.entenda:hover{
+    border-color:#83c5e375;
+    box-shadow:inset 0 1px #ccefff16,0 13px 30px #01061030,0 0 18px #56b8eb0c;
+  }
+  .cartaoScore:hover::after,.cartaoPosicao:hover::after,.estrelaCard:hover::after,.evolucao:hover::after,.entenda:hover::after{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .cartaoScore,.cartaoPosicao,.estrelaCard,.evolucao,.entenda{transition:none!important}
+  .cartaoScore::after,.cartaoPosicao::after,.estrelaCard::after,.evolucao::after,.entenda::after{display:none!important}
+}
