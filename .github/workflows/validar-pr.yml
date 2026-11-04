@@ -37,10 +37,13 @@ jobs:
           npm install --no-save --no-audit --no-fund playwright@1.64.1
           npx playwright install --with-deps chromium
       - name: Verificar desktop e celular
-        run: node scripts/testar-ajustes-browser.cjs
+        run: |
+          node scripts/testar-ajustes-browser.cjs
+          npm run test:entrada
+          npm run test:cinema
       - name: Salvar evidencias visuais
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ajustes-desktop-celular
-          path: artifacts/ajustes/
+          path: artifacts/

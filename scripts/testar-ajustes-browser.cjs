@@ -18,13 +18,13 @@ const server = http.createServer((req,res)=>{
 });
 (async()=>{
  await new Promise(resolve=>server.listen(4173,'127.0.0.1',resolve));
- const browser=await chromium.launch({headless:true});
+ const browser=await chromium.launch({headless:true, ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ? {executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH} : {})});
  fs.mkdirSync('artifacts/ajustes',{recursive:true});
  try{
  for(const [nome,width,height] of [['desktop',1440,1000],['celular',390,844],['celular-320',320,740]]){
   const page=await browser.newPage({viewport:{width,height}});
   const errors=[];page.on('pageerror',e=>errors.push(page.url()+': '+e.message));
-  await page.goto(`http://127.0.0.1:4173${base}/`);await page.waitForLoadState('networkidle');
+  await page.goto(`http://127.0.0.1:4173${base}/visao-geral/`);await page.waitForLoadState('networkidle');
   const chart=page.locator('section[aria-labelledby="evolucaoTitulo"]');
   const labels=chart.locator('svg text');
   const original=await labels.allTextContents();

@@ -7,7 +7,7 @@ import { IconeSistema, type NomeIconeSistema } from "@/components/IconesSistema"
 
 type ItemMenu = { url: string; titulo: string; icone: NomeIconeSistema };
 const itens: ItemMenu[] = [
-  { url: "/", titulo: "Visão geral", icone: "visao" },
+  { url: "/visao-geral", titulo: "Visão geral", icone: "visao" },
   { url: "/ranking", titulo: "Ranking", icone: "ranking" },
   { url: "/pendencias", titulo: "Pendências", icone: "pendencias" },
   { url: "/importacoes", titulo: "Importações", icone: "importacoes" },
@@ -50,7 +50,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
   }
 
   // A rota pública tem experiência independente e mobile-first, sem o painel administrativo.
-  if(caminho === "/motorista" || caminho.startsWith("/motorista/") || (base && (caminho===`${base}/motorista` || caminho.startsWith(`${base}/motorista/`)))) return <>{children}</>;
+  if(caminho === "/" || caminho === "/login" || caminho === `${base}/login` || (base && caminho === base) || caminho === "/motorista" || caminho.startsWith("/motorista/") || (base && (caminho===`${base}/motorista` || caminho.startsWith(`${base}/motorista/`)))) return <>{children}</>;
 
   return <div className={`app-shell ${flutuante ? "nav-recolhida" : "nav-fixa"} ${flutuante && expansaoTemporaria ? "nav-hover" : ""}`}>
     <aside
@@ -67,7 +67,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
     >
       <div className="branding">
         <div className="branding-top">
-          <Link href="/" className="branding-home" aria-label="Ir para Visão geral" onClick={() => { setMobileAberto(false); if (flutuante) setExpansaoTemporaria(false); }}>
+          <Link href="/visao-geral" className="branding-home" aria-label="Ir para Visão geral" onClick={() => { setMobileAberto(false); if (flutuante) setExpansaoTemporaria(false); }}>
             <img className="branding-imagem" src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas" />
             <span className="branding-marca-mini"><img className="estrela-oficial-mini" src={`${base}/estrela-oficial-5-estrelas.png`} alt="Símbolo oficial do Programa 5 Estrelas" /></span>
           </Link>

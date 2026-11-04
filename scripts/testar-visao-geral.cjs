@@ -34,7 +34,7 @@ for(const f of ['IDT','Gobrax','Maxtrack']) assert.equal(fonte.fonteDaAvaliacao(
 global.window={localStorage:{getItem(){throw Error('Configuração antiga não deve ser lida')}}};
 assert.equal(fonte.fonteDaAvaliacao({pessoa:{tipo:'Motorista',filial:'Lavras'}}),'Não informada');
 delete global.window;
-const home=fs.readFileSync('src/app/page.tsx','utf8');
+const home=fs.readFileSync('src/app/visao-geral/page.tsx','utf8');
 const config=fs.readFileSync('src/app/configuracoes/page.tsx','utf8');
 const pend=fs.readFileSync('src/app/pendencias/page.tsx','utf8');
 assert.ok(home.includes('const evolucao = evolucaoGeral();'));
