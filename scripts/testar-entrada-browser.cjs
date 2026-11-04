@@ -121,7 +121,6 @@ const server = http.createServer((req, res) => {
     const informativo = desktop.locator('article').filter({ hasText: 'SCORE MÉDIO' }).first();
     assert.ok(await informativo.isVisible(), 'Card informativo preservado');
     await informativo.hover({position:{x:120,y:90}});
-    await desktop.mouse.move(180, 680);
     assert.ok(await informativo.evaluate(el => el.style.getPropertyValue('--info-x')), 'Reflexo do card responde ao cursor');
     assert.equal(await informativo.evaluate(el => getComputedStyle(el).cursor), 'default', 'Card não sugere clique');
     await desktop.screenshot({path:path.join(output,'motorista-card-hover-1440.png'),fullPage:true,animations:'disabled'});
