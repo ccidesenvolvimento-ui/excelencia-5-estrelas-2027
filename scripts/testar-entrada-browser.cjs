@@ -116,7 +116,7 @@ const server = http.createServer((req, res) => {
     await desktop.waitForFunction(() => !document.querySelector('[data-flyby]'));
     console.log('✓ Spotlight, limpeza ao sair, foco por teclado e entrada finita da estrela.');
     await desktop.goto(`http://127.0.0.1:4174${base}/login/`);
-    const voltarLogin = desktop.getByRole('link', { name: 'Voltar ao início', exact: true });
+    const voltarLogin = desktop.getByRole('link', { name: /Voltar ao início/ });
     await voltarLogin.hover();
     const decorarLogin = await voltarLogin.locator('span').evaluate(el => ({
       line:getComputedStyle(el).textDecorationLine,
