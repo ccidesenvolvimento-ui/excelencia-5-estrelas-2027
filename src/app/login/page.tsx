@@ -3,7 +3,7 @@ import { CabecalhoEntrada, EstrelaInstitucional, RodapeEntrada, SetaEntrada } fr
 import styles from "../entrada.module.css";
 
 export default function LoginCorporativo() {
-  return <div className={styles.page}>
+  return <div className={`${styles.page} ${styles.home}`}>
     <a href="#conteudo" className={styles.skip}>Pular para o conteúdo</a>
     <div className={styles.container}>
       <CabecalhoEntrada login />
