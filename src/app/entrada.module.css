@@ -19,6 +19,20 @@
 }
 .page::after { content: none; }
 
+/* Fundo exclusivo da home: mesmas cores e composição do Portal do Motorista. */
+.home {
+  background: radial-gradient(ellipse at 80% 0%, #133e60 0, transparent 51%), #071526;
+}
+.home::before {
+  inset: auto;
+  top: -210px;
+  left: 18%;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, #35baff25, transparent 65%);
+}
+
+
 .container { max-width: 1440px; margin: auto; padding: 0 clamp(24px, 5.55vw, 80px); }
 .header { min-height: 116px; display: flex; align-items: center; gap: 30px; border-bottom: 1px solid #b6dbff1c; position: relative; z-index: 2; }
 .brand { display: block; width: 215px; flex-shrink: 0; }
