@@ -82,6 +82,23 @@ const server = http.createServer((req, res) => {
       await page.getByRole('link', { name: /02.*Área do Motorista/ }).click();
       await page.waitForURL('**/motorista/');
       assert.equal(await page.getByRole('navigation', { name: 'Páginas do sistema' }).count(), 0);
+      const retornoMotorista = page.getByRole('link', { name: 'Voltar ao início', exact: true });
+      assert.ok(await retornoMotorista.isVisible(), 'Portal oferece retorno à home');
+      assert.ok(await page.getByRole('button', { name: /Instalar no celular|Instalar aplicativo|App instalado/ }).isVisible(), 'Instalação preservada');
+      assert.ok(await page.getByText('AMBIENTE DE DEMONSTRAÇÃO · NOTAS FICTÍCIAS').isVisible());
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Portal sem overflow');
+      await page.screenshot({ path: path.join(output, `motorista-${width}.png`), fullPage: true });
+      if (width === 1440) {
+        await page.getByLabel('Sua matrícula').fill('F004');
+        await page.getByRole('button', { name: 'Consultar meu desempenho' }).click();
+        assert.ok(await page.getByRole('button', { name: 'Trocar matrícula' }).isVisible(), 'Consulta por matrícula preservada');
+        assert.ok(await page.getByRole('heading', { name: 'Minhas cinco estrelas' }).isVisible(), 'Avaliações preservadas');
+        await page.getByRole('button', { name: 'Trocar matrícula' }).click();
+        assert.ok(await page.getByLabel('Sua matrícula').isVisible(), 'Troca de matrícula preservada');
+      }
+      await retornoMotorista.click();
+      await page.waitForURL(url + '/');
+      assert.ok(await page.getByRole('heading', { name: 'A excelência será reconhecida!' }).isVisible(), 'Voltar ao início abre a home');
       assert.deepEqual(errors, []);
       console.log(`✓ ${width}px: entrada, login indisponível, demo, redirecionamento, motorista, imagens e ausência de overflow/erros.`);
       await page.close();

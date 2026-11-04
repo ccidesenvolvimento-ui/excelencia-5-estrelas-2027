@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect,useMemo,useState,type FormEvent} from "react";
+import Link from "next/link";
 import {avaliacaoDaMatricula,buscarMotorista,normalizarMatricula,periodoDisponivel} from "@/lib/consulta-motorista";
 import {estrelas,formatarNota,meses,mesesPeriodo,periodos,pesos,rotuloEstrela,type Periodo,type Pessoa} from "@/lib/dados-demo";
 import styles from "./portal.module.css";
@@ -84,8 +85,18 @@ export default function PortalMotorista(){
  return <main className={styles.portal}>
    <div className={styles.luzTopo} aria-hidden="true"/>
    <header className={styles.cabecalho}>
-     <div className={styles.marca}><img src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas 2027"/><span className={styles.marcaSeparador}/><span className={styles.marcaSelo}>ÁREA DO<br/><strong>MOTORISTA</strong></span></div>
-     <button type="button" className={styles.botaoInstalar} onClick={instalar} disabled={instalado} aria-expanded={instrucoes}><Icone nome="celular" tamanho={18}/><span>{instalado?"App instalado":eventoInstalar?"Instalar aplicativo":"Instalar no celular"}</span></button>
+     <div className={styles.cabecalhoInterno}>
+       <div className={styles.marca}>
+         <Link href="/" className={styles.marcaLink} aria-label="Programa Excelência 5 Estrelas 2027 — voltar à página inicial"><img src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas 2027"/></Link>
+         <span className={styles.marcaSeparador} aria-hidden="true"/>
+         <span className={styles.marcaSelo}>ÁREA DO<br/><strong>MOTORISTA</strong></span>
+       </div>
+       <nav className={styles.cabecalhoAcoes} aria-label="Ações do Portal do Motorista">
+         <span className={styles.edicao}>EDIÇÃO <strong>2027</strong></span>
+         <Link href="/" className={styles.voltarInicio}><Icone nome="voltar" tamanho={16}/><span>Voltar ao início</span></Link>
+         <button type="button" className={styles.botaoInstalar} onClick={instalar} disabled={instalado} aria-expanded={instrucoes}><Icone nome="celular" tamanho={18}/><span>{instalado?"App instalado":eventoInstalar?"Instalar aplicativo":"Instalar no celular"}</span></button>
+       </nav>
+     </div>
    </header>
    <div className={styles.container}>
      <AvisoDemo/>
@@ -169,9 +180,14 @@ export default function PortalMotorista(){
        </section>
      </>}
      <footer className={styles.rodape}>
-       <div><img src={`${base}/estrela-oficial-5-estrelas.png`} alt=""/><span>Programa Excelência 5 Estrelas · 2027</span></div>
-       <p>Ambiente visual de testes. Não representa dados oficiais. Matrícula não é autenticação; dados reais precisarão de acesso protegido.</p>
-       <button type="button" onClick={copiarLink} className={styles.copiar}><Icone nome="link" tamanho={15}/>{copiado?"Link copiado":"Copiar link deste portal"}</button>
+       <div className={styles.rodapeInstitucional}>
+         <span>EXPRESSO NEPOMUCENO <span className={styles.rodapeSeparador}>/</span> Excelência 5 Estrelas</span>
+         <span>Uma jornada de dedicação. Um reconhecimento à altura.</span>
+       </div>
+       <div className={styles.rodapeUtilidades}>
+         <p>Ambiente visual de testes. Não representa dados oficiais. Matrícula não é autenticação; dados reais precisarão de acesso protegido.</p>
+         <button type="button" onClick={copiarLink} className={styles.copiar}><Icone nome="link" tamanho={15}/>{copiado?"Link copiado":"Copiar link deste portal"}</button>
+       </div>
      </footer>
    </div>
  </main>;
