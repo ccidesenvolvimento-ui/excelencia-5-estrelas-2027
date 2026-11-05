@@ -319,3 +319,90 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 @media (prefers-reduced-motion: reduce) {
   .menu a[aria-current="page"]::after { animation: none; }
 }
+
+
+/* Fase 1 (#22) — identidade institucional exclusiva do shell administrativo.
+   Home, login e portal do motorista não usam .app-shell e permanecem intactos. */
+.app-shell {
+  --admin-fundo: #071526;
+  --admin-luz: #133e60;
+  --admin-contorno: #70b8da54;
+  --admin-contorno-ativo: #7bd9ff;
+  --admin-texto-suave: #a8c6d8;
+  --admin-superficie: #102b43;
+  --admin-superficie-profunda: #0a2035;
+  --mod-borda: #315875;
+  --mod-fundo: #102b43;
+  --mod-sec: #11314b;
+  --mod-muted: #a8c6d8;
+  font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #eff7ff;
+  background:
+    radial-gradient(ellipse 73% 590px at 88% 7%, #133e60ac 0%, transparent 74%),
+    radial-gradient(ellipse 650px 560px at 25% 56%, #35baff0b 0%, transparent 75%),
+    var(--admin-fundo);
+}
+.app-shell .sidebar {
+  background: linear-gradient(165deg, #102e48 0%, #0a2036 59%, #07182a 100%);
+  border-color: #70b8da47;
+  box-shadow: 0 18px 55px #01081288, 0 4px 22px #238dc014, inset 0 1px #aedffb16;
+}
+.app-shell .branding { border-bottom-color: #b6dbff20; }
+.app-shell .header {
+  background: linear-gradient(105deg, #091c30e8, #133854d8 78%, #102e49e6);
+  border-bottom-color: #78b7d435;
+  box-shadow: 0 10px 28px #010b1724;
+}
+.app-shell .header strong { font-weight: 650; letter-spacing: -.035em; }
+.app-shell .header span:not(.chip-demo) { color: var(--admin-texto-suave); }
+.app-shell .area-conteudo { position: relative; }
+.app-shell .cabecalho-premium h1 {
+  font-weight: 650;
+  letter-spacing: -.045em;
+}
+.app-shell .cabecalho-premium p { color: var(--admin-texto-suave); }
+.app-shell .painel,
+.app-shell .controles,
+.app-shell .mod-estatistica,
+.app-shell .metrica {
+  border-color: var(--admin-contorno);
+  box-shadow: inset 0 1px #b5e5ff0d, 0 12px 32px #000d1e21;
+}
+.app-shell .painel {
+  background: linear-gradient(145deg, #12334bea 0%, #0b2137eb 100%);
+}
+.app-shell .controles {
+  background: linear-gradient(135deg, #102b43c2, #0c2137e3);
+}
+.app-shell .sidebar-toggle:focus-visible,
+.app-shell .mobile-close:focus-visible,
+.app-shell .menu-toggle:focus-visible,
+.app-shell .menu a:focus-visible,
+.app-shell a:focus-visible,
+.app-shell button:focus-visible,
+.app-shell input:focus-visible,
+.app-shell select:focus-visible,
+.app-shell textarea:focus-visible {
+  outline: 2px solid var(--admin-contorno-ativo);
+  outline-offset: 3px;
+}
+.app-shell .menu a:not(.ativo):hover {
+  border-color: #70b8da5a;
+  background: #1b4c6c9c;
+}
+.app-shell .chip-demo {
+  background: #4b3e263d;
+  border-color: #bc9b5c64;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .menu a, .app-shell .sidebar, .app-shell .workspace {
+    transition: none !important;
+  }
+}
+@media print {
+  .app-shell { background: #fff !important; color: #111 !important; }
+  .app-shell .painel, .app-shell .metrica, .app-shell .mod-estatistica {
+    box-shadow: none !important;
+  }
+}
