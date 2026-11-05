@@ -79,3 +79,21 @@ jobs:
           docker compose --env-file .env.homologacao -f compose.homologacao.yml ps
           docker compose --env-file .env.homologacao -f compose.homologacao.yml logs --tail=80 web
           exit 1
+
+      - name: Testar schema PostgreSQL de homologacao
+        # Somente no PR da Issue 41, com banco descartavel do runner.
+        if: ${{ github.event.pull_request.head.ref == 'db/schema-homologacao-41' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml config --quiet
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          bash scripts/aplicar-schema-homologacao.sh
