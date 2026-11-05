@@ -406,3 +406,136 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
     box-shadow: none !important;
   }
 }
+
+
+/* Fase 3 (#26): refinamento exclusivo do Ranking administrativo.
+   Classes de escopo evitam impacto nas demais abas e nos relatórios gerados. */
+.app-shell .ranking-fase3-filtros {
+  padding: 19px 20px;
+  gap: 15px;
+  margin-bottom: 23px;
+  border: 1px solid #6497b36b;
+  border-radius: 17px;
+  background: linear-gradient(125deg, #153953e8, #0b253ce8);
+  box-shadow: inset 0 1px #c9ecff13, 0 12px 32px #000b1c22;
+}
+.app-shell .ranking-fase3-filtros .campo { flex: 1 1 155px; min-width: min(155px,100%); }
+.app-shell .ranking-fase3-filtros .campo label { color: #a9ccdf; font-size: 11px; letter-spacing: .025em; }
+.app-shell .ranking-fase3-filtros .campo input,
+.app-shell .ranking-fase3-filtros .campo select {
+  background: #0b273e;
+  border-color: #5886a37a;
+  border-radius: 10px;
+  color: #effaff;
+  min-height: 43px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.app-shell .ranking-fase3-filtros .campo input:hover,
+.app-shell .ranking-fase3-filtros .campo select:hover { border-color: #76bddf; }
+.app-shell .ranking-fase3-filtros .campo input:focus-visible,
+.app-shell .ranking-fase3-filtros .campo select:focus-visible { outline: 2px solid #84d7ff; outline-offset: 2px; }
+.app-shell .ranking-fase3-resumo { gap: 15px; margin-bottom: 22px; }
+.app-shell .ranking-fase3-resumo .mod-estatistica {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 148px;
+  border: 1px solid #6599b763;
+  border-radius: 16px;
+  background: linear-gradient(140deg, #153a55, #0c273f);
+  box-shadow: inset 0 1px #d7f3ff12, 0 14px 33px #000d1c21;
+}
+.app-shell .ranking-fase3-resumo .mod-estatistica::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -85px;
+  right: -58px;
+  width: 190px;
+  height: 190px;
+  background: radial-gradient(circle, #57c6ff1a, transparent 70%);
+  pointer-events: none;
+}
+.app-shell .ranking-fase3-resumo .mod-estatistica.verde::before { background: radial-gradient(circle, #42d9aa17, transparent 70%); }
+.app-shell .ranking-fase3-resumo .mod-estatistica.vermelho::before { background: radial-gradient(circle, #ff899317, transparent 70%); }
+.app-shell .ranking-fase3-resumo .mod-estatistica.amarelo::before { background: radial-gradient(circle, #f4c77b17, transparent 70%); }
+.app-shell .ranking-fase3-resumo .mod-estatistica small { color: #b9d4e5; letter-spacing: .02em; }
+.app-shell .ranking-fase3-resumo .mod-estatistica strong { color: #f5fbff; font-variant-numeric: tabular-nums; }
+.app-shell .ranking-fase3-resumo .mod-estatistica span { color: #a5c3d7; }
+.app-shell .ranking-fase3-painel {
+  border: 1px solid #6598b465;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #153953f0 0%, #0c293ff2 62%, #0a2137f2 100%);
+  box-shadow: inset 0 1px #c4e9ff10, 0 17px 36px #000c1c24;
+  padding: 24px;
+}
+.app-shell .ranking-fase3-painel .mod-chips { gap: 9px; }
+.app-shell .ranking-fase3-painel .mod-chip {
+  border: 1px solid #629bb46b;
+  color: #cce8f6;
+  background: #1643638c;
+}
+.app-shell .ranking-fase3-rolagem {
+  border: 1px solid #668ba24f;
+  border-radius: 13px;
+  background: #0b263d;
+  scrollbar-width: thin;
+  scrollbar-color: #418cb4 #0a273c;
+}
+.app-shell .ranking-fase3-tabela { border-collapse: separate; border-spacing: 0; }
+.app-shell .ranking-fase3-tabela th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #153953;
+  color: #c4e0ef;
+  border-bottom: 1px solid #6da7c26b;
+  padding: 16px 12px;
+  font-size: 10px;
+  letter-spacing: .065em;
+}
+.app-shell .ranking-fase3-tabela td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #6a94af29;
+  color: #e4f3fb;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+.app-shell .ranking-fase3-tabela tbody tr:nth-child(even) td { background: #13324a5c; }
+.app-shell .ranking-fase3-tabela tbody tr:hover td { background: #20547499; }
+.app-shell .ranking-fase3-tabela td:nth-child(1) strong { color: #9fe4ff; font-weight: 800; }
+.app-shell .ranking-fase3-tabela td:nth-child(2) strong { color: #f4faff; font-weight: 700; }
+.app-shell .ranking-fase3-tabela td:last-child strong { color: #b6edff; font-size: 13px; }
+.app-shell .ranking-fase3-tabela .texto-muted { color: #9fbfd2; }
+.app-shell .ranking-fase3-tabela .estado {
+  display: inline-block;
+  border: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 27%, transparent);
+  padding: 6px 10px;
+  font-weight: 750;
+}
+.app-shell .ranking-fase3-painel .nota-rodape { color: #b2cbdb; line-height: 1.65; }
+.app-shell .ranking-fase3-painel .botao:focus-visible,
+.app-shell .ranking-fase3-modal button:focus-visible { outline: 2px solid #86d9ff; outline-offset: 3px; }
+@media (max-width: 780px) {
+  .app-shell .ranking-fase3-filtros { padding: 15px; gap: 12px; }
+  .app-shell .ranking-fase3-painel { padding: 17px; }
+  .app-shell .ranking-fase3-tabela th { padding: 13px 10px; }
+  .app-shell .ranking-fase3-tabela td { padding: 12px 10px; }
+}
+@media (max-width: 420px) {
+  .app-shell .ranking-fase3-filtros .campo { flex: 1 1 100%; }
+  .app-shell .ranking-fase3-painel { padding: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .ranking-fase3-filtros .campo input,
+  .app-shell .ranking-fase3-filtros .campo select { transition: none; }
+}
+@media print {
+  .app-shell .ranking-fase3-painel,
+  .app-shell .ranking-fase3-resumo .mod-estatistica {
+    background: #fff !important; border-color: #888 !important; box-shadow: none !important;
+  }
+  .app-shell .ranking-fase3-tabela th,
+  .app-shell .ranking-fase3-tabela td { background: #fff !important; color: #111 !important; }
+}
