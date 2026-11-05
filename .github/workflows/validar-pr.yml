@@ -2,7 +2,9 @@ name: Validar pull request
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - "style/**"
 
 permissions:
   contents: read
