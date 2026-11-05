@@ -38,3 +38,7 @@ docker compose --env-file .env.homologacao -f compose.homologacao.yml \
 - Segunda execução é idempotente (somente valida);
 - `npm run typecheck`, `npm run test:rules` e build existentes aprovados;
 - Nada é implantado automaticamente no Vostro 3470.
+
+## Validação automatizada de PRs encadeados
+
+O workflow de pull requests deve aceitar a branch de destino `infra/**`, além de `main` e `style/**`. A correção foi incorporada à branch da infraestrutura (#40) e à branch deste PR (#42). O teste do schema precisa concluir com sucesso antes de qualquer execução no servidor físico.
