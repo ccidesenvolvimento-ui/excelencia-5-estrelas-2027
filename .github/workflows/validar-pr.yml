@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - "style/**"
+      - "infra/**"
+      - "db/**"
 
 permissions:
   contents: read
