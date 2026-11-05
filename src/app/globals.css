@@ -914,3 +914,179 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
     border-color:#888!important;box-shadow:none!important;
   }
 }
+
+
+/* Fase 8 (#36): refinamento exclusivo da tela Testes e erros (QA). */
+.app-shell .diagnostico-fase8 {
+  --qa-borda: #70a4bd70;
+  --qa-foco: #8cddff;
+  min-width: 0;
+  color: #eff9ff;
+}
+.app-shell .diagnostico-fase8 .cabecalho-premium { margin-bottom: 24px; }
+.app-shell .diagnostico-fase8 .cabecalho-premium p { color: #b7d4e5; }
+.app-shell .diagnostico-fase8 .cards-metricas {
+  gap: 15px;
+  margin-bottom: 23px;
+}
+.app-shell .diagnostico-fase8 .metrica {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 149px;
+  padding: 22px;
+  border: 1px solid var(--qa-borda);
+  border-radius: 17px;
+  background: linear-gradient(145deg, #163b56, #0d2b43 70%, #0b243b);
+  box-shadow: inset 0 1px #e4f6ff12, 0 14px 32px #000d1f24;
+}
+.app-shell .diagnostico-fase8 .metrica::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -80px;
+  right: -55px;
+  width: 185px;
+  height: 185px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6aceff1c, transparent 70%);
+  pointer-events: none;
+}
+.app-shell .diagnostico-fase8 .metrica small { color: #b8d7e8; letter-spacing: .017em; }
+.app-shell .diagnostico-fase8 .metrica strong {
+  color: #f5fbff;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.app-shell .diagnostico-fase8 .metrica span { color: #abc9dc; line-height: 1.5; }
+.app-shell .diagnostico-fase8 .painel {
+  margin-bottom: 22px;
+  padding: 25px;
+  border: 1px solid var(--qa-borda);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #153a55ec, #0d2a43f0 65%, #0a2239f4);
+  box-shadow: inset 0 1px #e1f5ff12, 0 16px 36px #000e1f26;
+}
+.app-shell .diagnostico-fase8 .painel h2 {
+  margin: 0;
+  color: #f4fbff;
+  letter-spacing: -.028em;
+  line-height: 1.3;
+}
+.app-shell .diagnostico-fase8 .linha-acoes { gap: 12px; }
+.app-shell .diagnostico-fase8 .painel > .linha-acoes:first-child {
+  padding-bottom: 18px;
+  border-bottom: 1px solid #75a6c03c;
+  margin-bottom: 18px !important;
+}
+.app-shell .diagnostico-fase8 .tabela-scroll {
+  border: 1px solid #70a1bd65;
+  border-radius: 13px;
+  scrollbar-width: thin;
+  scrollbar-color: #468daf #0b2b43;
+  background: #0c2a42;
+}
+.app-shell .diagnostico-fase8 .tabela { border-collapse: separate; border-spacing: 0; }
+.app-shell .diagnostico-fase8 .tabela th {
+  padding: 16px 14px;
+  background: #16405b;
+  color: #d0e9f6;
+  border-bottom: 1px solid #7bb4ce6b;
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+.app-shell .diagnostico-fase8 .tabela td {
+  padding: 14px;
+  border-bottom: 1px solid #78a5bb31;
+  color: #dceef8;
+  line-height: 1.55;
+}
+.app-shell .diagnostico-fase8 .tabela tbody tr:nth-child(even) td { background: #163b5366; }
+.app-shell .diagnostico-fase8 .tabela tbody tr:hover td { background: #1d506d9c; }
+.app-shell .diagnostico-fase8 .tabela td.texto-sucesso {
+  color: #8be9c1;
+  font-weight: 740;
+  white-space: nowrap;
+}
+.app-shell .diagnostico-fase8 .tabela td.texto-alerta {
+  color: #ffc1a5;
+  font-weight: 740;
+  white-space: nowrap;
+}
+.app-shell .diagnostico-fase8 .controles {
+  margin-top: 19px;
+  padding: 17px;
+  border: 1px solid #6e9fba65;
+  border-radius: 13px;
+  background: linear-gradient(125deg, #143c56, #0b2b43);
+}
+.app-shell .diagnostico-fase8 .controles .campo {
+  flex: 1 1 210px;
+  min-width: 0;
+}
+.app-shell .diagnostico-fase8 .campo label {
+  color: #bbd9e9;
+  font-size: 11px;
+  letter-spacing: .015em;
+}
+.app-shell .diagnostico-fase8 .campo input,
+.app-shell .diagnostico-fase8 .campo select,
+.app-shell .diagnostico-fase8 .campo textarea {
+  background: #0d2c44;
+  color: #f0faff;
+  border: 1px solid #70a0b98a;
+  border-radius: 10px;
+  min-height: 44px;
+}
+.app-shell .diagnostico-fase8 .campo textarea {
+  width: 100%;
+  padding: 14px;
+  resize: vertical;
+  line-height: 1.6;
+  min-height: 140px;
+}
+.app-shell .diagnostico-fase8 .campo input::placeholder,
+.app-shell .diagnostico-fase8 .campo textarea::placeholder { color: #9dbed2; }
+.app-shell .diagnostico-fase8 .campo select:hover,
+.app-shell .diagnostico-fase8 .campo textarea:hover { border-color: #8ac6e5; }
+.app-shell .diagnostico-fase8 .botao { border-radius: 10px; min-height: 43px; }
+.app-shell .diagnostico-fase8 button:focus-visible,
+.app-shell .diagnostico-fase8 input:focus-visible,
+.app-shell .diagnostico-fase8 select:focus-visible,
+.app-shell .diagnostico-fase8 textarea:focus-visible {
+  outline: 2px solid var(--qa-foco);
+  outline-offset: 3px;
+}
+.app-shell .diagnostico-fase8 .nota-rodape {
+  color: #aecadd;
+  margin-top: 21px;
+  line-height: 1.7;
+}
+@media (max-width: 750px) {
+  .app-shell .diagnostico-fase8 .cards-metricas { gap: 11px; }
+  .app-shell .diagnostico-fase8 .metrica { min-height: 135px; padding: 17px; }
+  .app-shell .diagnostico-fase8 .painel { padding: 18px; border-radius: 15px; }
+  .app-shell .diagnostico-fase8 .controles { padding: 14px; }
+  .app-shell .diagnostico-fase8 .tabela th,
+  .app-shell .diagnostico-fase8 .tabela td { padding: 12px; }
+}
+@media (max-width: 420px) {
+  .app-shell .diagnostico-fase8 .metrica { padding: 13px; }
+  .app-shell .diagnostico-fase8 .painel { padding: 15px; }
+  .app-shell .diagnostico-fase8 .painel .linha-acoes .botao { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .diagnostico-fase8 .metrica,
+  .app-shell .diagnostico-fase8 .botao { transition: none; }
+}
+@media print {
+  .app-shell .diagnostico-fase8 .metrica,
+  .app-shell .diagnostico-fase8 .painel,
+  .app-shell .diagnostico-fase8 .tabela th,
+  .app-shell .diagnostico-fase8 .tabela td {
+    background: #fff !important;
+    color: #111 !important;
+    box-shadow: none !important;
+    border-color: #888 !important;
+  }
+}
