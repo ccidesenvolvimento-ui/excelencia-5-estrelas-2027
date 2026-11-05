@@ -25,7 +25,7 @@ docker compose --env-file .env.homologacao -f compose.homologacao.yml \
   exec -it db psql -X -U excelencia5_app -d excelencia5_homologacao
 ```
 
-No prompt do psql, digitar `\password excelencia5_runtime` e escolher senha forte; concluir com `\\q`. Não enviar senha por chat, comando, URL ou Issue. Antes de habilitar a conexão na aplicação, a equipe deve revisar como fornecer a senha via configuração privada do contêiner (preferir Docker secrets), sem exposição em build ou logs.
+No prompt do psql, digitar `\password excelencia5_runtime` e escolher senha forte; concluir com `\q`. Não enviar senha por chat, comando, URL ou Issue. Antes de habilitar a conexão na aplicação, a equipe deve revisar como fornecer a senha via configuração privada do contêiner (preferir Docker secrets), sem exposição em build ou logs.
 
 ## Código TypeScript
 O módulo `src/server/postgres.ts` usa `pg`, `server-only` e um pool com no máximo duas conexões e timeouts. Ele só será executado se importado por uma rotina explicitamente de servidor; atualmente **nenhuma tela ou API o importa**. Exige `EXCELENCIA_DB_HOST`, `EXCELENCIA_DB_NAME`, `EXCELENCIA_DB_USER` (valor fixo `excelencia5_runtime`) e `EXCELENCIA_DB_PASSWORD`; porta opcional `EXCELENCIA_DB_PORT`.
