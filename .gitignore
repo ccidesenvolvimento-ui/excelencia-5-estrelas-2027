@@ -12,3 +12,6 @@ supabase/.branches/
 # Exportação estática e evidências locais de navegador
 out/
 artifacts/
+
+# Segredos de infraestrutura de homologação
+.env.homologacao
