@@ -77,7 +77,7 @@ export default function RH0034() {
     setResultado(conferirSelecaoRh0034(arquivo.name, arquivo.size));
   }
 
-  return <>
+  return <main className="rh0034-fase6">
     <Cabecalho
       tag="CADASTRO CORPORATIVO / RH0034"
       titulo="Cadastro e importação RH0034"
@@ -162,5 +162,5 @@ export default function RH0034() {
       <div className={estilos.rodapeClassificacao}><span>As classificações de demonstração ficam somente neste navegador e não alteram os rankings.</span><button className="botao botao-claro" type="button" disabled title="Regras automáticas exigem prévia dos afetados, aprovação e auditoria no backend">Criar regra automática (em breve)</button></div>
     </section>
     <div className="mod-sem-backend"><strong>Próxima fase técnica:</strong> leitura real da RH0034 com validação de todas as linhas antes de confirmar, deduplicação por empresa + matrícula, classificação por filial/segmento, elegibilidade de funções permitidas, férias e auditoria. Nesta demonstração não existe importação, gravação ou acesso a dados reais.</div>
-  </>;
+  </main>;
 }

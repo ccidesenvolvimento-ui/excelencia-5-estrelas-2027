@@ -34,3 +34,81 @@
 .rodapeClassificacao span{flex:1 1 260px;font-size:12px;color:#a4c2d7;line-height:1.5}
 @media(max-width:1020px){.importacaoGrade{grid-template-columns:1fr}}
 @media(max-width:560px){.zonaSoltar{min-height:220px}.linhaStatus{align-items:flex-start;flex-direction:column;gap:4px}.linhaStatus strong{text-align:left}.rodapeClassificacao .botao{width:100%}}
+
+
+/* Fase 6 (#32): acabamento visual RH0034, sem alterar interações ou validações. */
+.cabecalhoImportacao{gap:18px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid #83b3cb30}
+.selo{
+  border-radius:9px;color:#b7eaff;background:#19465fbb;
+  border:1px solid #68a9c88c;padding:9px 12px;
+}
+.importacaoGrade{gap:22px}
+.zonaSoltar{
+  min-height:249px;border:1.5px dashed #70b6d8;border-radius:16px;
+  background:radial-gradient(circle at 50% 0%,#25638336,transparent 72%),
+    linear-gradient(140deg,#16415bac,#0b2b43);
+  padding:26px 18px;gap:13px;box-shadow:inset 0 1px #e7f8ff14;
+}
+.zonaSoltar:hover{border-color:#9bddf6;background-color:#16425a}
+.zonaSoltar.arrastando{border-color:#95e5ff;background:#1e5878}
+.zonaSoltar strong{font-size:16px;color:#f8fcff;line-height:1.45}
+.zonaSoltar>span:not(.iconeArquivo){color:#bed8e9;line-height:1.5}
+.iconeArquivo{
+  width:58px;height:58px;border-radius:17px;color:#c5f2ff;
+  background:linear-gradient(145deg,#246181,#16425d);
+  border:1px solid #78c4e68c;box-shadow:0 8px 20px #00132432;
+}
+.arquivoEscolhido{
+  border-radius:12px;background:#153d54;
+  border-color:#77b8d17f;padding:15px;
+}
+.arquivoEscolhido strong{color:#f4faff}
+.arquivoEscolhido small{color:#b3d0e0}
+.arquivoEscolhido button{background:#20526e;border-color:#79a9c17d;cursor:pointer}
+.arquivoEscolhido button:hover{background:#286584}
+.acoesArquivo{gap:11px;margin-top:18px}
+.resultado{border-radius:12px;padding:15px 17px;line-height:1.65}
+.resultadoOk{border-color:#53a88a;color:#b6f7da}
+.resultadoErro{border-color:#cd8088;color:#ffe0e2}
+.areaStatus{
+  padding:23px;border-radius:15px;
+  border:1px solid #649bb679;
+  background:linear-gradient(148deg,#143b55,#0b273f);
+  box-shadow:inset 0 1px #d7f2ff10;
+}
+.linhaStatus{padding-bottom:13px;margin-bottom:13px;border-bottom:1px solid #77abc026}
+.linhaStatus span{color:#b7d3e5}
+.linhaStatus strong{color:#f2faff;line-height:1.45}
+.divisor{background:#79afc549;margin:19px 0}
+.areaStatus h3{font-size:15px;color:#f5fbff;margin-bottom:16px}
+.etapas{gap:11px}
+.etapas li{
+  padding:10px 11px;align-items:flex-start;gap:12px;
+  border:1px solid #6897b44d;border-radius:10px;
+  background:#153f5773;color:#cce4f1;line-height:1.55;
+}
+.etapas li span{
+  border:1px solid #71b9db70;background:#1f5775;
+  color:#d7f4ff;border-radius:8px;padding:5px 7px;
+}
+.notaPrivacidade{
+  margin-top:22px;padding-top:16px;border-top:1px solid #79afc533;
+  color:#b2cbdb;line-height:1.65;
+}
+.barraResultado{padding:3px 0 16px;border-bottom:1px solid #80b4cf2b;margin-bottom:18px;color:#bcd8e9}
+.rodapeClassificacao{margin-top:20px;padding-top:17px;border-top:1px solid #77a9c433}
+.rodapeClassificacao span{color:#b5cfe0;line-height:1.65}
+@media(max-width:560px){
+  .zonaSoltar{min-height:236px;padding:21px 13px}
+  .areaStatus{padding:18px}
+  .linhaStatus{gap:6px}
+  .acoesArquivo .botao{flex:1 1 190px}
+  .cabecalhoImportacao{gap:12px}
+}
+@media(prefers-reduced-motion:reduce){.zonaSoltar{transition:none}}
+@media print{
+  .zonaSoltar,.areaStatus,.etapas li{
+    background:#fff!important;color:#111!important;
+    box-shadow:none!important;border-color:#888!important;
+  }
+}

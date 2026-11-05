@@ -665,3 +665,100 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
   .app-shell .importacoes-fase5 p,
   .app-shell .importacoes-fase5 .passos li { color:#111!important; }
 }
+
+
+/* Fase 6 (#32): estilos globais estritamente escopados ao Cadastro RH0034. */
+.app-shell .rh0034-fase6 { --rh-borda:#6ba1be73;--rh-foco:#8edbff; }
+.app-shell .rh0034-fase6 .cabecalho-premium { margin-bottom:24px; }
+.app-shell .rh0034-fase6 .mod-grid-estatisticas { gap:15px;margin-bottom:23px; }
+.app-shell .rh0034-fase6 .mod-estatistica {
+  min-height:150px;position:relative;isolation:isolate;overflow:hidden;
+  padding:21px;border:1px solid var(--rh-borda);border-radius:17px;
+  background:linear-gradient(142deg,#163c57,#0d2b43);
+  box-shadow:inset 0 1px #d9f1ff11,0 15px 33px #000d2026;
+}
+.app-shell .rh0034-fase6 .mod-estatistica:before {
+  content:"";position:absolute;z-index:-1;
+  top:-70px;right:-55px;width:180px;height:180px;
+  background:radial-gradient(circle,#62cfff1b,transparent 72%);
+  pointer-events:none;
+}
+.app-shell .rh0034-fase6 .mod-estatistica.verde:before { background:radial-gradient(circle,#58d9ae1b,transparent 72%); }
+.app-shell .rh0034-fase6 .mod-estatistica.amarelo:before { background:radial-gradient(circle,#f4c77b1b,transparent 72%); }
+.app-shell .rh0034-fase6 .mod-estatistica small { color:#b7d5e7; }
+.app-shell .rh0034-fase6 .mod-estatistica strong { color:#f7fcff;font-variant-numeric:tabular-nums; }
+.app-shell .rh0034-fase6 .mod-estatistica span { color:#aac8db;line-height:1.45; }
+.app-shell .rh0034-fase6 .painel {
+  padding:26px;border:1px solid var(--rh-borda);border-radius:18px;
+  background:linear-gradient(145deg,#153b56f0,#0d2b43f0 65%,#0a2239f3);
+  box-shadow:inset 0 1px #d5edff11,0 16px 37px #000e2028;
+  margin-bottom:22px;
+}
+.app-shell .rh0034-fase6 .painel h2 { color:#f7fcff;letter-spacing:-.025em; }
+.app-shell .rh0034-fase6 .controles {
+  padding:19px;gap:14px;border:1px solid #76a4bf70;border-radius:15px;
+  background:linear-gradient(120deg,#143953dc,#0c2a43e8);
+}
+.app-shell .rh0034-fase6 .campo label { color:#b6d5e7;font-size:11px; }
+.app-shell .rh0034-fase6 .campo input,
+.app-shell .rh0034-fase6 .campo select {
+  min-height:44px;background:#0b2a42;border-color:#6196b48c;border-radius:10px;
+  color:#effaff;
+}
+.app-shell .rh0034-fase6 .campo input:hover,
+.app-shell .rh0034-fase6 .campo select:hover { border-color:#81c4e7; }
+.app-shell .rh0034-fase6 .campo input:focus-visible,
+.app-shell .rh0034-fase6 .campo select:focus-visible,
+.app-shell .rh0034-fase6 .botao:focus-visible,
+.app-shell .rh0034-fase6 button:focus-visible {
+  outline:2px solid var(--rh-foco);outline-offset:3px;
+}
+.app-shell .rh0034-fase6 .tabela-scroll {
+  border:1px solid #78a5bc5c;border-radius:13px;
+  background:#0d2b42;scrollbar-width:thin;scrollbar-color:#438eb6 #09273d;
+}
+.app-shell .rh0034-fase6 .tabela {
+  border-collapse:separate;border-spacing:0;min-width:990px;
+}
+.app-shell .rh0034-fase6 .tabela th {
+  background:#163d57;color:#cde7f5;
+  border-bottom:1px solid #78b2cc6b;
+  padding:16px 12px;font-size:10px;letter-spacing:.06em;
+}
+.app-shell .rh0034-fase6 .tabela td {
+  padding:14px 12px;line-height:1.55;
+  border-bottom:1px solid #689dbb31;
+  color:#dceff9;font-variant-numeric:tabular-nums;
+}
+.app-shell .rh0034-fase6 .tabela tbody tr:nth-child(even) td { background:#14354c6b; }
+.app-shell .rh0034-fase6 .tabela tbody tr:hover td { background:#20567699; }
+.app-shell .rh0034-fase6 .tabela td:first-child strong { color:#f6fcff; }
+.app-shell .rh0034-fase6 .tabela .campo select { min-height:39px;max-width:260px; }
+.app-shell .rh0034-fase6 .mod-status {
+  display:inline-flex;align-items:center;border-radius:8px;
+  padding:6px 9px;background:#1d4b67;border:1px solid #71a5c07a;
+  color:#ccecff;
+}
+.app-shell .rh0034-fase6 .mod-sem-backend {
+  border-color:#609ab96b;background:#143a53b3;color:#bfd9e7;
+  border-radius:12px;line-height:1.65;
+}
+@media(max-width:720px){
+  .app-shell .rh0034-fase6 .painel { padding:18px;border-radius:15px; }
+  .app-shell .rh0034-fase6 .mod-grid-estatisticas { gap:11px; }
+  .app-shell .rh0034-fase6 .mod-estatistica { padding:16px;min-height:140px; }
+  .app-shell .rh0034-fase6 .controles { padding:15px; }
+}
+@media(max-width:420px){
+  .app-shell .rh0034-fase6 .mod-estatistica { padding:13px; }
+  .app-shell .rh0034-fase6 .painel { padding:15px; }
+}
+@media print {
+  .app-shell .rh0034-fase6 .painel,
+  .app-shell .rh0034-fase6 .mod-estatistica,
+  .app-shell .rh0034-fase6 .tabela th,
+  .app-shell .rh0034-fase6 .tabela td {
+    background:#fff!important;color:#111!important;
+    box-shadow:none!important;border-color:#888!important;
+  }
+}
