@@ -50,3 +50,30 @@ jobs:
         with:
           name: ajustes-desktop-celular
           path: artifacts/
+
+      - name: Validar homologacao Docker e Next.js servidor
+        # Executa contêineres efêmeros somente no runner do GitHub, sem acesso ao servidor do setor.
+        if: ${{ github.event.pull_request.head.ref == 'infra/homologacao-local-39' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml config --quiet
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --build --wait
+          for tentativa in $(seq 1 40); do
+            if curl --fail --silent --show-error --max-time 4 -I http://127.0.0.1:3107/ >/dev/null 2>&1; then
+              echo 'Smoke test Next.js via loopback: OK'
+              exit 0
+            fi
+            sleep 3
+          done
+          echo 'Falha no smoke test do Next.js'
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml ps
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml logs --tail=80 web
+          exit 1
