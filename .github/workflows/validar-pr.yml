@@ -97,3 +97,27 @@ jobs:
           docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
           bash scripts/aplicar-schema-homologacao.sh
           bash scripts/aplicar-schema-homologacao.sh
+
+      - name: Validar papel runtime e permissoes PostgreSQL
+        if: ${{ github.event.pull_request.head.ref == 'db/conexao-segura-43' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml \
+            exec -T db psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/20_runtime_minimo.sql
+          bash scripts/testar-runtime-db.sh
+          # Segunda aplicação deve preservar os grants e não gerar duplicação de roles.
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml \
+            exec -T db psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/20_runtime_minimo.sql
+          bash scripts/testar-runtime-db.sh
