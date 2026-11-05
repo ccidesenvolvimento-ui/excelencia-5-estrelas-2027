@@ -40,7 +40,7 @@ export default function Configuracoes(){
    setUsuarios(atual=>[...atual,novo]);setSelecionado(novo.id);setNovoNome("");setAviso("Perfil de teste criado localmente. Nenhuma conta real foi criada.");
  }
  function reset(){setUsuarios(INICIAIS);setSelecionado("consulta-001");setAviso("Simulação redefinida para os perfis fictícios iniciais.")}
- return <>
+ return <main className="configuracoes-fase7">
  <Cabecalho tag="ADMINISTRAÇÃO / PROGRAMA 2027" titulo="Configurações do sistema" descricao="Reúna metodologia, ciclos de avaliação, usuários, acessos por filial e requisitos de auditoria em uma só área."/>
  <AvisoDemo texto="Nesta versão pública, as regras são informativas e os perfis de usuários são uma simulação local. Nenhum acesso real é criado ou autorizado."/>
  <div className="mod-tabbar" role="tablist" aria-label="Áreas de configurações">{abas.map(a=><button key={a.id} type="button" role="tab" aria-selected={aba===a.id} className="mod-tab" onClick={()=>mudarAba(a.id)}>{a.nome}</button>)}</div>
@@ -66,5 +66,5 @@ export default function Configuracoes(){
  <section className="painel"><BlocoTitulo superior="POLÍTICA DE ACESSOS" titulo="Matriz de autorização prevista"/><div className="tabela-scroll"><table className="tabela"><thead><tr><th>Perfil</th><th>Visualizar</th><th>Importar</th><th>Editar</th><th>Exportar</th><th>Filiais</th></tr></thead><tbody><tr><td>Administrador (3 iniciais)</td><td>Sim</td><td>Sim</td><td>Com auditoria</td><td>Sim</td><td>Todas</td></tr><tr><td>Analista autorizado</td><td>Conforme concessão</td><td>Conforme concessão</td><td>Conforme concessão</td><td>Conforme concessão</td><td>Específicas</td></tr><tr><td>Consulta</td><td>Conforme concessão</td><td>Não, por padrão</td><td>Não, por padrão</td><td>Conforme concessão</td><td>Específicas</td></tr></tbody></table></div></section>
  </>}
  {aba==="seguranca"&&<><section className="painel"><BlocoTitulo superior="SEGURANÇA CORPORATIVA" titulo="Requisitos antes de habilitar dados reais" descricao="A demonstração é pública, portanto não deve possuir dados pessoais, chaves privadas ou endpoints de edição reais."/><ol className="passos"><li>Autenticação corporativa segura (Supabase Auth ou provedor aprovado).</li><li>Row Level Security por usuário, filial e operação.</li><li>Backend autenticado para importação e validação integral das planilhas.</li><li>Auditoria imutável de alterações e fechamento da competência.</li><li>Exportações protegidas pelas mesmas regras do banco de dados.</li></ol></section><section className="painel"><BlocoTitulo superior="AUDITORIA" titulo="Registro de alterações — estrutura prevista"/><div className="tabela-scroll"><table className="tabela"><thead><tr><th>Data e hora</th><th>Responsável</th><th>Tipo de alteração</th><th>Antes / Depois</th></tr></thead><tbody><tr><td colSpan={4} className="mod-vazio">Sem registros: não existe auditoria conectada nesta demonstração.</td></tr></tbody></table></div></section></>}
- </>;
+ </main>;
 }
