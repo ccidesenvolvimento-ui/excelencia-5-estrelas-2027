@@ -762,3 +762,155 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
     box-shadow:none!important;border-color:#888!important;
   }
 }
+
+
+/* Fase 7 (#34): refinamento exclusivo da tela Configurações. */
+.app-shell .configuracoes-fase7 { --cfg-borda:#6c9fba6e;--cfg-foco:#8cddff; color:#edf8ff; }
+.app-shell .configuracoes-fase7 .cabecalho-premium { margin-bottom:24px; }
+.app-shell .configuracoes-fase7 .cabecalho-premium p { color:#b6d2e5; }
+.app-shell .configuracoes-fase7 .mod-tabbar {
+  display:flex;flex-wrap:wrap;gap:9px;padding:9px;margin-bottom:23px;
+  border:1px solid var(--cfg-borda);border-radius:15px;
+  background:linear-gradient(125deg,#173950e3,#0c2b42ed);
+  box-shadow:inset 0 1px #cbebff12;
+}
+.app-shell .configuracoes-fase7 .mod-tab {
+  min-height:43px;padding:11px 17px;border:1px solid transparent;
+  border-radius:10px;color:#b7d5e8;background:transparent;
+  font-weight:730;transition:background .18s,border-color .18s,color .18s;
+}
+.app-shell .configuracoes-fase7 .mod-tab:hover {
+  background:#1d4b68;color:#f3fbff;border-color:#6ca6c44f;
+}
+.app-shell .configuracoes-fase7 .mod-tab[aria-selected="true"] {
+  color:#f8fcff;background:linear-gradient(110deg,#176ca0,#1a5176);
+  border-color:#77c5e47d;box-shadow:0 5px 16px #00142730;
+}
+.app-shell .configuracoes-fase7 .mod-grid-estatisticas { gap:15px;margin-bottom:22px; }
+.app-shell .configuracoes-fase7 .mod-estatistica {
+  position:relative;isolation:isolate;overflow:hidden;min-height:148px;
+  padding:21px;border:1px solid var(--cfg-borda);
+  border-radius:17px;background:linear-gradient(140deg,#173d57,#0e2b44);
+  box-shadow:inset 0 1px #d9f2ff10,0 14px 32px #000e2025;
+}
+.app-shell .configuracoes-fase7 .mod-estatistica:before {
+  content:"";position:absolute;z-index:-1;top:-80px;right:-60px;
+  width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,#60cafa1d,transparent 70%);
+}
+.app-shell .configuracoes-fase7 .mod-estatistica small { color:#b8d5e7;letter-spacing:.02em; }
+.app-shell .configuracoes-fase7 .mod-estatistica strong { color:#f7fcff;font-variant-numeric:tabular-nums; }
+.app-shell .configuracoes-fase7 .mod-estatistica span { color:#a9c9dc;line-height:1.5; }
+.app-shell .configuracoes-fase7 .painel {
+  padding:25px;border:1px solid var(--cfg-borda);border-radius:17px;
+  background:linear-gradient(150deg,#153a54ed,#0c2a42f0 68%,#0b243af2);
+  box-shadow:inset 0 1px #ddf3ff11,0 15px 35px #000d1f26;
+  margin-bottom:21px;
+}
+.app-shell .configuracoes-fase7 .painel h2 { color:#f5fbff;letter-spacing:-.027em; }
+.app-shell .configuracoes-fase7 .nota-rodape { color:#a9c9dc;line-height:1.7; }
+.app-shell .configuracoes-fase7 .barra-item { gap:14px; }
+.app-shell .configuracoes-fase7 .barra-item > span { color:#cce5f3; }
+.app-shell .configuracoes-fase7 .barra-item > div {
+  height:12px;background:#09293f;border:1px solid #6d98ae43;border-radius:99px;
+}
+.app-shell .configuracoes-fase7 .barra-item i {
+  border-radius:99px;background:linear-gradient(90deg,#1787c6,#88dbff);
+}
+.app-shell .configuracoes-fase7 .mod-categoria-lista { gap:13px; }
+.app-shell .configuracoes-fase7 .mod-categoria-item {
+  padding:18px;border:1px solid #679ab86d;border-radius:12px;
+  background:linear-gradient(130deg,#17415aa6,#0f2d46b8);
+  color:#ecf8ff;line-height:1.5;
+}
+.app-shell .configuracoes-fase7 .rotulo-chave { color:#95dbff; }
+.app-shell .configuracoes-fase7 .passos { gap:12px; }
+.app-shell .configuracoes-fase7 .passos li {
+  padding:13px 15px;align-items:flex-start;gap:12px;
+  border:1px solid #6798b45e;border-radius:11px;
+  background:#153b557a;color:#cfe5f2;line-height:1.65;
+}
+.app-shell .configuracoes-fase7 .passos li:before {
+  width:29px;height:29px;flex:0 0 29px;
+  border:1px solid #72bde07d;border-radius:9px;
+  color:#d5f3ff;background:#1e5678;
+}
+.app-shell .configuracoes-fase7 .tabela-scroll {
+  border:1px solid #6899b65e;border-radius:12px;
+  scrollbar-width:thin;scrollbar-color:#498db4 #0a263e;
+}
+.app-shell .configuracoes-fase7 .tabela {
+  border-collapse:separate;border-spacing:0;
+}
+.app-shell .configuracoes-fase7 .tabela th {
+  padding:15px 12px;background:#16415d;
+  color:#d0e9f7;border-bottom:1px solid #75b1cb78;
+  letter-spacing:.05em;
+}
+.app-shell .configuracoes-fase7 .tabela td {
+  padding:13px 12px;line-height:1.55;
+  border-bottom:1px solid #6a9bb536;color:#e1f1fa;
+}
+.app-shell .configuracoes-fase7 .tabela tbody tr:nth-child(even) td { background:#173b5363; }
+.app-shell .configuracoes-fase7 .tabela tbody tr:hover td { background:#20567391; }
+.app-shell .configuracoes-fase7 .mod-accessos { gap:18px; }
+.app-shell .configuracoes-fase7 .mod-accessos > div {
+  min-width:0;padding:19px;
+  border:1px solid #6b9bb667;border-radius:13px;
+  background:linear-gradient(140deg,#153a54ae,#0d2a43be);
+}
+.app-shell .configuracoes-fase7 .campo label { color:#bbd8e8; }
+.app-shell .configuracoes-fase7 .campo input,
+.app-shell .configuracoes-fase7 .campo select {
+  background:#0c2d45;border:1px solid #6899b58b;border-radius:10px;
+  color:#f2faff;min-height:43px;
+}
+.app-shell .configuracoes-fase7 .campo input:hover,
+.app-shell .configuracoes-fase7 .campo select:hover { border-color:#8dcee9; }
+.app-shell .configuracoes-fase7 input[type="checkbox"] { accent-color:#58c4f5; }
+.app-shell .configuracoes-fase7 .mod-check {
+  border-color:#699cba65;border-radius:9px;
+  background:#14374fa3;color:#dceefa;
+}
+.app-shell .configuracoes-fase7 .mod-check:hover { border-color:#83c5e0; }
+.app-shell .configuracoes-fase7 .mod-permissoes td:not(:first-child),
+.app-shell .configuracoes-fase7 .mod-permissoes th:not(:first-child) { text-align:center; }
+.app-shell .configuracoes-fase7 .mod-sem-backend {
+  border-color:#66a2c075;border-radius:11px;
+  background:#123a56b6;color:#c3deec;line-height:1.65;
+}
+.app-shell .configuracoes-fase7 .bloco-info {
+  border:1px solid #66a7c380;border-left:3px solid #67ccff;
+  border-radius:12px;background:#153d58;color:#cce7f7;
+}
+.app-shell .configuracoes-fase7 button:focus-visible,
+.app-shell .configuracoes-fase7 input:focus-visible,
+.app-shell .configuracoes-fase7 select:focus-visible {
+  outline:2px solid var(--cfg-foco);outline-offset:3px;
+}
+@media(max-width:800px){
+  .app-shell .configuracoes-fase7 .painel { padding:18px;border-radius:14px; }
+  .app-shell .configuracoes-fase7 .mod-accessos > div { padding:15px; }
+  .app-shell .configuracoes-fase7 .mod-grid-estatisticas { gap:11px; }
+  .app-shell .configuracoes-fase7 .mod-tabbar { padding:7px;gap:6px; }
+}
+@media(max-width:470px){
+  .app-shell .configuracoes-fase7 .mod-tab { flex:1 1 100%;text-align:center; }
+  .app-shell .configuracoes-fase7 .painel { padding:15px; }
+  .app-shell .configuracoes-fase7 .mod-estatistica { padding:14px; }
+  .app-shell .configuracoes-fase7 .barra-item { gap:8px; }
+}
+@media(prefers-reduced-motion:reduce){
+  .app-shell .configuracoes-fase7 .mod-tab { transition:none; }
+}
+@media print {
+  .app-shell .configuracoes-fase7 .painel,
+  .app-shell .configuracoes-fase7 .mod-estatistica,
+  .app-shell .configuracoes-fase7 .mod-accessos > div,
+  .app-shell .configuracoes-fase7 .tabela th,
+  .app-shell .configuracoes-fase7 .tabela td,
+  .app-shell .configuracoes-fase7 .passos li {
+    color:#111!important;background:#fff!important;
+    border-color:#888!important;box-shadow:none!important;
+  }
+}
