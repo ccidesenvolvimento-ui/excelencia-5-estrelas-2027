@@ -26,3 +26,177 @@
 .cp-modal-fundo{position:fixed;inset:0;z-index:101;background:#020b18df;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}.cp-modal{width:min(560px,100%);padding:25px;background:#0b2942;border:1px solid #377aa5;border-radius:15px;box-shadow:0 25px 70px #0009}.cp-modal-top{display:flex;justify-content:space-between;gap:12px}.cp-modal-top h2{font-size:25px;margin:0 0 9px}.cp-modal-top p{color:#b2d1e7;margin:0}.cp-modal-top button{align-self:start;background:#163d5e;border:1px solid #3a769d;border-radius:7px;color:white;width:34px;height:34px;font-size:22px}.cp-modal-etiquetas{margin:23px 0}.cp-detalhe-fonte{border:1px solid #326b90;background:#123a56;border-radius:8px;padding:14px;font-size:13px;color:#cdeaff}.cp-modal-aviso{font-size:12px;color:#98c3df;line-height:1.6;margin:18px 0}.cp-btn-fechar{width:100%;background:#145687}
 @media(max-width:1100px){.cp-filtros-grid{grid-template-columns:repeat(2,minmax(170px,1fr))}.cp-busca{grid-column:auto}}
 @media(max-width:620px){.cp-filtros{padding:15px}.cp-filtros-grid{grid-template-columns:1fr}.cp-secao-cabecalho h2,.cp-agrupamento h2{font-size:16px}.cp-tabela-cabecalho{padding:15px}.cp-rodape-filtros{align-items:stretch}.cp-rodape-filtros p{width:100%}.cp-btn-limpar{flex:1}.cp-paginacao{padding:15px;align-items:flex-start}.cp-controle-pagina{width:100%;justify-content:space-between}.cp-card{border-radius:10px}.cp-titulo h1{font-size:31px}}
+
+
+/* Fase 4 (#28) — acabamento institucional exclusivo da Central de Pendências.
+   Não modifica regras, etiquetas semânticas, filtros nem exportação XLSX. */
+.cp-pagina {
+  --cp-acento: #78d8ff;
+  --cp-borda: #679bb66e;
+  --cp-fundo-controle: #0b2a42;
+}
+.cp-titulo { margin-bottom: 24px; }
+.cp-kicker { color: #85d9ff; }
+.cp-titulo h1 { letter-spacing: -.047em; color: #f5fbff; }
+.cp-titulo p { color: #b6d3e5; }
+.cp-card {
+  isolation: isolate;
+  border: 1px solid var(--cp-borda);
+  border-radius: 18px;
+  background: linear-gradient(148deg, #153953ed 0%, #0d2a42f2 60%, #0b2238f5 100%);
+  box-shadow: inset 0 1px #d5efff10, 0 17px 36px #000e2029;
+  margin-bottom: 22px;
+}
+.cp-filtros { padding: 23px 24px 20px; }
+.cp-secao-cabecalho h2, .cp-agrupamento h2 { color: #f4fbff; font-weight: 760; letter-spacing: -.03em; }
+.cp-secao-icone {
+  min-width: 35px;
+  height: 35px;
+  padding: 7px;
+  color: var(--cp-acento);
+  background: linear-gradient(135deg, #205777, #153a56);
+  border: 1px solid #76c6e94d;
+  border-radius: 10px;
+}
+.cp-filtros-grid {
+  margin-top: 21px;
+  padding-top: 19px;
+  border-top: 1px solid #8ab7ce21;
+  gap: 16px;
+}
+.cp-campo { gap: 8px; }
+.cp-campo span { font-size: 11px; color: #b8d6e7; letter-spacing: .01em; }
+.cp-campo select, .cp-campo input {
+  min-height: 44px;
+  background: var(--cp-fundo-controle);
+  border: 1px solid #6090ac86;
+  border-radius: 10px;
+  color: #f4fbff;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.cp-campo select:hover, .cp-campo input:hover { border-color: #80c7e9; background: #10344f; }
+.cp-campo select:focus-visible, .cp-campo input:focus-visible {
+  outline: 2px solid #8bdfff;
+  outline-offset: 2px;
+  border-color: #75c9ef;
+  box-shadow: 0 0 0 3px #3baee41a;
+}
+.cp-campo input::placeholder { color: #9ebed1; }
+.cp-rodape-filtros { margin-top: 20px; padding-top: 15px; border-top: 1px solid #8ab7ce21; }
+.cp-rodape-filtros p { color: #abc8da; }
+.cp-info { color: #8addff; border-color: #71bfe5; }
+.cp-btn {
+  border-radius: 10px;
+  min-height: 41px;
+  border-color: #5ca4cb94;
+  background: #123c5a;
+  color: #e9f8ff;
+}
+.cp-btn-exportar {
+  background: linear-gradient(100deg, #117ab6, #1e94cf);
+  border-color: #64c9f3;
+  color: #f6fdff;
+  box-shadow: 0 7px 20px #0575a22e;
+}
+.cp-btn-exportar:hover { background: linear-gradient(100deg, #158ac9, #36a8de); }
+.cp-btn-limpar { background: #0d304b; }
+.cp-btn:focus-visible, .cp-ver:focus-visible,
+.cp-tabela th button:focus-visible, .cp-paginacao button:focus-visible,
+.cp-paginacao select:focus-visible, .cp-modal-top button:focus-visible {
+  outline: 2px solid #91dfff;
+  outline-offset: 3px;
+}
+.cp-tabela-cabecalho {
+  padding: 20px 24px;
+  border-bottom: 1px solid #79a9c447;
+  background: linear-gradient(95deg, #16415c8c, #0d2e47a6);
+}
+.cp-contador { color: #e9f8ff; background: #1d5777; border-color: #72b9da70; padding: 5px 11px; }
+.cp-tabela-area { scrollbar-color: #468cb5 #09273e; }
+.cp-tabela { border-collapse: separate; border-spacing: 0; }
+.cp-tabela thead { background: #153b57; }
+.cp-tabela th {
+  color: #d5edfb;
+  border-bottom: 1px solid #6ca2bf70;
+  padding: 0 14px;
+  font-size: 11px;
+}
+.cp-tabela th button { min-height: 48px; }
+.cp-setas { color: #94cdeb; }
+.cp-tabela th[aria-sort="ascending"] button,
+.cp-tabela th[aria-sort="descending"] button { color: #a5e5ff; }
+.cp-tabela td {
+  padding: 14px;
+  border-bottom: 1px solid #6898b333;
+  color: #deeff9;
+  line-height: 1.5;
+}
+.cp-tabela tbody tr:nth-child(odd) { background: #0e2c43; }
+.cp-tabela tbody tr:nth-child(even) { background: #10334c; }
+.cp-tabela tbody tr:hover { background: #1b4c69; }
+.cp-nome { color: #f7fcff!important; }
+.cp-matricula { color: #b9d9ed!important; }
+.cp-etiquetas { gap: 7px; }
+.cp-etiqueta { padding: 6px 10px; font-size: 10px; border-radius: 8px; letter-spacing: .005em; }
+.cp-estado { color: #ffd99e; font-weight: 700; }
+.cp-ver {
+  background: #153c5780;
+  border-color: #5b91af5c;
+  border-radius: 10px;
+  color: #bfeaff;
+}
+.cp-ver:hover { background: #215c7e; border-color: #79ceee; }
+.cp-vazio { color: #bfd8e7!important; }
+.cp-paginacao {
+  padding: 17px 24px;
+  background: #0d2a41;
+  border-top: 1px solid #75a4c135;
+  color: #b2d0e3;
+}
+.cp-controle-pagina select, .cp-paginacao button {
+  background: #123852;
+  color: #e4f6ff;
+  border-color: #639dbb7d;
+  border-radius: 9px;
+}
+.cp-pagina-atual { background: #1c709f; border-radius: 9px; }
+.cp-nota { color: #a8c6d9; }
+.cp-modal-fundo { background: #020b18e8; }
+.cp-modal {
+  border-radius: 19px;
+  border-color: #77b8d47d;
+  background: radial-gradient(ellipse at 90% 0%, #1d567663, transparent 55%),
+    linear-gradient(150deg, #153750, #0b253d);
+  box-shadow: inset 0 1px #dbf1ff14, 0 30px 78px #000b;
+}
+.cp-modal-top { padding-bottom: 15px; border-bottom: 1px solid #79a9c43b; }
+.cp-modal-top h2 { color: #f7fcff; }
+.cp-modal-top p { color: #b5d2e4; }
+.cp-modal-top button { background: #17415f; border-color: #75b7d575; border-radius: 10px; cursor: pointer; }
+.cp-modal-top button:hover { background: #215a7c; }
+.cp-detalhe-fonte { background: #153d59; border-color: #649ec180; border-radius: 11px; }
+.cp-modal-aviso { color: #b2cedf; }
+@media (max-width: 620px) {
+  .cp-card { border-radius: 15px; }
+  .cp-filtros { padding: 18px 16px; }
+  .cp-filtros-grid { margin-top: 17px; padding-top: 16px; gap: 14px; }
+  .cp-tabela-cabecalho { padding: 17px 16px; }
+  .cp-tabela td { padding: 12px; }
+  .cp-tabela th { padding: 0 12px; }
+  .cp-paginacao { padding: 16px; }
+  .cp-secao-icone { width: 31px; height: 31px; min-width: 31px; }
+  .cp-modal { padding: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cp-campo select, .cp-campo input { transition: none; }
+}
+@media print {
+  .cp-card, .cp-modal {
+    background: #fff!important;
+    box-shadow: none!important;
+    border-color: #777!important;
+  }
+  .cp-card h2, .cp-tabela th, .cp-tabela td, .cp-nome, .cp-matricula {
+    color: #111!important;
+  }
+}

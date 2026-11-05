@@ -2,7 +2,9 @@ name: Validar pull request
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - "style/**"
 
 permissions:
   contents: read
@@ -39,6 +41,7 @@ jobs:
       - name: Verificar desktop e celular
         run: |
           node scripts/testar-ajustes-browser.cjs
+          node scripts/testar-fundacao-admin-browser.cjs
           npm run test:entrada
           npm run test:cinema
       - name: Salvar evidencias visuais

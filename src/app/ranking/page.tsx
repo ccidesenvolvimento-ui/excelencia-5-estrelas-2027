@@ -93,7 +93,7 @@ export default function Ranking(){
  return <>
    <Cabecalho tag="DESEMPENHO OPERACIONAL / RANKINGS" titulo="Ranking de Excelência" descricao="Compare as cinco estrelas, consulte as posições por segmento e gere relatórios diretamente dos filtros selecionados." acao={<button className="botao" type="button" onClick={()=>setRelatorioAberto(true)}>▤ Gerar relatório</button>}/>
    <AvisoDemo texto="Rankings e relatórios demonstrativos com dados fictícios. Colaboradores pendentes não aparecem na classificação; os resultados não são oficiais."/>
-   <div className="controles no-print">
+   <div className="controles no-print ranking-fase3-filtros">
      <div className="campo"><label htmlFor="rank-periodo">Período</label><select id="rank-periodo" value={periodo} onChange={e=>setPeriodo(e.target.value as Periodo)}>{periodos.map(p=><option key={p.id} value={p.id}>{p.nome}</option>)}</select></div>
      {periodo==="mensal"&&<div className="campo"><label htmlFor="rank-mes">Competência</label><select id="rank-mes" value={mes} onChange={e=>setMes(Number(e.target.value))}>{meses.map((m,i)=><option value={i} key={m}>{m}/2027</option>)}</select></div>}
      <div className="campo" style={{flex:"2 1 225px"}}><label htmlFor="rank-segmento">Segmento</label><select id="rank-segmento" value={categoria} onChange={e=>{setCategoria(e.target.value as Categoria);setFilial("");}}>{categorias.map(c=><option key={c}>{c}</option>)}</select></div>
@@ -101,21 +101,21 @@ export default function Ranking(){
      <div className="campo"><label htmlFor="rank-ordem">Ordenação</label><select id="rank-ordem" value={ordem} onChange={e=>setOrdem(e.target.value as Ordem)}><option value="maior">Score: maior primeiro</option><option value="menor">Score: menor primeiro</option></select></div>
      <div className="campo"><label htmlFor="rank-busca">Colaborador</label><input id="rank-busca" type="search" placeholder="Nome ou matrícula" value={busca} onChange={e=>setBusca(e.target.value)}/></div>
    </div>
-   <div className="mod-grid-estatisticas">
+   <div className="mod-grid-estatisticas ranking-fase3-resumo">
       <div className="mod-estatistica"><small>Visíveis no ranking</small><strong>{lista.length}</strong><span>Participantes para os filtros atuais</span></div>
       <div className="mod-estatistica verde"><small>Elegíveis</small><strong>{elegiveis.length}</strong><span>Com posição oficial</span></div>
       <div className="mod-estatistica vermelho"><small>Inelegíveis</small><strong>{inelegiveis.length}</strong><span>Sem posição</span></div>
       <div className="mod-estatistica amarelo"><small>Pendentes</small><strong>{pendentes}</strong><span>Não entram no ranking</span></div>
    </div>
-   <section className="painel">
+   <section className="painel ranking-fase3-painel">
       <BlocoTitulo superior="CLASSIFICAÇÃO / 2027" titulo={categoria} descricao={`${periodoTexto} · ${filial||"Todas as filiais"}`} acao={<div className="mod-chips"><span className="mod-chip">Posições oficiais por segmento</span><button className="botao botao-secundario" type="button" onClick={()=>setRelatorioAberto(true)}>Gerar relatório ↗</button></div>}/>
-      <div className="tabela-scroll"><table className="tabela"><thead><tr><th>Pos.</th><th>Colaborador / Filial</th><th>Situação</th>{colunas.map((c,i)=><th key={`${c}-${i}`}>{c}</th>)}<th>Score médio</th></tr></thead><tbody>
+      <div className="tabela-scroll ranking-fase3-rolagem"><table className="tabela ranking-fase3-tabela"><thead><tr><th>Pos.</th><th>Colaborador / Filial</th><th>Situação</th>{colunas.map((c,i)=><th key={`${c}-${i}`}>{c}</th>)}<th>Score médio</th></tr></thead><tbody>
        {lista.map(r=><tr key={r.pessoa.id}><td><strong>{r.posicao??"—"}</strong></td><td><strong>{r.pessoa.nome} / {r.pessoa.filial}</strong><br/><small className="texto-muted">{r.pessoa.matricula}</small></td><td><Estado tipo={r.status}/></td>{periodo==="anual"?r.mensais.map((v,i)=><td key={i}>{formatarNota(v)}</td>):estrelas.map(e=><td key={e}>{formatarNota(r.notas[e])}</td>)}<td><strong>{formatarNota(r.score)}</strong></td></tr>)}
        {!lista.length&&<tr><td colSpan={colunas.length+4} className="mod-vazio"><strong>Nenhuma avaliação encontrada.</strong>Altere os filtros ou consulte a Central de Pendências.</td></tr>}
       </tbody></table></div>
       <p className="nota-rodape">Ciclos: médias dos cinco pilares. Anual: pontuações mensais e Score Médio. O segmento Sucro usa mar–nov. A posição não muda ao filtrar ou inverter a ordenação. Férias ainda não são estimadas nesta demonstração.</p>
    </section>
-   {relatorioAberto&&<div className="mod-report-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setRelatorioAberto(false)}}><div className="mod-report-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio">
+   {relatorioAberto&&<div className="mod-report-overlay ranking-fase3-modal" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setRelatorioAberto(false)}}><div className="mod-report-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-relatorio">
      <header><div><div className="mod-sobre-titulo">PROGRAMA 5 ESTRELAS / RELATÓRIO DE RANKING</div><h2 id="titulo-relatorio">Relatório visual</h2><p>O arquivo PDF terá fundo azul escuro até as bordas, sem a janela de impressão. Cada página contém no máximo dez posições.</p></div><button className="mod-fechar" aria-label="Fechar prévia" type="button" onClick={()=>setRelatorioAberto(false)}>×</button></header>
      <div className="mod-report-filtros"><div className="campo"><label htmlFor="top-n">Limite Top N</label><input id="top-n" min={1} max={500} type="number" value={limite} onChange={e=>setLimite(Math.max(1,Math.min(500,Number(e.target.value)||1)))}/></div><span className="mod-chip">{periodoTexto}</span><span className="mod-chip">{categoria}</span><span className="mod-chip">{filial||"Todas as filiais"}</span>{busca&&<span className="mod-chip">Busca: {busca}</span>}</div>
      <div className="mod-report-preview" aria-live="polite">

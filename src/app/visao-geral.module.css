@@ -46,3 +46,165 @@
 .graficoRolagem:focus-visible{outline:2px solid #8fddff;outline-offset:2px}
 .graficoConteudo{min-width:600px}
 .graficoValor{fill:#d9f5ff;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+
+
+/* Fase 2 (#24) — acabamento institucional da Visão Geral.
+   Somente apresentação: métricas, filtros, gráficos e atalhos mantêm os dados
+   e comportamentos aprovados. */
+.pagina {
+  --line: #47799780;
+  --muted: #a9c9dc;
+  --panel: #102c45;
+  --panel2: #143953;
+}
+.cabecalho { margin-bottom: 24px; }
+.sobreTitulo { color: #8ad9ff; }
+.subtitulo { color: #b3cee0; }
+.alertaDemo {
+  border-color: #6e9ab755;
+  background: linear-gradient(95deg, #173851b8, #102b43a6);
+}
+.filtros {
+  border-color: #6e9ab75c;
+  background: linear-gradient(120deg, #153751eb, #0c263fd9);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: inset 0 1px #c2eaff0b, 0 12px 30px #000e1c1e;
+}
+.filtro > span { color: #a4c9df; }
+.filtro select {
+  background: #0c2943;
+  border-color: #5481a07d;
+  min-height: 42px;
+  color: #f2faff;
+}
+.filtro select:hover { border-color: #71b9dd; }
+.resumo { gap: 15px; margin-bottom: 22px; }
+.metrica {
+  isolation: isolate;
+  min-height: 168px;
+  padding: 23px 21px;
+  border-radius: 17px;
+  border-color: #6699b75a;
+  background: linear-gradient(145deg, #173c57 0%, #0f2b44 68%, #0b2339 100%);
+  box-shadow: inset 0 1px #d4f1ff14, 0 15px 31px #000e201f;
+}
+.metrica::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -80px;
+  right: -55px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 13%, transparent), transparent 68%);
+  pointer-events: none;
+}
+.metrica::after { height: 3px; opacity: .9; }
+.metricaTitulo { font-size: 12px; color: #c3dceb; }
+.metricaIcone {
+  width: 42px;
+  height: 42px;
+  border: 1px solid color-mix(in srgb, var(--accent) 27%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 10%, #102b43);
+}
+.metricaNumero { font-size: clamp(32px, 3vw, 43px); margin: 17px 0 8px; }
+.metricaDescricao { font-size: 11px; color: #a4c2d5; }
+.primeiraLinha, .segundaLinha { gap: 19px; margin-bottom: 19px; }
+.colunaDireita { gap: 19px; }
+.painel {
+  border-radius: 18px;
+  border-color: #6397b35c;
+  background: linear-gradient(148deg, #163a55ec 0%, #0d2a42f0 58%, #0b2238f0 100%);
+  padding: 25px 25px 22px;
+  box-shadow: inset 0 1px #c9edff12, 0 16px 35px #000d1e24;
+}
+.painelCabecalho { padding-bottom: 15px; border-bottom: 1px solid #78a6c126; margin-bottom: 19px; }
+.painelTag { color: #88d7ff; }
+.painel h2, .atalhosCabecalho h2 { color: #f5fbff; font-weight: 750; letter-spacing: -.035em; }
+.painelCabecalho p { color: #aec9dc; }
+.iconePainel {
+  background: linear-gradient(135deg, #205b7b, #153c59);
+  border: 1px solid #6bbddd4a;
+  border-radius: 11px;
+}
+.listaSegmentos { gap: 19px; margin-top: 21px; }
+.segmentoTitulo strong { color: #e0eff8; }
+.segmentoTitulo span, .painelNota { color: #a2bed1; }
+.segmentoTrilho { height: 9px; background: #09243c; box-shadow: inset 0 1px 3px #000b20a6; }
+.segmentoTrilho > span { background: linear-gradient(90deg, #258bd0, #72dcff); }
+.segmentoGrafico > strong { font-size: 13px; color: #eafaff; }
+.graficoSituacao { padding: 7px 0 6px; }
+.anel { box-shadow: 0 0 0 7px #4facc20b, 0 0 35px #40b8d81a; }
+.anel:before { background: #102d46; }
+.anelCentro strong { color: #f7fcff; }
+.anelCentro span, .legendaSituacao > div { color: #b8d2e3; }
+.legendaSituacao > div { padding-bottom: 8px; border-bottom: 1px solid #7ca9c11a; }
+.painelScore {
+  border-color: #4698c06b;
+  background: radial-gradient(ellipse at 94% 2%, #23749b70, transparent 57%),
+    linear-gradient(105deg, #124967, #0d304e);
+}
+.scoreTrilho { height: 9px; background: #09253c; }
+.scoreLinha > strong { font-size: 34px; }
+.painelScore p { color: #b0ccdf; }
+.graficoRolagem { scrollbar-color: #438cb2 #0a273d; }
+.graficoEscala, .graficoMeses span { color: #aac4d5; }
+.graficoValor { fill: #ecfaff; }
+.atencoes { gap: 13px; }
+.atencao {
+  border-color: #5785a24f;
+  background: linear-gradient(110deg, #173a55a8, #102f49a8);
+  border-radius: 12px;
+  padding: 14px;
+}
+.atencao strong { color: #f0f9ff; }
+.atencao small { color: #a9c7da; }
+.atencao[href]:hover { background: #1d4a69; border-color: #73c5e7; }
+.atalhosSecao { margin-top: 7px; }
+.atalhosCabecalho { margin-bottom: 17px; }
+.atalhosCabecalho > span { color: #a0bdd0; }
+.gradeAtalhos { gap: 14px; }
+.atalho {
+  border-color: #6295b25c;
+  background: linear-gradient(132deg, #163c57d9, #0c2942eb);
+  border-radius: 13px;
+  padding: 17px;
+  box-shadow: inset 0 1px #d0edff0b;
+}
+.atalho:hover { background: #1b4968; border-color: #78d4f1; }
+.atalhoIcone { border: 1px solid #6fcaf643; border-radius: 10px; }
+.atalhoTexto strong { color: #f4faff; }
+.atalhoTexto small, .rodape { color: #a5c3d5; }
+@media (max-width: 1400px) {
+  .painel { padding: 21px; }
+  .metrica { padding: 20px; }
+}
+@media (max-width: 730px) {
+  .resumo { gap: 11px; }
+  .metrica { min-height: 150px; padding: 17px 15px; }
+  .metricaIcone { width: 33px; height: 33px; }
+  .metricaNumero { font-size: 33px; margin: 13px 0 8px; }
+  .filtros { padding: 15px; }
+}
+@media (max-width: 450px) {
+  .metrica { min-height: 145px; padding: 16px 13px; }
+  .metricaNumero { font-size: 30px; }
+  .metricaTitulo { font-size: 11px; }
+  .metricaDescricao { font-size: 10px; }
+  .painel { padding: 18px; }
+  .scoreLinha > strong { font-size: 29px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .segmentoTrilho > span, .botaoPrincipal, .atalho { transition: none; }
+}
+@media print {
+  .metrica, .painel, .atalho {
+    background: #fff !important;
+    box-shadow: none !important;
+    border-color: #777 !important;
+  }
+  .metrica::before, .metrica::after { display: none; }
+}

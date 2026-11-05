@@ -319,3 +319,774 @@ html::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 @media (prefers-reduced-motion: reduce) {
   .menu a[aria-current="page"]::after { animation: none; }
 }
+
+
+/* Fase 1 (#22) — identidade institucional exclusiva do shell administrativo.
+   Home, login e portal do motorista não usam .app-shell e permanecem intactos. */
+.app-shell {
+  --admin-fundo: #071526;
+  --admin-luz: #133e60;
+  --admin-contorno: #70b8da54;
+  --admin-contorno-ativo: #7bd9ff;
+  --admin-texto-suave: #a8c6d8;
+  --admin-superficie: #102b43;
+  --admin-superficie-profunda: #0a2035;
+  --mod-borda: #315875;
+  --mod-fundo: #102b43;
+  --mod-sec: #11314b;
+  --mod-muted: #a8c6d8;
+  font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #eff7ff;
+  background:
+    radial-gradient(ellipse 73% 590px at 88% 7%, #133e60ac 0%, transparent 74%),
+    radial-gradient(ellipse 650px 560px at 25% 56%, #35baff0b 0%, transparent 75%),
+    var(--admin-fundo);
+}
+.app-shell .sidebar {
+  background: linear-gradient(165deg, #102e48 0%, #0a2036 59%, #07182a 100%);
+  border-color: #70b8da47;
+  box-shadow: 0 18px 55px #01081288, 0 4px 22px #238dc014, inset 0 1px #aedffb16;
+}
+.app-shell .branding { border-bottom-color: #b6dbff20; }
+.app-shell .header {
+  background: linear-gradient(105deg, #091c30e8, #133854d8 78%, #102e49e6);
+  border-bottom-color: #78b7d435;
+  box-shadow: 0 10px 28px #010b1724;
+}
+.app-shell .header strong { font-weight: 650; letter-spacing: -.035em; }
+.app-shell .header span:not(.chip-demo) { color: var(--admin-texto-suave); }
+.app-shell .area-conteudo { position: relative; }
+.app-shell .cabecalho-premium h1 {
+  font-weight: 650;
+  letter-spacing: -.045em;
+}
+.app-shell .cabecalho-premium p { color: var(--admin-texto-suave); }
+.app-shell .painel,
+.app-shell .controles,
+.app-shell .mod-estatistica,
+.app-shell .metrica {
+  border-color: var(--admin-contorno);
+  box-shadow: inset 0 1px #b5e5ff0d, 0 12px 32px #000d1e21;
+}
+.app-shell .painel {
+  background: linear-gradient(145deg, #12334bea 0%, #0b2137eb 100%);
+}
+.app-shell .controles {
+  background: linear-gradient(135deg, #102b43c2, #0c2137e3);
+}
+.app-shell .sidebar-toggle:focus-visible,
+.app-shell .mobile-close:focus-visible,
+.app-shell .menu-toggle:focus-visible,
+.app-shell .menu a:focus-visible,
+.app-shell a:focus-visible,
+.app-shell button:focus-visible,
+.app-shell input:focus-visible,
+.app-shell select:focus-visible,
+.app-shell textarea:focus-visible {
+  outline: 2px solid var(--admin-contorno-ativo);
+  outline-offset: 3px;
+}
+.app-shell .menu a:not(.ativo):hover {
+  border-color: #70b8da5a;
+  background: #1b4c6c9c;
+}
+.app-shell .chip-demo {
+  background: #4b3e263d;
+  border-color: #bc9b5c64;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .menu a, .app-shell .sidebar, .app-shell .workspace {
+    transition: none !important;
+  }
+}
+@media print {
+  .app-shell { background: #fff !important; color: #111 !important; }
+  .app-shell .painel, .app-shell .metrica, .app-shell .mod-estatistica {
+    box-shadow: none !important;
+  }
+}
+
+
+/* Fase 3 (#26): refinamento exclusivo do Ranking administrativo.
+   Classes de escopo evitam impacto nas demais abas e nos relatórios gerados. */
+.app-shell .ranking-fase3-filtros {
+  padding: 19px 20px;
+  gap: 15px;
+  margin-bottom: 23px;
+  border: 1px solid #6497b36b;
+  border-radius: 17px;
+  background: linear-gradient(125deg, #153953e8, #0b253ce8);
+  box-shadow: inset 0 1px #c9ecff13, 0 12px 32px #000b1c22;
+}
+.app-shell .ranking-fase3-filtros .campo { flex: 1 1 155px; min-width: min(155px,100%); }
+.app-shell .ranking-fase3-filtros .campo label { color: #a9ccdf; font-size: 11px; letter-spacing: .025em; }
+.app-shell .ranking-fase3-filtros .campo input,
+.app-shell .ranking-fase3-filtros .campo select {
+  background: #0b273e;
+  border-color: #5886a37a;
+  border-radius: 10px;
+  color: #effaff;
+  min-height: 43px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.app-shell .ranking-fase3-filtros .campo input:hover,
+.app-shell .ranking-fase3-filtros .campo select:hover { border-color: #76bddf; }
+.app-shell .ranking-fase3-filtros .campo input:focus-visible,
+.app-shell .ranking-fase3-filtros .campo select:focus-visible { outline: 2px solid #84d7ff; outline-offset: 2px; }
+.app-shell .ranking-fase3-resumo { gap: 15px; margin-bottom: 22px; }
+.app-shell .ranking-fase3-resumo .mod-estatistica {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 148px;
+  border: 1px solid #6599b763;
+  border-radius: 16px;
+  background: linear-gradient(140deg, #153a55, #0c273f);
+  box-shadow: inset 0 1px #d7f3ff12, 0 14px 33px #000d1c21;
+}
+.app-shell .ranking-fase3-resumo .mod-estatistica::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -85px;
+  right: -58px;
+  width: 190px;
+  height: 190px;
+  background: radial-gradient(circle, #57c6ff1a, transparent 70%);
+  pointer-events: none;
+}
+.app-shell .ranking-fase3-resumo .mod-estatistica.verde::before { background: radial-gradient(circle, #42d9aa17, transparent 70%); }
+.app-shell .ranking-fase3-resumo .mod-estatistica.vermelho::before { background: radial-gradient(circle, #ff899317, transparent 70%); }
+.app-shell .ranking-fase3-resumo .mod-estatistica.amarelo::before { background: radial-gradient(circle, #f4c77b17, transparent 70%); }
+.app-shell .ranking-fase3-resumo .mod-estatistica small { color: #b9d4e5; letter-spacing: .02em; }
+.app-shell .ranking-fase3-resumo .mod-estatistica strong { color: #f5fbff; font-variant-numeric: tabular-nums; }
+.app-shell .ranking-fase3-resumo .mod-estatistica span { color: #a5c3d7; }
+.app-shell .ranking-fase3-painel {
+  border: 1px solid #6598b465;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #153953f0 0%, #0c293ff2 62%, #0a2137f2 100%);
+  box-shadow: inset 0 1px #c4e9ff10, 0 17px 36px #000c1c24;
+  padding: 24px;
+}
+.app-shell .ranking-fase3-painel .mod-chips { gap: 9px; }
+.app-shell .ranking-fase3-painel .mod-chip {
+  border: 1px solid #629bb46b;
+  color: #cce8f6;
+  background: #1643638c;
+}
+.app-shell .ranking-fase3-rolagem {
+  border: 1px solid #668ba24f;
+  border-radius: 13px;
+  background: #0b263d;
+  scrollbar-width: thin;
+  scrollbar-color: #418cb4 #0a273c;
+}
+.app-shell .ranking-fase3-tabela { border-collapse: separate; border-spacing: 0; }
+.app-shell .ranking-fase3-tabela th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #153953;
+  color: #c4e0ef;
+  border-bottom: 1px solid #6da7c26b;
+  padding: 16px 12px;
+  font-size: 10px;
+  letter-spacing: .065em;
+}
+.app-shell .ranking-fase3-tabela td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #6a94af29;
+  color: #e4f3fb;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+.app-shell .ranking-fase3-tabela tbody tr:nth-child(even) td { background: #13324a5c; }
+.app-shell .ranking-fase3-tabela tbody tr:hover td { background: #20547499; }
+.app-shell .ranking-fase3-tabela td:nth-child(1) strong { color: #9fe4ff; font-weight: 800; }
+.app-shell .ranking-fase3-tabela td:nth-child(2) strong { color: #f4faff; font-weight: 700; }
+.app-shell .ranking-fase3-tabela td:last-child strong { color: #b6edff; font-size: 13px; }
+.app-shell .ranking-fase3-tabela .texto-muted { color: #9fbfd2; }
+.app-shell .ranking-fase3-tabela .estado {
+  display: inline-block;
+  border: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 27%, transparent);
+  padding: 6px 10px;
+  font-weight: 750;
+}
+.app-shell .ranking-fase3-painel .nota-rodape { color: #b2cbdb; line-height: 1.65; }
+.app-shell .ranking-fase3-painel .botao:focus-visible,
+.app-shell .ranking-fase3-modal button:focus-visible { outline: 2px solid #86d9ff; outline-offset: 3px; }
+@media (max-width: 780px) {
+  .app-shell .ranking-fase3-filtros { padding: 15px; gap: 12px; }
+  .app-shell .ranking-fase3-painel { padding: 17px; }
+  .app-shell .ranking-fase3-tabela th { padding: 13px 10px; }
+  .app-shell .ranking-fase3-tabela td { padding: 12px 10px; }
+}
+@media (max-width: 420px) {
+  .app-shell .ranking-fase3-filtros .campo { flex: 1 1 100%; }
+  .app-shell .ranking-fase3-painel { padding: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .ranking-fase3-filtros .campo input,
+  .app-shell .ranking-fase3-filtros .campo select { transition: none; }
+}
+@media print {
+  .app-shell .ranking-fase3-painel,
+  .app-shell .ranking-fase3-resumo .mod-estatistica {
+    background: #fff !important; border-color: #888 !important; box-shadow: none !important;
+  }
+  .app-shell .ranking-fase3-tabela th,
+  .app-shell .ranking-fase3-tabela td { background: #fff !important; color: #111 !important; }
+}
+
+
+/* Fase 5 (#30) — refinamento visual exclusivamente da aba Importações.
+   Arquivos XLSX, validação demonstrativa e URLs de download permanecem intactos. */
+.app-shell .importacoes-fase5 { --imp-borda:#669bb76b; --imp-luz:#84d9ff; color:#eef8ff; }
+.app-shell .importacoes-fase5 .cabecalho-premium { margin-bottom:23px; }
+.app-shell .importacoes-fase5 .cabecalho-premium p { color:#b4d0e1; }
+.app-shell .importacoes-fase5 .mod-grid-estatisticas { gap:15px; margin-bottom:23px; }
+.app-shell .importacoes-fase5 .mod-estatistica {
+  position:relative; isolation:isolate; overflow:hidden;
+  min-height:150px; border-radius:17px; padding:22px;
+  border:1px solid var(--imp-borda);
+  background:linear-gradient(145deg,#173c57 0%,#102d46 70%,#0c263c 100%);
+  box-shadow:inset 0 1px #d7efff12,0 14px 34px #000d1f24;
+}
+.app-shell .importacoes-fase5 .mod-estatistica:before {
+  content:"";position:absolute;z-index:-1;width:190px;height:190px;
+  right:-60px;top:-85px;border-radius:50%;
+  background:radial-gradient(circle,#6ccaff1d,transparent 70%);
+  pointer-events:none;
+}
+.app-shell .importacoes-fase5 .mod-estatistica small { color:#bcd8e8;letter-spacing:.015em; }
+.app-shell .importacoes-fase5 .mod-estatistica strong { color:#f7fcff;font-variant-numeric:tabular-nums; }
+.app-shell .importacoes-fase5 .mod-estatistica span { color:#a7c7db;line-height:1.45; }
+.app-shell .importacoes-fase5 .painel {
+  border:1px solid var(--imp-borda);border-radius:18px;
+  background:linear-gradient(145deg,#153a55ef 0%,#0c2a43f2 58%,#0a2239f2 100%);
+  padding:26px;
+  margin-bottom:21px;
+  box-shadow:inset 0 1px #def2ff13,0 16px 35px #000f1d23;
+}
+.app-shell .importacoes-fase5 .painel .mod-sobre-titulo { color:#8bdcff; }
+.app-shell .importacoes-fase5 .painel h2 { color:#f7fcff;letter-spacing:-.03em; }
+.app-shell .importacoes-fase5 .lista-modelos { gap:15px; }
+.app-shell .importacoes-fase5 .modelo {
+  gap:16px;min-width:0;align-items:center;
+  padding:21px;border:1px solid #5a8fac6b;border-radius:14px;
+  background:linear-gradient(128deg,#173d59d9,#0d2d46ed);
+  box-shadow:inset 0 1px #bbebff0b;
+}
+.app-shell .importacoes-fase5 .modelo:hover {
+  border-color:#79c6e6;
+  background:linear-gradient(128deg,#1a4766e6,#10344fec);
+}
+.app-shell .importacoes-fase5 .modelo > div { min-width:0; }
+.app-shell .importacoes-fase5 .rotulo-chave { color:#90deff;font-size:10px;letter-spacing:.12em; }
+.app-shell .importacoes-fase5 .modelo h3 { color:#f1faff;line-height:1.35;letter-spacing:-.018em; }
+.app-shell .importacoes-fase5 .modelo p { color:#afccdf;line-height:1.6; }
+.app-shell .importacoes-fase5 .modelo .botao {
+  border-radius:10px;border-color:#6eb9dc7d;
+  background:#174767;flex:0 0 auto;
+  color:#e2f8ff;
+}
+.app-shell .importacoes-fase5 .modelo .botao:hover { background:#23648b;border-color:#8ddfff; }
+.app-shell .importacoes-fase5 .form-grid { gap:16px;margin-top:21px;margin-bottom:20px; }
+.app-shell .importacoes-fase5 .campo label { color:#b7d6e8; }
+.app-shell .importacoes-fase5 .campo input,
+.app-shell .importacoes-fase5 .campo select {
+  min-height:45px;background:#0c2b43;color:#f0faff;
+  border:1px solid #6396b48c;border-radius:10px;
+}
+.app-shell .importacoes-fase5 .campo input:hover,
+.app-shell .importacoes-fase5 .campo select:hover { border-color:#82c9eb; }
+.app-shell .importacoes-fase5 .campo input[type="file"] {
+  padding:9px 11px;max-width:100%;
+}
+.app-shell .importacoes-fase5 .campo input[type="file"]::file-selector-button {
+  border:1px solid #6aa5c77b;background:#1b4e70;
+  color:#ecfaff;border-radius:7px;padding:5px 9px;margin-right:10px;
+  cursor:pointer;
+}
+.app-shell .importacoes-fase5 .campo input:focus-visible,
+.app-shell .importacoes-fase5 .campo select:focus-visible,
+.app-shell .importacoes-fase5 .botao:focus-visible {
+  outline:2px solid var(--imp-luz);outline-offset:3px;
+}
+.app-shell .importacoes-fase5 .bloco-info {
+  margin-top:18px;border:1px solid #5daaca7b;border-left:3px solid #68d0ff;
+  background:linear-gradient(110deg,#164460,#102d48);
+  border-radius:11px;color:#cbe5f4;line-height:1.65;
+}
+.app-shell .importacoes-fase5 .nota-rodape { color:#aac8d9;line-height:1.7; }
+.app-shell .importacoes-fase5 .passos {
+  gap:13px;margin-top:19px;
+}
+.app-shell .importacoes-fase5 .passos li {
+  gap:13px;padding:13px 15px;align-items:flex-start;
+  border:1px solid #5785a35b;border-radius:11px;
+  background:#12344e85;color:#d1e5f2;line-height:1.6;
+}
+.app-shell .importacoes-fase5 .passos li:before {
+  flex:0 0 29px;width:29px;height:29px;border-radius:9px;
+  border:1px solid #6ebde47a;background:#1b5274;color:#d4f4ff;
+}
+@media(max-width:1100px) {
+  .app-shell .importacoes-fase5 .modelo { flex-wrap:wrap;align-items:flex-start; }
+  .app-shell .importacoes-fase5 .modelo .botao { margin-top:3px; }
+}
+@media(max-width:730px) {
+  .app-shell .importacoes-fase5 .painel { padding:19px;border-radius:15px; }
+  .app-shell .importacoes-fase5 .mod-grid-estatisticas { gap:11px; }
+  .app-shell .importacoes-fase5 .mod-estatistica { min-height:145px;padding:16px; }
+  .app-shell .importacoes-fase5 .modelo { padding:17px; }
+  .app-shell .importacoes-fase5 .form-grid { gap:13px; }
+}
+@media(max-width:420px) {
+  .app-shell .importacoes-fase5 .modelo .botao { width:100%; }
+  .app-shell .importacoes-fase5 .mod-estatistica { padding:14px; }
+  .app-shell .importacoes-fase5 .passos li { padding:12px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .app-shell .importacoes-fase5 .modelo .botao { transition:none; }
+}
+@media print {
+  .app-shell .importacoes-fase5 .painel,
+  .app-shell .importacoes-fase5 .mod-estatistica,
+  .app-shell .importacoes-fase5 .modelo,
+  .app-shell .importacoes-fase5 .passos li {
+    background:#fff!important;box-shadow:none!important;border-color:#777!important;
+    color:#111!important;
+  }
+  .app-shell .importacoes-fase5 h2,
+  .app-shell .importacoes-fase5 h3,
+  .app-shell .importacoes-fase5 p,
+  .app-shell .importacoes-fase5 .passos li { color:#111!important; }
+}
+
+
+/* Fase 6 (#32): estilos globais estritamente escopados ao Cadastro RH0034. */
+.app-shell .rh0034-fase6 { --rh-borda:#6ba1be73;--rh-foco:#8edbff; }
+.app-shell .rh0034-fase6 .cabecalho-premium { margin-bottom:24px; }
+.app-shell .rh0034-fase6 .mod-grid-estatisticas { gap:15px;margin-bottom:23px; }
+.app-shell .rh0034-fase6 .mod-estatistica {
+  min-height:150px;position:relative;isolation:isolate;overflow:hidden;
+  padding:21px;border:1px solid var(--rh-borda);border-radius:17px;
+  background:linear-gradient(142deg,#163c57,#0d2b43);
+  box-shadow:inset 0 1px #d9f1ff11,0 15px 33px #000d2026;
+}
+.app-shell .rh0034-fase6 .mod-estatistica:before {
+  content:"";position:absolute;z-index:-1;
+  top:-70px;right:-55px;width:180px;height:180px;
+  background:radial-gradient(circle,#62cfff1b,transparent 72%);
+  pointer-events:none;
+}
+.app-shell .rh0034-fase6 .mod-estatistica.verde:before { background:radial-gradient(circle,#58d9ae1b,transparent 72%); }
+.app-shell .rh0034-fase6 .mod-estatistica.amarelo:before { background:radial-gradient(circle,#f4c77b1b,transparent 72%); }
+.app-shell .rh0034-fase6 .mod-estatistica small { color:#b7d5e7; }
+.app-shell .rh0034-fase6 .mod-estatistica strong { color:#f7fcff;font-variant-numeric:tabular-nums; }
+.app-shell .rh0034-fase6 .mod-estatistica span { color:#aac8db;line-height:1.45; }
+.app-shell .rh0034-fase6 .painel {
+  padding:26px;border:1px solid var(--rh-borda);border-radius:18px;
+  background:linear-gradient(145deg,#153b56f0,#0d2b43f0 65%,#0a2239f3);
+  box-shadow:inset 0 1px #d5edff11,0 16px 37px #000e2028;
+  margin-bottom:22px;
+}
+.app-shell .rh0034-fase6 .painel h2 { color:#f7fcff;letter-spacing:-.025em; }
+.app-shell .rh0034-fase6 .controles {
+  padding:19px;gap:14px;border:1px solid #76a4bf70;border-radius:15px;
+  background:linear-gradient(120deg,#143953dc,#0c2a43e8);
+}
+.app-shell .rh0034-fase6 .campo label { color:#b6d5e7;font-size:11px; }
+.app-shell .rh0034-fase6 .campo input,
+.app-shell .rh0034-fase6 .campo select {
+  min-height:44px;background:#0b2a42;border-color:#6196b48c;border-radius:10px;
+  color:#effaff;
+}
+.app-shell .rh0034-fase6 .campo input:hover,
+.app-shell .rh0034-fase6 .campo select:hover { border-color:#81c4e7; }
+.app-shell .rh0034-fase6 .campo input:focus-visible,
+.app-shell .rh0034-fase6 .campo select:focus-visible,
+.app-shell .rh0034-fase6 .botao:focus-visible,
+.app-shell .rh0034-fase6 button:focus-visible {
+  outline:2px solid var(--rh-foco);outline-offset:3px;
+}
+.app-shell .rh0034-fase6 .tabela-scroll {
+  border:1px solid #78a5bc5c;border-radius:13px;
+  background:#0d2b42;scrollbar-width:thin;scrollbar-color:#438eb6 #09273d;
+}
+.app-shell .rh0034-fase6 .tabela {
+  border-collapse:separate;border-spacing:0;min-width:990px;
+}
+.app-shell .rh0034-fase6 .tabela th {
+  background:#163d57;color:#cde7f5;
+  border-bottom:1px solid #78b2cc6b;
+  padding:16px 12px;font-size:10px;letter-spacing:.06em;
+}
+.app-shell .rh0034-fase6 .tabela td {
+  padding:14px 12px;line-height:1.55;
+  border-bottom:1px solid #689dbb31;
+  color:#dceff9;font-variant-numeric:tabular-nums;
+}
+.app-shell .rh0034-fase6 .tabela tbody tr:nth-child(even) td { background:#14354c6b; }
+.app-shell .rh0034-fase6 .tabela tbody tr:hover td { background:#20567699; }
+.app-shell .rh0034-fase6 .tabela td:first-child strong { color:#f6fcff; }
+.app-shell .rh0034-fase6 .tabela .campo select { min-height:39px;max-width:260px; }
+.app-shell .rh0034-fase6 .mod-status {
+  display:inline-flex;align-items:center;border-radius:8px;
+  padding:6px 9px;background:#1d4b67;border:1px solid #71a5c07a;
+  color:#ccecff;
+}
+.app-shell .rh0034-fase6 .mod-sem-backend {
+  border-color:#609ab96b;background:#143a53b3;color:#bfd9e7;
+  border-radius:12px;line-height:1.65;
+}
+@media(max-width:720px){
+  .app-shell .rh0034-fase6 .painel { padding:18px;border-radius:15px; }
+  .app-shell .rh0034-fase6 .mod-grid-estatisticas { gap:11px; }
+  .app-shell .rh0034-fase6 .mod-estatistica { padding:16px;min-height:140px; }
+  .app-shell .rh0034-fase6 .controles { padding:15px; }
+}
+@media(max-width:420px){
+  .app-shell .rh0034-fase6 .mod-estatistica { padding:13px; }
+  .app-shell .rh0034-fase6 .painel { padding:15px; }
+}
+@media print {
+  .app-shell .rh0034-fase6 .painel,
+  .app-shell .rh0034-fase6 .mod-estatistica,
+  .app-shell .rh0034-fase6 .tabela th,
+  .app-shell .rh0034-fase6 .tabela td {
+    background:#fff!important;color:#111!important;
+    box-shadow:none!important;border-color:#888!important;
+  }
+}
+
+
+/* Fase 7 (#34): refinamento exclusivo da tela Configurações. */
+.app-shell .configuracoes-fase7 { --cfg-borda:#6c9fba6e;--cfg-foco:#8cddff; color:#edf8ff; }
+.app-shell .configuracoes-fase7 .cabecalho-premium { margin-bottom:24px; }
+.app-shell .configuracoes-fase7 .cabecalho-premium p { color:#b6d2e5; }
+.app-shell .configuracoes-fase7 .mod-tabbar {
+  display:flex;flex-wrap:wrap;gap:9px;padding:9px;margin-bottom:23px;
+  border:1px solid var(--cfg-borda);border-radius:15px;
+  background:linear-gradient(125deg,#173950e3,#0c2b42ed);
+  box-shadow:inset 0 1px #cbebff12;
+}
+.app-shell .configuracoes-fase7 .mod-tab {
+  min-height:43px;padding:11px 17px;border:1px solid transparent;
+  border-radius:10px;color:#b7d5e8;background:transparent;
+  font-weight:730;transition:background .18s,border-color .18s,color .18s;
+}
+.app-shell .configuracoes-fase7 .mod-tab:hover {
+  background:#1d4b68;color:#f3fbff;border-color:#6ca6c44f;
+}
+.app-shell .configuracoes-fase7 .mod-tab[aria-selected="true"] {
+  color:#f8fcff;background:linear-gradient(110deg,#176ca0,#1a5176);
+  border-color:#77c5e47d;box-shadow:0 5px 16px #00142730;
+}
+.app-shell .configuracoes-fase7 .mod-grid-estatisticas { gap:15px;margin-bottom:22px; }
+.app-shell .configuracoes-fase7 .mod-estatistica {
+  position:relative;isolation:isolate;overflow:hidden;min-height:148px;
+  padding:21px;border:1px solid var(--cfg-borda);
+  border-radius:17px;background:linear-gradient(140deg,#173d57,#0e2b44);
+  box-shadow:inset 0 1px #d9f2ff10,0 14px 32px #000e2025;
+}
+.app-shell .configuracoes-fase7 .mod-estatistica:before {
+  content:"";position:absolute;z-index:-1;top:-80px;right:-60px;
+  width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,#60cafa1d,transparent 70%);
+}
+.app-shell .configuracoes-fase7 .mod-estatistica small { color:#b8d5e7;letter-spacing:.02em; }
+.app-shell .configuracoes-fase7 .mod-estatistica strong { color:#f7fcff;font-variant-numeric:tabular-nums; }
+.app-shell .configuracoes-fase7 .mod-estatistica span { color:#a9c9dc;line-height:1.5; }
+.app-shell .configuracoes-fase7 .painel {
+  padding:25px;border:1px solid var(--cfg-borda);border-radius:17px;
+  background:linear-gradient(150deg,#153a54ed,#0c2a42f0 68%,#0b243af2);
+  box-shadow:inset 0 1px #ddf3ff11,0 15px 35px #000d1f26;
+  margin-bottom:21px;
+}
+.app-shell .configuracoes-fase7 .painel h2 { color:#f5fbff;letter-spacing:-.027em; }
+.app-shell .configuracoes-fase7 .nota-rodape { color:#a9c9dc;line-height:1.7; }
+.app-shell .configuracoes-fase7 .barra-item { gap:14px; }
+.app-shell .configuracoes-fase7 .barra-item > span { color:#cce5f3; }
+.app-shell .configuracoes-fase7 .barra-item > div {
+  height:12px;background:#09293f;border:1px solid #6d98ae43;border-radius:99px;
+}
+.app-shell .configuracoes-fase7 .barra-item i {
+  border-radius:99px;background:linear-gradient(90deg,#1787c6,#88dbff);
+}
+.app-shell .configuracoes-fase7 .mod-categoria-lista { gap:13px; }
+.app-shell .configuracoes-fase7 .mod-categoria-item {
+  padding:18px;border:1px solid #679ab86d;border-radius:12px;
+  background:linear-gradient(130deg,#17415aa6,#0f2d46b8);
+  color:#ecf8ff;line-height:1.5;
+}
+.app-shell .configuracoes-fase7 .rotulo-chave { color:#95dbff; }
+.app-shell .configuracoes-fase7 .passos { gap:12px; }
+.app-shell .configuracoes-fase7 .passos li {
+  padding:13px 15px;align-items:flex-start;gap:12px;
+  border:1px solid #6798b45e;border-radius:11px;
+  background:#153b557a;color:#cfe5f2;line-height:1.65;
+}
+.app-shell .configuracoes-fase7 .passos li:before {
+  width:29px;height:29px;flex:0 0 29px;
+  border:1px solid #72bde07d;border-radius:9px;
+  color:#d5f3ff;background:#1e5678;
+}
+.app-shell .configuracoes-fase7 .tabela-scroll {
+  border:1px solid #6899b65e;border-radius:12px;
+  scrollbar-width:thin;scrollbar-color:#498db4 #0a263e;
+}
+.app-shell .configuracoes-fase7 .tabela {
+  border-collapse:separate;border-spacing:0;
+}
+.app-shell .configuracoes-fase7 .tabela th {
+  padding:15px 12px;background:#16415d;
+  color:#d0e9f7;border-bottom:1px solid #75b1cb78;
+  letter-spacing:.05em;
+}
+.app-shell .configuracoes-fase7 .tabela td {
+  padding:13px 12px;line-height:1.55;
+  border-bottom:1px solid #6a9bb536;color:#e1f1fa;
+}
+.app-shell .configuracoes-fase7 .tabela tbody tr:nth-child(even) td { background:#173b5363; }
+.app-shell .configuracoes-fase7 .tabela tbody tr:hover td { background:#20567391; }
+.app-shell .configuracoes-fase7 .mod-accessos { gap:18px; }
+.app-shell .configuracoes-fase7 .mod-accessos > div {
+  min-width:0;padding:19px;
+  border:1px solid #6b9bb667;border-radius:13px;
+  background:linear-gradient(140deg,#153a54ae,#0d2a43be);
+}
+.app-shell .configuracoes-fase7 .campo label { color:#bbd8e8; }
+.app-shell .configuracoes-fase7 .campo input,
+.app-shell .configuracoes-fase7 .campo select {
+  background:#0c2d45;border:1px solid #6899b58b;border-radius:10px;
+  color:#f2faff;min-height:43px;
+}
+.app-shell .configuracoes-fase7 .campo input:hover,
+.app-shell .configuracoes-fase7 .campo select:hover { border-color:#8dcee9; }
+.app-shell .configuracoes-fase7 input[type="checkbox"] { accent-color:#58c4f5; }
+.app-shell .configuracoes-fase7 .mod-check {
+  border-color:#699cba65;border-radius:9px;
+  background:#14374fa3;color:#dceefa;
+}
+.app-shell .configuracoes-fase7 .mod-check:hover { border-color:#83c5e0; }
+.app-shell .configuracoes-fase7 .mod-permissoes td:not(:first-child),
+.app-shell .configuracoes-fase7 .mod-permissoes th:not(:first-child) { text-align:center; }
+.app-shell .configuracoes-fase7 .mod-sem-backend {
+  border-color:#66a2c075;border-radius:11px;
+  background:#123a56b6;color:#c3deec;line-height:1.65;
+}
+.app-shell .configuracoes-fase7 .bloco-info {
+  border:1px solid #66a7c380;border-left:3px solid #67ccff;
+  border-radius:12px;background:#153d58;color:#cce7f7;
+}
+.app-shell .configuracoes-fase7 button:focus-visible,
+.app-shell .configuracoes-fase7 input:focus-visible,
+.app-shell .configuracoes-fase7 select:focus-visible {
+  outline:2px solid var(--cfg-foco);outline-offset:3px;
+}
+@media(max-width:800px){
+  .app-shell .configuracoes-fase7 .painel { padding:18px;border-radius:14px; }
+  .app-shell .configuracoes-fase7 .mod-accessos > div { padding:15px; }
+  .app-shell .configuracoes-fase7 .mod-grid-estatisticas { gap:11px; }
+  .app-shell .configuracoes-fase7 .mod-tabbar { padding:7px;gap:6px; }
+}
+@media(max-width:470px){
+  .app-shell .configuracoes-fase7 .mod-tab { flex:1 1 100%;text-align:center; }
+  .app-shell .configuracoes-fase7 .painel { padding:15px; }
+  .app-shell .configuracoes-fase7 .mod-estatistica { padding:14px; }
+  .app-shell .configuracoes-fase7 .barra-item { gap:8px; }
+}
+@media(prefers-reduced-motion:reduce){
+  .app-shell .configuracoes-fase7 .mod-tab { transition:none; }
+}
+@media print {
+  .app-shell .configuracoes-fase7 .painel,
+  .app-shell .configuracoes-fase7 .mod-estatistica,
+  .app-shell .configuracoes-fase7 .mod-accessos > div,
+  .app-shell .configuracoes-fase7 .tabela th,
+  .app-shell .configuracoes-fase7 .tabela td,
+  .app-shell .configuracoes-fase7 .passos li {
+    color:#111!important;background:#fff!important;
+    border-color:#888!important;box-shadow:none!important;
+  }
+}
+
+
+/* Fase 8 (#36): refinamento exclusivo da tela Testes e erros (QA). */
+.app-shell .diagnostico-fase8 {
+  --qa-borda: #70a4bd70;
+  --qa-foco: #8cddff;
+  min-width: 0;
+  color: #eff9ff;
+}
+.app-shell .diagnostico-fase8 .cabecalho-premium { margin-bottom: 24px; }
+.app-shell .diagnostico-fase8 .cabecalho-premium p { color: #b7d4e5; }
+.app-shell .diagnostico-fase8 .cards-metricas {
+  gap: 15px;
+  margin-bottom: 23px;
+}
+.app-shell .diagnostico-fase8 .metrica {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 149px;
+  padding: 22px;
+  border: 1px solid var(--qa-borda);
+  border-radius: 17px;
+  background: linear-gradient(145deg, #163b56, #0d2b43 70%, #0b243b);
+  box-shadow: inset 0 1px #e4f6ff12, 0 14px 32px #000d1f24;
+}
+.app-shell .diagnostico-fase8 .metrica::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -80px;
+  right: -55px;
+  width: 185px;
+  height: 185px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6aceff1c, transparent 70%);
+  pointer-events: none;
+}
+.app-shell .diagnostico-fase8 .metrica small { color: #b8d7e8; letter-spacing: .017em; }
+.app-shell .diagnostico-fase8 .metrica strong {
+  color: #f5fbff;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.app-shell .diagnostico-fase8 .metrica span { color: #abc9dc; line-height: 1.5; }
+.app-shell .diagnostico-fase8 .painel {
+  margin-bottom: 22px;
+  padding: 25px;
+  border: 1px solid var(--qa-borda);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #153a55ec, #0d2a43f0 65%, #0a2239f4);
+  box-shadow: inset 0 1px #e1f5ff12, 0 16px 36px #000e1f26;
+}
+.app-shell .diagnostico-fase8 .painel h2 {
+  margin: 0;
+  color: #f4fbff;
+  letter-spacing: -.028em;
+  line-height: 1.3;
+}
+.app-shell .diagnostico-fase8 .linha-acoes { gap: 12px; }
+.app-shell .diagnostico-fase8 .painel > .linha-acoes:first-child {
+  padding-bottom: 18px;
+  border-bottom: 1px solid #75a6c03c;
+  margin-bottom: 18px !important;
+}
+.app-shell .diagnostico-fase8 .tabela-scroll {
+  border: 1px solid #70a1bd65;
+  border-radius: 13px;
+  scrollbar-width: thin;
+  scrollbar-color: #468daf #0b2b43;
+  background: #0c2a42;
+}
+.app-shell .diagnostico-fase8 .tabela { border-collapse: separate; border-spacing: 0; }
+.app-shell .diagnostico-fase8 .tabela th {
+  padding: 16px 14px;
+  background: #16405b;
+  color: #d0e9f6;
+  border-bottom: 1px solid #7bb4ce6b;
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+.app-shell .diagnostico-fase8 .tabela td {
+  padding: 14px;
+  border-bottom: 1px solid #78a5bb31;
+  color: #dceef8;
+  line-height: 1.55;
+}
+.app-shell .diagnostico-fase8 .tabela tbody tr:nth-child(even) td { background: #163b5366; }
+.app-shell .diagnostico-fase8 .tabela tbody tr:hover td { background: #1d506d9c; }
+.app-shell .diagnostico-fase8 .tabela td.texto-sucesso {
+  color: #8be9c1;
+  font-weight: 740;
+  white-space: nowrap;
+}
+.app-shell .diagnostico-fase8 .tabela td.texto-alerta {
+  color: #ffc1a5;
+  font-weight: 740;
+  white-space: nowrap;
+}
+.app-shell .diagnostico-fase8 .controles {
+  margin-top: 19px;
+  padding: 17px;
+  border: 1px solid #6e9fba65;
+  border-radius: 13px;
+  background: linear-gradient(125deg, #143c56, #0b2b43);
+}
+.app-shell .diagnostico-fase8 .controles .campo {
+  flex: 1 1 210px;
+  min-width: 0;
+}
+.app-shell .diagnostico-fase8 .campo label {
+  color: #bbd9e9;
+  font-size: 11px;
+  letter-spacing: .015em;
+}
+.app-shell .diagnostico-fase8 .campo input,
+.app-shell .diagnostico-fase8 .campo select,
+.app-shell .diagnostico-fase8 .campo textarea {
+  background: #0d2c44;
+  color: #f0faff;
+  border: 1px solid #70a0b98a;
+  border-radius: 10px;
+  min-height: 44px;
+}
+.app-shell .diagnostico-fase8 .campo textarea {
+  width: 100%;
+  padding: 14px;
+  resize: vertical;
+  line-height: 1.6;
+  min-height: 140px;
+}
+.app-shell .diagnostico-fase8 .campo input::placeholder,
+.app-shell .diagnostico-fase8 .campo textarea::placeholder { color: #9dbed2; }
+.app-shell .diagnostico-fase8 .campo select:hover,
+.app-shell .diagnostico-fase8 .campo textarea:hover { border-color: #8ac6e5; }
+.app-shell .diagnostico-fase8 .botao { border-radius: 10px; min-height: 43px; }
+.app-shell .diagnostico-fase8 button:focus-visible,
+.app-shell .diagnostico-fase8 input:focus-visible,
+.app-shell .diagnostico-fase8 select:focus-visible,
+.app-shell .diagnostico-fase8 textarea:focus-visible {
+  outline: 2px solid var(--qa-foco);
+  outline-offset: 3px;
+}
+.app-shell .diagnostico-fase8 .nota-rodape {
+  color: #aecadd;
+  margin-top: 21px;
+  line-height: 1.7;
+}
+@media (max-width: 750px) {
+  .app-shell .diagnostico-fase8 .cards-metricas { gap: 11px; }
+  .app-shell .diagnostico-fase8 .metrica { min-height: 135px; padding: 17px; }
+  .app-shell .diagnostico-fase8 .painel { padding: 18px; border-radius: 15px; }
+  .app-shell .diagnostico-fase8 .controles { padding: 14px; }
+  .app-shell .diagnostico-fase8 .tabela th,
+  .app-shell .diagnostico-fase8 .tabela td { padding: 12px; }
+}
+@media (max-width: 420px) {
+  .app-shell .diagnostico-fase8 .metrica { padding: 13px; }
+  .app-shell .diagnostico-fase8 .painel { padding: 15px; }
+  .app-shell .diagnostico-fase8 .painel .linha-acoes .botao { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .diagnostico-fase8 .metrica,
+  .app-shell .diagnostico-fase8 .botao { transition: none; }
+}
+@media print {
+  .app-shell .diagnostico-fase8 .metrica,
+  .app-shell .diagnostico-fase8 .painel,
+  .app-shell .diagnostico-fase8 .tabela th,
+  .app-shell .diagnostico-fase8 .tabela td {
+    background: #fff !important;
+    color: #111 !important;
+    box-shadow: none !important;
+    border-color: #888 !important;
+  }
+}
