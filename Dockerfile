@@ -7,7 +7,8 @@ COPY package.json ./
 # Repositório ainda sem lockfile: pinagem reprodutível será tratada em PR próprio.
 RUN npm install --no-audit --no-fund
 COPY . .
-RUN npm run build
+# Next.js 16: proxy só no build Node; GitHub Pages permanece sem proxy.
+RUN cp src/server/proxy-autenticacao.ts src/proxy.ts && npm run build
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
