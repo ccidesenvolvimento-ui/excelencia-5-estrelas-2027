@@ -7,6 +7,7 @@ on:
       - "style/**"
       - "infra/**"
       - "db/**"
+      - "auth/**"
 
 permissions:
   contents: read
@@ -34,6 +35,9 @@ jobs:
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
+      - name: Verificar base de sessao Supabase SSR
+        if: ${{ github.event.pull_request.head.ref == 'auth/supabase-ssr-47' }}
+        run: node scripts/testar-sessao-supabase-ssr.cjs
       - name: Compilar sistema
         run: npm run build
         env:
