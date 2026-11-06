@@ -37,6 +37,9 @@ jobs:
       - name: Verificar base de sessao Supabase SSR
         if: ${{ github.event.pull_request.head.ref == 'auth/supabase-ssr-47' }}
         run: node scripts/testar-sessao-supabase-ssr.cjs
+      - name: Verificar login Supabase opt-in sem dados reais
+        if: ${{ github.event.pull_request.head.ref == 'auth/login-inicial-49' }}
+        run: node scripts/testar-login-supabase.cjs
       - name: Compilar sistema
         run: npm run build
         env:
