@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { CabecalhoEntrada, EstrelaInstitucional, RodapeEntrada, SetaEntrada } from "@/components/EntradaInstitucional";
+import { CabecalhoEntrada, EstrelaInstitucional, RodapeEntrada } from "@/components/EntradaInstitucional";
 import styles from "../entrada.module.css";
+import { FormularioLoginSupabase } from "@/components/FormularioLoginSupabase";
 
 export default function LoginCorporativo() {
   return <div className={`${styles.page} ${styles.home}`}>
@@ -18,15 +19,7 @@ export default function LoginCorporativo() {
           <div className={styles.panelTop}><span className={styles.eyebrow}>ACESSO CORPORATIVO</span><svg width="20" height="23" viewBox="0 0 24 26" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M5 11V8a7 7 0 0 1 14 0v3M4 11h16v13H4zM12 16v4"/></svg></div>
           <h2 id="titulo-login">Bem-vindo à<br/>Área Corporativa.</h2>
           <p className={styles.panelIntro}>O próximo passo para acompanhar a excelência do nosso time.</p>
-          <div className={styles.availability} id="estado-acesso"><span className={styles.statusDot}/><span>Integração corporativa em preparação</span></div>
-          <div className={styles.fields} aria-describedby="estado-acesso aviso-login">
-            <label htmlFor="email-corporativo">E-mail corporativo</label>
-            <input id="email-corporativo" type="email" placeholder="seu.nome@empresa.com.br" disabled autoComplete="off" />
-            <label htmlFor="senha-corporativa">Senha</label>
-            <input id="senha-corporativa" type="password" placeholder="Sua senha corporativa" disabled autoComplete="off" />
-            <button type="button" disabled className={styles.loginButton}>Acesso ainda indisponível <SetaEntrada /></button>
-          </div>
-          <p id="aviso-login" className={styles.loginNotice}>O login será habilitado após a integração segura com o serviço de autenticação corporativa. Nenhuma credencial é coletada nesta versão.</p>
+          <FormularioLoginSupabase />
           <div className={styles.demo}><span className={styles.demoTag}>AMBIENTE DEMONSTRATIVO</span><p>Conheça a plataforma com dados fictícios, sem acesso a informações corporativas.</p><Link href="/visao-geral" className={styles.demoButton}>Explorar demonstração <SetaEntrada /></Link></div>
           <p className={styles.driverLink}>É motorista? <Link href="/motorista">Acesse sua área →</Link></p>
         </section>
