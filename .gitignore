@@ -15,3 +15,6 @@ artifacts/
 
 # Segredos de infraestrutura de homologação
 .env.homologacao
+
+# Proxy gerado somente no build Docker/Node do Next.js 16
+src/proxy.ts
