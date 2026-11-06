@@ -18,6 +18,8 @@ const recursosPublicos = new Set([
 
 function publica(pathname: string) {
   const caminho = pathname.replace(/\/+$/, "") || "/";
+  // Endpoints de API sempre passam pela verificação de identidade.
+  if (caminho === "/api" || caminho.startsWith("/api/")) return false;
   return rotasPublicas.has(caminho) ||
     caminho.startsWith("/motorista/") ||
     caminho.startsWith("/_next/") ||
