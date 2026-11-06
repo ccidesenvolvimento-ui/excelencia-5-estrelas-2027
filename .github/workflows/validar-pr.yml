@@ -41,6 +41,9 @@ jobs:
       - name: Verificar login Supabase opt-in sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'auth/login-inicial-49' }}
         run: node scripts/testar-login-supabase.cjs
+      - name: Verificar controle de rotas e isolamento do proxy
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
+        run: node scripts/testar-protecao-rotas.cjs
       - name: Compilar sistema
         run: npm run build
         env:
@@ -62,6 +65,15 @@ jobs:
         with:
           name: ajustes-desktop-celular
           path: artifacts/
+
+      - name: Compilar com proxy de autenticacao no Next.js Node
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'rm -f src/proxy.ts' EXIT
+          cp src/server/proxy-autenticacao.ts src/proxy.ts
+          npm run build
 
       - name: Validar homologacao Docker e Next.js servidor
         # Executa contêineres efêmeros somente no runner do GitHub, sem acesso ao servidor do setor.
