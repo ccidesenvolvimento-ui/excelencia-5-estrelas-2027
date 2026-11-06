@@ -44,6 +44,30 @@ jobs:
       - name: Verificar controle de rotas e isolamento do proxy
         if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
         run: node scripts/testar-protecao-rotas.cjs
+      - name: Testar RLS de filiais em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'db/rls-filiais-53' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\\nDB_PASSWORD=ci-rls-somente-teste-descartavel-123\\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \\
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \\
+            < db/homologacao/29_auth_uid_apenas_ci.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \\
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \\
+            < supabase/migrations/20261106000100_rls_filiais_leitura.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \\
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \\
+            < db/homologacao/30_testar_rls_filiais.sql
+
       - name: Compilar sistema
         run: npm run build
         env:
