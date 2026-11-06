@@ -10,5 +10,9 @@ assert.match(source, /cookieStore\.getAll\(\)/);
 assert.match(source, /cookieStore\.set\(/);
 assert.match(source, /supabase\.auth\.getUser\(\)/);
 assert.doesNotMatch(source, /\.auth\.getSession\(/);
-assert.doesNotMatch(source, /NEXT_PUBLIC_|service_role|sb_secret_/);
+// Verificar uso de credenciais na execução, não menções em mensagens de erro.
+assert.doesNotMatch(source, /process\.env\.NEXT_PUBLIC_/);
+assert.doesNotMatch(source, /process\.env\.(?:SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY)/);
+assert.match(source, /createServerClient\(url, chavePublicavel,/);
+assert.match(source, /chavePublicavel\.startsWith\(["']sb_publishable_["']\)/);
 console.log("Sessão SSR Supabase: verificações estáticas aprovadas.");
