@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CabecalhoEntrada, EstrelaInstitucional, RodapeEntrada } from "@/components/EntradaInstitucional";
+import { CabecalhoEntrada, EstrelaInstitucional, RodapeEntrada, SetaEntrada } from "@/components/EntradaInstitucional";
 import styles from "../entrada.module.css";
 import { FormularioLoginSupabase } from "@/components/FormularioLoginSupabase";
 
