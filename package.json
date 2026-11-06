@@ -25,7 +25,8 @@
     "@supabase/supabase-js": "2.118.0",
     "@supabase/ssr": "0.12.7",
     "jszip": "^3.10.2",
-    "exceljs": "4.4.0"
+    "exceljs": "4.4.0",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "typescript": "^5.9.0",
