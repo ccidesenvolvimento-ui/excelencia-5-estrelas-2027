@@ -69,6 +69,29 @@ jobs:
             psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
             < db/homologacao/30_testar_rls_filiais.sql
 
+      - name: Testar autorizacao de administradores importadores
+        if: ${{ github.event.pull_request.head.ref == 'auth/admin-importacoes-55' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-admin-teste-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          for arquivo in \
+            db/homologacao/29_auth_uid_apenas_ci.sql \
+            supabase/migrations/20261106000100_rls_filiais_leitura.sql \
+            supabase/migrations/20261111000100_admin_importacoes_autorizacao.sql \
+            db/homologacao/40_testar_admin_importacoes.sql; do
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+              psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 < "$arquivo"
+          done
+
       - name: Compilar sistema
         run: npm run build
         env:
