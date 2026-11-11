@@ -16,6 +16,7 @@ export const dynamic = "force-dynamic";
 const FLAG = "EXCELENCIA_AJUSTES_API_ENABLED";
 const NO_STORE = { "Cache-Control": "private, no-store, max-age=0", "Content-Type": "application/json; charset=utf-8", "X-Content-Type-Options": "nosniff" };
 const ESTRELAS = new Set(["seguranca","produtividade","dirigibilidade","jornada","treinamentos"]);
+function duasCasas(valor:number){ return Math.abs(Math.round(valor*100)-valor*100)<1e-8; }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 type Erro = { erro: string };
@@ -112,9 +113,9 @@ export async function POST(request:NextRequest) {
   if(Object.keys(payload).some(x=>!["notaId","novaNota","notaEsperada","justificativa"].includes(x))
     || typeof notaId!=="string"||!UUID.test(notaId)
     || typeof novaNota!=="number"||!Number.isFinite(novaNota)||novaNota<0||novaNota>100
-    || Math.round(novaNota*100)!==novaNota*100
+    || !duasCasas(novaNota)
     || typeof notaEsperada!=="number"||!Number.isFinite(notaEsperada)||notaEsperada<0||notaEsperada>100
-    || Math.round(notaEsperada*100)!==notaEsperada*100
+    || !duasCasas(notaEsperada)
     || typeof justificativa!=="string"
     || justificativa.trim().length<15||justificativa.trim().length>1000
     || novaNota===notaEsperada
