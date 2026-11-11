@@ -92,6 +92,30 @@ jobs:
               psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 < "$arquivo"
           done
 
+      - name: Testar ajustes administrativos e auditoria em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-ajustes-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          for arquivo in \
+            db/homologacao/29_auth_uid_apenas_ci.sql \
+            supabase/migrations/20261106000100_rls_filiais_leitura.sql \
+            supabase/migrations/20261111000100_admin_importacoes_autorizacao.sql \
+            supabase/migrations/20261111000200_ajustes_administrativos_notas.sql \
+            db/homologacao/41_testar_ajustes_notas.sql; do
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+              psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 < "$arquivo"
+          done
+
       - name: Compilar sistema
         run: npm run build
         env:
