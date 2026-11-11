@@ -40,7 +40,7 @@ export function ModalAjusteNotaDemo({nota,aoFechar,aoConcluir}:{
     return ()=>{document.body.style.overflow=overflow;document.removeEventListener("keydown",teclado);anterior?.focus();};
   },[aoFechar]);
 
-  return <div className="ajustes-overlay ajustes-overlay-embaçado" onMouseDown={e=>{if(e.target===e.currentTarget)aoFechar();}}>
+  return <div className="ajustes-overlay ajustes-overlay-embaçado" style={{backdropFilter:"blur(9px)",WebkitBackdropFilter:"blur(9px)"}} onMouseDown={e=>{if(e.target===e.currentTarget)aoFechar();}}>
     <section ref={dialogo} role="dialog" aria-modal="true" aria-labelledby="aj-modal-titulo" aria-describedby="aj-modal-descricao" className="ajustes-dialogo ajustes-editor">
       <header className="ajustes-modal-cabecalho">
         <div><span className="rotulo-chave">AJUSTE ADMINISTRATIVO / DEMONSTRAÇÃO</span><h2 id="aj-modal-titulo">{confirmando?"Conferir alteração":"Alterar nota do motorista"}</h2>
