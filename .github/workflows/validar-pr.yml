@@ -18,7 +18,8 @@ concurrency:
 
 jobs:
   validar:
-    runs-on: ubuntu-latest
+    # Fixar LTS estável; runner pré-configurado com bibliotecas para testes Chromium.
+    runs-on: ubuntu-24.04
     steps:
       - name: Baixar codigo
         uses: actions/checkout@v4
@@ -44,6 +45,30 @@ jobs:
       - name: Verificar controle de rotas e isolamento do proxy
         if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
         run: node scripts/testar-protecao-rotas.cjs
+      - name: Testar RLS de filiais em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'db/rls-filiais-53' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-rls-somente-teste-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/29_auth_uid_apenas_ci.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < supabase/migrations/20261106000100_rls_filiais_leitura.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/30_testar_rls_filiais.sql
+
       - name: Compilar sistema
         run: npm run build
         env:
@@ -51,8 +76,13 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
       - name: Instalar navegador para regressao visual
         run: |
+          set -euo pipefail
+          # Falhas temporárias de DNS do mirror apt não devem ser confundidas com regressão do sistema.
           npm install --no-save --no-audit --no-fund playwright@1.64.1
-          npx playwright install --with-deps chromium
+          # Evita apt-get/--with-deps: mirrors Ubuntu estão indisponíveis no runner.
+          # O Chromium é obtido pelo instalador Playwright; dependências de sistema
+          # já disponíveis no runner são verificadas ao iniciar o navegador.
+          npx playwright install chromium
       - name: Verificar desktop e celular
         run: |
           node scripts/testar-ajustes-browser.cjs
