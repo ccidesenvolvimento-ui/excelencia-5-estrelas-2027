@@ -8,6 +8,7 @@ on:
       - "infra/**"
       - "db/**"
       - "auth/**"
+      - "feat/**"
 
 permissions:
   contents: read
