@@ -39,6 +39,29 @@ INSERT INTO public.notas_mensais(colaborador_id,competencia,estrela,nota,origem)
  ('40000000-0000-4000-8000-000000000001','2026-01-01','seguranca',100,'seguranca_calculada'),
  ('40000000-0000-4000-8000-000000000002','2026-01-01','seguranca',100,'seguranca_calculada');
 
+-- Antes de simular JWT, conferir os privilégios efetivos de todas as tabelas.
+-- RLS NÃO impede TRUNCATE; REFERENCES e TRIGGER também devem estar revogados.
+DO $
+DECLARE tabela record; papel text; privilegio text;
+BEGIN
+  FOR tabela IN
+    SELECT tablename FROM pg_tables WHERE schemaname='public'
+      AND tablename <> 'migracoes_homologacao'
+  LOOP
+    FOREACH papel IN ARRAY ARRAY['anon','authenticated'] LOOP
+      FOREACH privilegio IN ARRAY ARRAY['TRUNCATE','TRIGGER','REFERENCES','INSERT','UPDATE','DELETE'] LOOP
+        IF has_table_privilege(papel, format('public.%I', tabela.tablename), privilegio) THEN
+          RAISE EXCEPTION 'Privilégio indevido: papel %, tabela %, ação %',
+            papel, tabela.tablename, privilegio;
+        END IF;
+      END LOOP;
+      IF papel='anon' AND has_table_privilege(papel, format('public.%I', tabela.tablename), 'SELECT') THEN
+        RAISE EXCEPTION 'Leitura anônima indevida na tabela %', tabela.tablename;
+      END IF;
+    END LOOP;
+  END LOOP;
+END $;
+
 -- Cada teste roda como role autenticada, respeitando RLS, com JWT fictício.
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
