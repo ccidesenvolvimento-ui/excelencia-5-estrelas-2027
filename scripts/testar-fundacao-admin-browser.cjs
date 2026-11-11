@@ -50,17 +50,17 @@ const pages=[
       const blur=await page.locator('.ajustes-overlay-embaçado').evaluate(el=>getComputedStyle(el).backdropFilter);
       assert.ok(blur.includes('blur('),'Fundo desfocado');
       assert.ok(await page.locator('#aj-nova').isVisible(),'Edição visível sem rolar a tela principal');
-      await page.locator('#aj-nova').fill('90');
+      const notaAtual=await page.locator('.ajustes-valores > div:nth-child(2) strong').textContent();
+      await page.locator('#aj-nova').fill(notaAtual?.trim()==='90,00'?'75':'90');
       await page.locator('#aj-just').fill('Correção de divergência confirmada pelo setor de Produtividade.');
       const preview=page.getByRole('button',{name:'Revisar ajuste (demo)'});
-      if(await preview.isEnabled()){
+      assert.ok(await preview.isEnabled(),'Uma correção válida habilita pré-visualização');
+      {
         await preview.click();
         assert.ok(await page.getByRole('dialog',{name:'Conferir alteração'}).isVisible());
         await page.getByRole('button',{name:'Concluir pré-visualização (sem salvar)'}).click();
         assert.equal(await page.getByRole('dialog').count(),0,'Fechou após prévia');
         assert.ok(await page.getByText('Nenhum ajuste foi enviado ou salvo.',{exact:false}).isVisible());
-      } else {
-        await page.keyboard.press('Escape');
       }
       await page.locator('#aj-pilar').selectOption('seguranca');
       await page.locator('.ajustes-tabela tbody button').first().click();
