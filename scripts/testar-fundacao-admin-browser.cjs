@@ -19,7 +19,7 @@ const server = http.createServer((req,res)=>{
 });
 const pages=[
  ['visao-geral','Visão geral'],['ranking','Ranking'],['pendencias','Pendências'],
- ['importacoes','Importações'],['rh0034','Cadastro RH0034'],
+ ['importacoes','Importações'],['rh0034','Cadastro RH0034'],['ajustes-notas','Ajustes de notas'],
  ['configuracoes','Configurações'],['diagnostico','Testes e erros']
 ];
 (async()=>{
@@ -36,7 +36,28 @@ const pages=[
     await page.goto(`http://127.0.0.1:4176${base}/${route}/`);
     await page.waitForLoadState('networkidle');
     assert.equal(await page.locator('.app-shell').count(),1,`Shell administrativo em ${route}`);
-    assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a').count(),8,'Menu administrativo preservado');
+    if(route==='ajustes-notas') {
+      assert.ok(await page.getByRole('heading',{name:'Ajustes administrativos de notas'}).isVisible());
+      assert.ok(await page.getByText('não registra alterações',{exact:false}).first().isVisible());
+      await page.locator('#aj-mes').selectOption('0');
+      await page.locator('#aj-pilar').selectOption('produtividade');
+      await page.locator('.ajustes-tabela tbody button').first().click();
+      await page.locator('#aj-nova').fill('90');
+      await page.locator('#aj-just').fill('Correção de divergência confirmada pelo setor de Produtividade.');
+      const preview=page.getByRole('button',{name:'Revisar ajuste (demo)'});
+      if(await preview.isEnabled()){
+        await preview.click();
+        assert.ok(await page.getByRole('dialog',{name:'Conferência do ajuste'}).isVisible());
+        await page.getByRole('button',{name:'Concluir pré-visualização (sem salvar)'}).click();
+        assert.ok(await page.getByText('Nenhum ajuste foi enviado ou salvo.',{exact:false}).isVisible());
+      }
+      await page.locator('#aj-pilar').selectOption('seguranca');
+      await page.locator('.ajustes-tabela tbody button').first().click();
+      assert.ok(await page.getByText('Segurança: edição manual bloqueada.').isVisible());
+      assert.equal(await page.locator('#aj-nova').count(),0);
+    }
+
+    assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a').count(),9,'Menu administrativo preservado');
     assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a[aria-current="page"]').count(),1,`Aba ativa em ${route}`);
     const pageInfo=await page.locator('.app-shell').evaluate(el=>{
       const style=getComputedStyle(el);
@@ -57,7 +78,7 @@ const pages=[
     }
    }
    assert.deepEqual(failures,[],`Sem erros JS a ${width}px`);
-   console.log(`✓ Fundação administrativa: sete abas verificadas em ${width}px.`);
+   console.log(`✓ Fundação administrativa: oito abas verificadas em ${width}px.`);
    await page.close();
   }
   // Escopo: garantir que as páginas institucionais não recebam .app-shell.
