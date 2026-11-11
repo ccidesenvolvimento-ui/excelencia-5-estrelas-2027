@@ -19,7 +19,7 @@ const server = http.createServer((req,res)=>{
 });
 const pages=[
  ['visao-geral','Visão geral'],['ranking','Ranking'],['pendencias','Pendências'],
- ['importacoes','Importações'],['rh0034','Cadastro RH0034'],
+ ['importacoes','Importações'],['rh0034','Cadastro RH0034'],['ajustes-notas','Ajustes de notas'],
  ['configuracoes','Configurações'],['diagnostico','Testes e erros']
 ];
 (async()=>{
@@ -36,7 +36,7 @@ const pages=[
     await page.goto(`http://127.0.0.1:4176${base}/${route}/`);
     await page.waitForLoadState('networkidle');
     assert.equal(await page.locator('.app-shell').count(),1,`Shell administrativo em ${route}`);
-    assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a').count(),8,'Menu administrativo preservado');
+    assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a').count(),9,'Menu administrativo preservado');
     assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a[aria-current="page"]').count(),1,`Aba ativa em ${route}`);
     const pageInfo=await page.locator('.app-shell').evaluate(el=>{
       const style=getComputedStyle(el);
@@ -57,7 +57,7 @@ const pages=[
     }
    }
    assert.deepEqual(failures,[],`Sem erros JS a ${width}px`);
-   console.log(`✓ Fundação administrativa: sete abas verificadas em ${width}px.`);
+   console.log(`✓ Fundação administrativa: oito abas verificadas em ${width}px.`);
    await page.close();
   }
   // Escopo: garantir que as páginas institucionais não recebam .app-shell.
