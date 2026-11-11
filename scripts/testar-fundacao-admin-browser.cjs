@@ -39,22 +39,36 @@ const pages=[
     if(route==='ajustes-notas') {
       assert.ok(await page.getByRole('heading',{name:'Ajustes administrativos de notas'}).isVisible());
       assert.ok(await page.getByText('não registra alterações',{exact:false}).first().isVisible());
+      const itemMenu=page.locator('nav a.menu-ajustes-notas');
+      assert.ok(await itemMenu.isVisible());
+      assert.equal(await itemMenu.locator('svg').count(),1,'Ícone exclusivo na aba');
       await page.locator('#aj-mes').selectOption('0');
       await page.locator('#aj-pilar').selectOption('produtividade');
       await page.locator('.ajustes-tabela tbody button').first().click();
+      const modal=page.getByRole('dialog',{name:'Alterar nota do motorista'});
+      assert.ok(await modal.isVisible(),'Modal abre imediatamente ao selecionar');
+      const blur=await page.locator('.ajustes-overlay-embaçado').evaluate(el=>getComputedStyle(el).backdropFilter);
+      assert.ok(blur.includes('blur('),'Fundo desfocado');
+      assert.ok(await page.locator('#aj-nova').isVisible(),'Edição visível sem rolar a tela principal');
       await page.locator('#aj-nova').fill('90');
       await page.locator('#aj-just').fill('Correção de divergência confirmada pelo setor de Produtividade.');
       const preview=page.getByRole('button',{name:'Revisar ajuste (demo)'});
       if(await preview.isEnabled()){
         await preview.click();
-        assert.ok(await page.getByRole('dialog',{name:'Conferência do ajuste'}).isVisible());
+        assert.ok(await page.getByRole('dialog',{name:'Conferir alteração'}).isVisible());
         await page.getByRole('button',{name:'Concluir pré-visualização (sem salvar)'}).click();
+        assert.equal(await page.getByRole('dialog').count(),0,'Fechou após prévia');
         assert.ok(await page.getByText('Nenhum ajuste foi enviado ou salvo.',{exact:false}).isVisible());
+      } else {
+        await page.keyboard.press('Escape');
       }
       await page.locator('#aj-pilar').selectOption('seguranca');
       await page.locator('.ajustes-tabela tbody button').first().click();
+      assert.ok(await page.getByRole('dialog',{name:'Alterar nota do motorista'}).isVisible());
       assert.ok(await page.getByText('Segurança: edição manual bloqueada.').isVisible());
       assert.equal(await page.locator('#aj-nova').count(),0);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.getByRole('dialog').count(),0,'Escape fecha modal');
     }
 
     assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a').count(),9,'Menu administrativo preservado');
