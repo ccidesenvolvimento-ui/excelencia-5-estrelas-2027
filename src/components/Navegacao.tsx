@@ -12,7 +12,7 @@ const itens: ItemMenu[] = [
   { url: "/pendencias", titulo: "Pendências", icone: "pendencias" },
   { url: "/importacoes", titulo: "Importações", icone: "importacoes" },
   { url: "/rh0034", titulo: "Cadastro RH0034", icone: "rh" },
-  { url: "/ajustes-notas", titulo: "Ajustes de notas", icone: "configuracoes" },
+  { url: "/ajustes-notas", titulo: "Ajustes de notas", icone: "ajustes-notas" },
   { url: "/configuracoes", titulo: "Configurações", icone: "configuracoes" },
   { url: "/diagnostico", titulo: "Testes e erros", icone: "diagnostico" },
   { url: "/motorista", titulo: "Portal do motorista", icone: "rh" },
@@ -96,7 +96,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
           href={item.url}
           aria-label={item.titulo}
           aria-current={caminho === item.url ? "page" : undefined}
-          className={caminho === item.url ? "ativo" : ""}
+          className={[caminho === item.url ? "ativo" : "",item.url==="/ajustes-notas" ? "menu-ajustes-notas" : ""].filter(Boolean).join(" ")}
           title={!expandida && !mobileAberto ? item.titulo : undefined}
           onClick={() => {
             setMobileAberto(false);
