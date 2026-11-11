@@ -18,7 +18,8 @@ concurrency:
 
 jobs:
   validar:
-    runs-on: ubuntu-latest
+    # Fixar LTS estável: ubuntu-latest passou a usar 26.04 no runner e apt teve falha DNS.
+    runs-on: ubuntu-24.04
     steps:
       - name: Baixar codigo
         uses: actions/checkout@v4
@@ -75,6 +76,9 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
       - name: Instalar navegador para regressao visual
         run: |
+          set -euo pipefail
+          # Falhas temporárias de DNS do mirror apt não devem ser confundidas com regressão do sistema.
+          sudo apt-get -o Acquire::Retries=3 update
           npm install --no-save --no-audit --no-fund playwright@1.64.1
           npx playwright install --with-deps chromium
       - name: Verificar desktop e celular
