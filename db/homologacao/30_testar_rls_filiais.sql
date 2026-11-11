@@ -41,7 +41,7 @@ INSERT INTO public.notas_mensais(colaborador_id,competencia,estrela,nota,origem)
 
 -- Antes de simular JWT, conferir os privilégios efetivos de todas as tabelas.
 -- RLS NÃO impede TRUNCATE; REFERENCES e TRIGGER também devem estar revogados.
-DO $
+DO $$
 DECLARE tabela record; papel text; privilegio text;
 BEGIN
   FOR tabela IN
@@ -60,7 +60,7 @@ BEGIN
       END IF;
     END LOOP;
   END LOOP;
-END $;
+END $$;
 
 -- Cada teste roda como role autenticada, respeitando RLS, com JWT fictício.
 SET LOCAL ROLE authenticated;
