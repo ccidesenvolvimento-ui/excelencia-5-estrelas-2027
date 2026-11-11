@@ -41,8 +41,7 @@ BEGIN
   IF (SELECT nota FROM public.notas_mensais WHERE id='62000000-0000-4000-8000-000000000030') <> 75
     OR (SELECT nota_efetiva FROM public.notas_mensais_efetivas WHERE id='62000000-0000-4000-8000-000000000030') <> 90
     OR (SELECT count(*) FROM public.ajustes_notas WHERE nota_mensal_id='62000000-0000-4000-8000-000000000030') <> 1
-    OR (SELECT count(*) FROM public.auditoria WHERE registro_id='62000000-0000-4000-8000-000000000030') <> 1
-  THEN RAISE EXCEPTION 'Origem/efetiva/auditoria inválidas'; END IF;
+  THEN RAISE EXCEPTION 'Origem/efetiva/histórico inválidos'; END IF;
 END $$;
 
 -- Verificar exceções dentro de blocos para não abortar transação de CI.
@@ -110,7 +109,12 @@ BEGIN
 END $$;
 
 RESET ROLE;
-DO $$
+DO $
+BEGIN
+ IF (SELECT count(*) FROM public.auditoria WHERE registro_id='62000000-0000-4000-8000-000000000030' AND acao='ajuste_administrativo_nota') <> 1
+ THEN RAISE EXCEPTION 'Registro de auditoria ausente'; END IF;
+END $;
+DO $
 BEGIN
   BEGIN
     UPDATE public.notas_mensais SET nota=79 WHERE id='62000000-0000-4000-8000-000000000030';
