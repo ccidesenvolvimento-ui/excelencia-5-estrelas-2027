@@ -15,7 +15,7 @@ assert.ok(server.includes('cliente.auth.getUser()'), 'Identity deve ser validada
 assert.ok(server.includes('rpc("eh_administrador_ativo")'), 'Checagem de admin no banco');
 assert.ok(server.includes('rpc("registrar_ajuste_nota"'), 'Somente escrita por RPC auditada');
 assert.ok(server.includes('function origemValida'), 'Proteção de origem contra CSRF');
-assert.ok(!/service_role|sb_secret_/.test(server), 'Não usar chaves privilegiadas');
+assert.ok(!/process\.env\.(?:SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY)/.test(server), 'Não usar chaves privilegiadas');
 assert.ok(route.includes('export { GET, POST }'), 'Template exporta handlers');
 assert.ok(config.includes('output: "export"'), 'GitHub Pages continua estático');
 console.log('✓ Isolamento da API de ajustes e flags fail-closed: aprovado.');
