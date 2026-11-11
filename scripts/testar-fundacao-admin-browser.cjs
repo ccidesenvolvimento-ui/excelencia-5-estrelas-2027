@@ -69,6 +69,8 @@ const pages=[
       assert.equal(await page.locator('#aj-nova').count(),0);
       await page.keyboard.press('Escape');
       assert.equal(await page.getByRole('dialog').count(),0,'Escape fecha modal');
+      const focoRestaurado=await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')??'');
+      assert.ok(focoRestaurado.startsWith('Selecionar nota de '),'Foco retorna ao botão Selecionar após Escape');
     }
 
     assert.equal(await page.locator('nav[aria-label="Páginas do sistema"] a').count(),9,'Menu administrativo preservado');
