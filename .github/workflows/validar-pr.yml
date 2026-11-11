@@ -117,11 +117,25 @@ jobs:
               psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 < "$arquivo"
           done
 
+      - name: Verificar isolamento da API Node de ajustes
+        if: ${{ github.event.pull_request.head.ref == 'feat/api-ajustes-notas-61' }}
+        run: node scripts/testar-api-ajustes-config.cjs
+
       - name: Compilar sistema
         run: npm run build
         env:
           NEXT_PUBLIC_DEPLOY_TARGET: github-pages
           NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
+      - name: Compilar API de ajustes em Next.js Node descartavel
+        if: ${{ github.event.pull_request.head.ref == 'feat/api-ajustes-notas-61' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/app/api/ajustes-notas
+          trap 'rm -f src/app/api/ajustes-notas/route.ts; rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true' EXIT
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          npm run build
+
       - name: Instalar navegador para regressao visual
         run: |
           set -euo pipefail
