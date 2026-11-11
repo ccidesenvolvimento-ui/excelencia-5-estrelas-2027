@@ -109,12 +109,12 @@ BEGIN
 END $$;
 
 RESET ROLE;
-DO $
+DO $$
 BEGIN
  IF (SELECT count(*) FROM public.auditoria WHERE registro_id='62000000-0000-4000-8000-000000000030' AND acao='ajuste_administrativo_nota') <> 1
  THEN RAISE EXCEPTION 'Registro de auditoria ausente'; END IF;
-END $;
-DO $
+END $$;
+DO $$
 BEGIN
   BEGIN
     UPDATE public.notas_mensais SET nota=79 WHERE id='62000000-0000-4000-8000-000000000030';
