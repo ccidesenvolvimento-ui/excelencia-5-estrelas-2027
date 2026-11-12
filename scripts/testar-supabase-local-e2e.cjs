@@ -60,6 +60,14 @@ async function executar(){
    .trim().split("\n").filter(Boolean).find(x=>x.includes("excelencia-5-estrelas-2027"));
  assert.ok(container,"Banco Supabase local descartável não encontrado");
  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],{input:sql,stdio:["pipe","pipe","pipe"]});
+ if(process.env.E5_E2E_SETUP_ONLY==="true"){
+   const fs=require("node:fs");
+   const arquivo=process.env.E5_E2E_FIXTURE_PATH;
+   assert.equal(arquivo,"/tmp/e5-ajustes-e2e-fixture.json","Fixture apenas no runner descartável");
+   fs.writeFileSync(arquivo,JSON.stringify({usuarios,senha,ids:id}),{mode:0o600});
+   console.log("✓ Supabase local: quatro identidades e notas de teste inseridas, sem ajuste prévio.");
+   return;
+ }
  const clientes={};
  for(const [papel] of perfis){
    clientes[papel]=anonCliente();
