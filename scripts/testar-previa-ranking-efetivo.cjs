@@ -54,6 +54,9 @@ teste("Documentos públicos não ativam as rotas reais",()=>{
  const page=fs.readFileSync("src/server/templates/ranking-efetivo-page.tsx","utf8");
  const api=fs.readFileSync("src/server/api-ranking-efetivo.ts","utf8");
  assert.ok(route.includes('from "@/server/api-ranking-efetivo"'));
+ assert.ok(route.includes('export const runtime="nodejs"'));
+ assert.ok(route.includes('export const dynamic="force-dynamic"'));
+ assert.ok(!/export\s*\{[^}]*\b(?:runtime|dynamic)\b/.test(route),"Next exige configurações locais");
  assert.ok(page.includes('credentials:"same-origin"'));
  assert.ok(page.includes("não atribui posições"));
  assert.ok(api.includes('EXCELENCIA_RANKING_PREVIA_ENABLED'));
