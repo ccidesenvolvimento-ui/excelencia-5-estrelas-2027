@@ -48,12 +48,12 @@ export function conferirContratoRH(
   autorizados.add(id);
  }
  const vistos=new Set<string>();
- const inicioMes=periodoCompetencia(contexto.competencia).inicio;
+ const fimMes=periodoCompetencia(contexto.competencia).termino;
  const saida:RegistroRHConferido[]=[];
  for(const r of registros){
   if(!r||typeof r.colaboradorId!=="string"||!autorizados.has(r.colaboradorId)||
    vistos.has(r.colaboradorId)||r.competencia!==contexto.competencia||
-   !dataValida(r.dataAdmissao)||r.dataAdmissao>inicioMes||
+   !dataValida(r.dataAdmissao)||r.dataAdmissao>fimMes||
    !["ativo","ferias","desligado","afastado"].includes(r.situacao)||
    typeof r.fonte!=="string"||!r.fonte.trim()||
    typeof r.referenciaFonte!=="string"||!r.referenciaFonte.trim())
