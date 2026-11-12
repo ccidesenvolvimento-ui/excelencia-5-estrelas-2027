@@ -54,6 +54,8 @@ jobs:
         run: npm run test:sumario-homologacao
       - name: Validar contrato de admissao e situacao RH com dados ficticios
         run: npm run test:contrato-rh
+      - name: Verificar isolamento do deploy e da pilha Draft
+        run: npm run test:integracao-guardrails
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
