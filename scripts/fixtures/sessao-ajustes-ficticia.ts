@@ -41,7 +41,7 @@ function consulta(tabela:string,papel:Papel){
  };
  return builder;
 }
-export async function criarClienteAutenticadoServidor(){
+export async function criarClienteAutenticadoServidor():Promise<any>{
  const loja=await cookies();
  const bruto=loja.get("e5_teste_papel")?.value;
  const papel=(["admin-filial-a","admin-filial-b","comum","inativo"].includes(bruto??"")?bruto:"comum") as Papel;
