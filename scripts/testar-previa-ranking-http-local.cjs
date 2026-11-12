@@ -111,6 +111,10 @@ async function executar(){
   assert.equal(rb.body.matriz.situacao,"BLOQUEADO");
  }
  if(process.env.E5_VERIFICAR_SUMARIO==="true"){
+  const ts=require("typescript");
+  require.extensions[".ts"]=(mod,file)=>mod._compile(ts.transpileModule(
+   fs.readFileSync(file,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}
+  ).outputText,file);
   const {gerarSumarioHomologacao}=require("../src/lib/sumario-homologacao.ts");
   const texto=JSON.stringify(gerarSumarioHomologacao(ra.body.matriz));
   assert.equal(JSON.parse(texto).situacao,"BLOQUEADO");
