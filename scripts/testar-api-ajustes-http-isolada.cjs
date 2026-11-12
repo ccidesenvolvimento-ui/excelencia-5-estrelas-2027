@@ -2,7 +2,7 @@
 const assert = require("node:assert/strict");
 const modo = process.env.AJUSTES_HTTP_MODO;
 const porta = Number(process.env.AJUSTES_HTTP_PORTA || "3199");
-assert.ok(["desativado","ativado"].includes(modo));
+assert.ok(["desativado","producao","ativado"].includes(modo));
 assert.ok(Number.isInteger(porta) && porta > 1024 && porta < 65536);
 const origem = "http://127.0.0.1:" + porta;
 const rota = origem + "/api/ajustes-notas";
@@ -18,6 +18,10 @@ async function requisicao(metodo,opcoes={}) {
     assert.equal(await requisicao("GET"),503,"GET com flags desligadas");
     assert.equal(await requisicao("POST",{headers:{"content-type":"application/json"},body:"{}"}),503,"POST com flags desligadas");
     console.log("✓ API desligada: GET e POST bloqueados com 503.");
+  } else if(modo==="producao") {
+    assert.equal(await requisicao("GET"),503,"GET sem Supabase em produção");
+    assert.equal(await requisicao("POST",{headers:{"origin":origem,"content-type":"application/json"},body:"{}"}),403,"HTTP Origin deve ser bloqueado em produção");
+    console.log("✓ Produção: rejeição da origem HTTP; acesso ao Supabase indisponível.");
   } else {
     // Flags de teste, sem URL/credenciais de Supabase: nenhum acesso externo.
     assert.equal(await requisicao("GET"),503,"GET sem configuração Supabase");
