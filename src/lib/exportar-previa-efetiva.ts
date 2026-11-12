@@ -104,7 +104,7 @@ export function criarPaginasPreviaPdf(preview:PreviaRanking):HTMLCanvasElement[]
  const p=prepararDocumento(preview);
  if(typeof document==="undefined")throw new Error("PDF disponível somente no navegador");
  const paginas:HTMLCanvasElement[]=[];
- const max=12;
+ const max=8;
  const total=Math.max(1,Math.ceil(p.linhas.length/max));
  for(let indice=0;indice<total;indice++){
   const canvas=document.createElement("canvas");canvas.width=1684;canvas.height=1190;
@@ -122,8 +122,8 @@ export function criarPaginasPreviaPdf(preview:PreviaRanking):HTMLCanvasElement[]
   ctx.strokeStyle="#9DAAB7";ctx.beginPath();ctx.moveTo(28,139);ctx.lineTo(814,139);ctx.stroke();
   const pageRows=p.linhas.slice(indice*max,(indice+1)*max);
   pageRows.forEach((l,i)=>{
-   const y=161+i*28;
-   if(i%2===0){ctx.fillStyle="#EFF6FA";ctx.fillRect(25,y-17,791,26)}
+   const y=159+i*42;
+   if(i%2===0){ctx.fillStyle="#EFF6FA";ctx.fillRect(25,y-18,791,40)}
    ctx.font="10px Arial";ctx.fillStyle="#142A41";
    const cortar=(v:string,max:number)=>v.length>max?v.slice(0,max-1)+"…":v;
    ctx.fillText(cortar(l.nome+" / "+l.matricula,36),28,y);
@@ -131,11 +131,16 @@ export function criarPaginasPreviaPdf(preview:PreviaRanking):HTMLCanvasElement[]
    ctx.fillText(cortar(l.categoria,38),335,y);
    ctx.fillText(valor(l.score),606,y);
    ctx.fillText(cortar(l.status,17),682,y);
+   // Rastreabilidade por pilar: sempre exibir original e efetiva, inclusive zero.
+   const detalhe=ESTRELAS.map((e,k)=>{
+    const n=l.notas[e];return TITULOS[k].slice(0,4)+": "+(n?valor(n.original)+" → "+valor(n.efetiva)+(n.ajustada?" *":""):"ausente");
+   }).join("   ");
+   ctx.font="8px Arial";ctx.fillStyle="#4A5C70";ctx.fillText(cortar(detalhe,125),33,y+15);
   });
   ctx.fillStyle="#B4232C";ctx.font="bold 10px Arial";
   ctx.fillText("Sem posições oficiais, pódio ou classificação global.",28,510);
   ctx.fillStyle="#334E67";ctx.font="9px Arial";
-  ctx.fillText("Notas corrigidas e pendências detalhadas constam no XLSX da mesma prévia.",28,530);
+  ctx.fillText("* Nota corrigida; os valores originais e efetivos constam acima. Pendências completas no XLSX.",28,530);
   ctx.fillText("Não utilizar para premiações ou decisões de RH.",28,547);
   ctx.fillText("Página "+(indice+1)+" de "+total,730,570);
   paginas.push(canvas);
