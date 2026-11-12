@@ -91,6 +91,6 @@ test("Nova consulta SSR inclui as duas fontes RLS sem fallback demonstrativo",()
  assert.match(s,/lerTodasPaginas<FeriasRH>/);
  assert.match(s,/lerTodasPaginas<HistoricoCategoriaRH>/);
  assert.match(s,/fontesHistoricasLidas:true/);
- assert.ok(!s.includes("service_role"));
+ assert.ok(!/SUPABASE_SERVICE_ROLE_KEY|createClient\([^)]*service_role/i.test(s),"Consulta não deve utilizar credenciais elevadas");
 });
 console.log(n+" verificações de RH temporal aprovadas");
