@@ -286,7 +286,11 @@ jobs:
           if [ "$pronto" != "1" ]; then tail -n 35 /tmp/e5-next-local.log; exit 1; fi
           node scripts/testar-api-http-supabase-local-e2e.cjs
           if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ]; then
-            node scripts/testar-previa-ranking-http-local.cjs
+            if ! node scripts/testar-previa-ranking-http-local.cjs; then
+              echo "Diagnostico de compilacao da rota de previa no runner:"
+              tail -n 50 /tmp/e5-next-local.log
+              exit 1
+            fi
           fi
           if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
             # Navegador executado aqui antes do trap que destrói o Supabase local.
