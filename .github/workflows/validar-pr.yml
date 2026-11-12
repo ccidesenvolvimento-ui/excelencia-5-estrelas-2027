@@ -226,7 +226,7 @@ jobs:
           export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
           node scripts/testar-supabase-local-e2e.cjs
       - name: E2E HTTP Next e Supabase Auth/PostgREST/SQL locais (sem Cloud)
-        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' }}
+        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' }}
         timeout-minutes: 24
         shell: bash
         run: |
@@ -238,8 +238,8 @@ jobs:
             if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
             cp "$original" src/lib/supabase/sessao-servidor.ts
             rm -f "$original" /tmp/e5-ajustes-e2e-fixture.json
-            rm -f src/app/api/ajustes-notas/route.ts src/app/api/ci-login/route.ts
-            rmdir src/app/api/ajustes-notas src/app/api/ci-login src/app/api 2>/dev/null || true
+            rm -f src/app/api/ajustes-notas/route.ts src/app/api/ci-login/route.ts src/app/ajustes-notas-live/page.tsx
+            rmdir src/app/api/ajustes-notas src/app/api/ci-login src/app/api src/app/ajustes-notas-live 2>/dev/null || true
             ./node_modules/.bin/supabase stop --no-backup || true
           }
           trap cleanup EXIT
@@ -255,6 +255,10 @@ jobs:
           mkdir -p src/app/api/ajustes-notas src/app/api/ci-login
           cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
           cp scripts/fixtures/ci-login-route.ts src/app/api/ci-login/route.ts
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
+            mkdir -p src/app/ajustes-notas-live
+            cp src/server/templates/ajustes-notas-live-page.tsx src/app/ajustes-notas-live/page.tsx
+          fi
           # A chave local é legado JWT e só existe no ambiente de teste descartável.
           export SUPABASE_PUBLISHABLE_KEY="$ANON_KEY"
           export E5_E2E_LOCAL_ONLY=true
@@ -269,6 +273,12 @@ jobs:
           done
           if [ "$pronto" != "1" ]; then tail -n 35 /tmp/e5-next-local.log; exit 1; fi
           node scripts/testar-api-http-supabase-local-e2e.cjs
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
+            # Navegador executado aqui antes do trap que destrói o Supabase local.
+            npm install --no-save --no-audit --no-fund playwright@1.64.1
+            npx playwright install chromium
+            node scripts/testar-modal-api-browser-e2e.cjs
+          fi
       - name: Instalar navegador para regressao visual
         run: |
           set -euo pipefail
