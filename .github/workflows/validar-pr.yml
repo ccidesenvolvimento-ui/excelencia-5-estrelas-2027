@@ -94,7 +94,7 @@ jobs:
           done
 
       - name: Testar ajustes administrativos e auditoria em PostgreSQL descartavel
-        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' }}
+        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' || github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -122,6 +122,16 @@ jobs:
         env:
           NEXT_PUBLIC_DEPLOY_TARGET: github-pages
           NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
+      - name: Compilar rota Node de ajustes apenas no runner descartavel
+        if: ${{ github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/app/api/ajustes-notas
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          trap 'rm -f src/app/api/ajustes-notas/route.ts; rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true' EXIT
+          npm run build
+          # Sem flags, sem Supabase e sem qualquer servidor externo.
       - name: Instalar navegador para regressao visual
         run: |
           set -euo pipefail
