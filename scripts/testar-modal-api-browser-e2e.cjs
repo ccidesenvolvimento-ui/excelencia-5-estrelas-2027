@@ -46,7 +46,7 @@ async function login(context){
     assert.ok(await modal.getByText("85,00",{exact:true}).isVisible(),"Nota efetiva salva disponível no mobile");
    }
    await page.screenshot({path:"artifacts/ajustes/live-"+width+".png",fullPage:true});
-   await modal.getByRole("button",{name:"Fechar ajuste"}).click();
+   if(await modal.count())await modal.getByRole("button",{name:"Fechar ajuste"}).click();
    await page.locator("#aj-real-pilar").selectOption("seguranca");
    await page.getByRole("button",{name:"Selecionar"}).first().click();
    assert.ok(await page.getByText("Segurança: edição manual bloqueada.").isVisible());
