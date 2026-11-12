@@ -110,6 +110,17 @@ async function executar(){
   assert.equal(rb.body.matriz.participantesAnalisados,0,"RLS de filial B não pode revelar A");
   assert.equal(rb.body.matriz.situacao,"BLOQUEADO");
  }
+ if(process.env.E5_VERIFICAR_SUMARIO==="true"){
+  const {gerarSumarioHomologacao}=require("../src/lib/sumario-homologacao.ts");
+  const texto=JSON.stringify(gerarSumarioHomologacao(ra.body.matriz));
+  assert.equal(JSON.parse(texto).situacao,"BLOQUEADO");
+  for(const segredo of [fixture.ids.colaborador,fixture.ids.nota,"colaboradorId","matricula","notaSeguranca"])
+   assert.ok(!texto.includes(segredo),"Sumário não deve expor identificadores individuais");
+  const soma=JSON.parse(texto).quantidadesPorClasse;
+  assert.ok(Object.values(soma).every(n=>Number.isInteger(n)&&n>=0));
+  const outra=gerarSumarioHomologacao(rb.body.matriz);
+  assert.equal(outra.participantesAnalisados,0,"Outro perfil não pode revelar dados da filial A");
+ }
  assert.equal(linha.score,62,"Score usa produtividade efetiva 90 ajustada pelo E2E anterior");
  assert.equal(linha.status,"Inelegível");
  assert.equal(linha.posicao,null);
