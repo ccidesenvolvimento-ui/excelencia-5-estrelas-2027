@@ -3,7 +3,8 @@
 import {useEffect,useState} from "react";
 import type { PreviaRanking } from "@/lib/projecao-ranking-efetivo";
 import type { DiagnosticoProntidao } from "@/lib/diagnostico-prontidao-ranking";
-type Previa=PreviaRanking & {diagnostico?:DiagnosticoProntidao};
+import type { ConciliacaoSeguranca } from "@/lib/conciliacao-seguranca";
+type Previa=PreviaRanking & {diagnostico?:DiagnosticoProntidao;seguranca?:ConciliacaoSeguranca};
 const pilares=["seguranca","produtividade","dirigibilidade","jornada","treinamentos"] as const;
 const titulo:{[k:string]:string}={seguranca:"Segurança",produtividade:"Produtividade",dirigibilidade:"Dirigibilidade",jornada:"Jornada",treinamentos:"Treinamentos"};
 const meses=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -77,6 +78,19 @@ export default function PreviaRankingNotasEfetivas(){
      <p>Fontes RH: {dados.diagnostico.fontesHistoricasLidas?"consultadas sob RLS (sem homologação de regras de RH)":"não consultadas"}.</p>
      <h3>Impedimentos para classificação oficial</h3>
      <ul>{dados.diagnostico.impedimentosGlobais.map(m=><li key={m}>{m.replaceAll("_"," ")}</li>)}</ul>
+    </section>}
+    {dados.seguranca&&<section aria-label="Conciliação de Segurança" className="painel">
+     <h2>Conciliação de Segurança — não oficial</h2>
+     <p>Penalizações consultadas: {dados.seguranca.fonteLida?"sim, sob RLS":"não"}.
+      Advertências: {dados.seguranca.totalAdvertencias}; acidentes: {dados.seguranca.totalAcidentes}.
+      Fontes ainda sem fechamento homologado.</p>
+     <div className="tabela-scroll"><table className="tabela"><thead><tr>
+      <th>Colaborador</th><th>Advertências</th><th>Acidentes</th><th>Nota Segurança</th><th>Revisões necessárias</th>
+     </tr></thead><tbody>{dados.seguranca.linhas.map(l=><tr key={l.colaboradorId}>
+      <td>{l.nome} / {l.matricula}</td><td>{l.advertencias}</td><td>{l.acidentes}</td>
+      <td>{formatar(l.notaSeguranca)}</td><td>{l.conflitos.join(", ")||"Nenhuma divergência identificada"}</td>
+     </tr>)}</tbody></table></div>
+     <ul>{dados.seguranca.avisos.map(a=><li key={a}>{a}</li>)}</ul>
     </section>}
     <section aria-label="Avisos de homologação"><h2>Limitações desta prévia</h2><ul>{dados.avisos.map((a,i)=><li key={i}>{a}</li>)}</ul></section>
    </>}
