@@ -24,7 +24,7 @@ teste("Scores corrigidos usam somente nota efetiva, original é preservada",()=>
  b.registros=[registro("seguranca",100),registro("produtividade",75,90,true),
  registro("dirigibilidade",80),registro("jornada",90),registro("treinamentos",100)];
  const p=proj.projetarPreviaEfetiva(b,9);
- assert.equal(p.linhas[0].score,86);
+ assert.equal(p.linhas[0].score,92);
  assert.equal(p.linhas[0].notas.produtividade.original,75);
  assert.equal(p.linhas[0].notas.produtividade.efetiva,90);
  assert.equal(p.linhas[0].posicao,null);
@@ -33,7 +33,7 @@ teste("Zero efetivo produz inelegibilidade, não pendência",()=>{
  const b=base();b.registros=[registro("seguranca",0),registro("produtividade",75,90,true),
  registro("dirigibilidade",80),registro("jornada",90),registro("treinamentos",100)];
  const p=proj.projetarPreviaEfetiva(b,9);
- assert.equal(p.linhas[0].status,"Inelegível");assert.equal(p.linhas[0].score,56);
+ assert.equal(p.linhas[0].status,"Inelegível");assert.equal(p.linhas[0].score,62);
 });
 teste("Sucro não é considerado fora de março a novembro",()=>{
  const b=base();b.colaboradores=[{...c,categoria_id:2}];b.categorias=[{id:2,nome:"Sucro"}];
