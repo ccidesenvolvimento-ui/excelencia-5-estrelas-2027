@@ -94,7 +94,7 @@ jobs:
           done
 
       - name: Testar ajustes administrativos e auditoria em PostgreSQL descartavel
-        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' || github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' }}
+        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' || github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' || github.event.pull_request.head.ref == 'test/http-api-ajustes-isolada-69' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -150,8 +150,9 @@ jobs:
           run_case() {
             local mode="$1"
             local flag="$2"
+            local modo_servidor="$3"
             EXCELENCIA_AJUSTES_API_ENABLED="$flag" EXCELENCIA_AUTH_GUARD_ENABLED="$flag" \
-              ./node_modules/.bin/next start --hostname 127.0.0.1 --port 3199 > /tmp/ajustes-http-next.log 2>&1 &
+              ./node_modules/.bin/next "$modo_servidor" --hostname 127.0.0.1 --port 3199 > /tmp/ajustes-http-next.log 2>&1 &
             server_pid=$!
             local pronto=0
             for i in $(seq 1 30); do
@@ -169,8 +170,10 @@ jobs:
               sleep 1
             done
           }
-          run_case desativado false
-          run_case ativado true
+          run_case desativado false start
+          run_case producao true start
+          # Next dev aceita Origin HTTP apenas no loopback; não é teste de produção HTTPS.
+          run_case ativado true dev
       - name: Instalar navegador para regressao visual
         run: |
           set -euo pipefail
