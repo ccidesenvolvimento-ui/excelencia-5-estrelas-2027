@@ -2,6 +2,7 @@
 // Nunca importar este arquivo diretamente da aplicação e nunca publicá-lo em produção.
 import "server-only";
 import { cookies } from "next/headers";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type Papel = "admin-filial-a" | "admin-filial-b" | "comum" | "inativo";
 type Registro = { id:string; colaborador_id:string; competencia:string; estrela:string; nota:number; nota_efetiva:number; possui_ajuste:boolean };
@@ -41,7 +42,7 @@ function consulta(tabela:string,papel:Papel){
  };
  return builder;
 }
-export async function criarClienteAutenticadoServidor():Promise<any>{
+export async function criarClienteAutenticadoServidor():Promise<SupabaseClient>{
  const loja=await cookies();
  const bruto=loja.get("e5_teste_papel")?.value;
  const papel=(["admin-filial-a","admin-filial-b","comum","inativo"].includes(bruto??"")?bruto:"comum") as Papel;
@@ -69,5 +70,5 @@ export async function criarClienteAutenticadoServidor():Promise<any>{
    return resultado(evento.id);
   },
   from(tabela:string){return consulta(tabela,papel);}
- };
+ } as unknown as SupabaseClient;
 }
