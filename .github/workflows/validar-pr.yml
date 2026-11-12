@@ -94,7 +94,7 @@ jobs:
           done
 
       - name: Testar ajustes administrativos e auditoria em PostgreSQL descartavel
-        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' || github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' }}
+        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' || github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' || github.event.pull_request.head.ref == 'test/http-api-ajustes-isolada-69' || github.event.pull_request.head.ref == 'test/sessao-http-ficticia-ajustes-71' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -132,6 +132,153 @@ jobs:
           trap 'rm -f src/app/api/ajustes-notas/route.ts; rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true' EXIT
           npm run build
           # Sem flags, sem Supabase e sem qualquer servidor externo.
+      - name: Testar API de ajustes via HTTP isolado no runner
+        if: ${{ github.event.pull_request.head.ref == 'test/http-api-ajustes-isolada-69' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/app/api/ajustes-notas
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          server_pid=""
+          cleanup() {
+            if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
+            rm -f src/app/api/ajustes-notas/route.ts
+            rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          npm run build
+          run_case() {
+            local mode="$1"
+            local flag="$2"
+            local modo_servidor="$3"
+            EXCELENCIA_AJUSTES_API_ENABLED="$flag" EXCELENCIA_AUTH_GUARD_ENABLED="$flag" \
+              ./node_modules/.bin/next "$modo_servidor" --hostname 127.0.0.1 --port 3199 > /tmp/ajustes-http-next.log 2>&1 &
+            server_pid=$!
+            local pronto=0
+            for i in $(seq 1 30); do
+              if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:3199/api/ajustes-notas; then pronto=1; break; fi
+              sleep 1
+            done
+            if [ "$pronto" != "1" ]; then cat /tmp/ajustes-http-next.log; return 1; fi
+            AJUSTES_HTTP_MODO="$mode" AJUSTES_HTTP_PORTA=3199 node scripts/testar-api-ajustes-http-isolada.cjs
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+            server_pid=""
+            # Garante que a segunda execução não reutilize a anterior.
+            for i in $(seq 1 15); do
+              if ! curl --silent --output /dev/null --max-time 1 http://127.0.0.1:3199/api/ajustes-notas; then break; fi
+              sleep 1
+            done
+          }
+          run_case desativado false start
+          run_case producao true start
+          # Next dev aceita Origin HTTP apenas no loopback; não é teste de produção HTTPS.
+          run_case ativado true dev
+      - name: Exercitar API com usuarios e RPC inteiramente ficticios (sem Auth/Cloud)
+        if: ${{ github.event.pull_request.head.ref == 'test/sessao-http-ficticia-ajustes-71' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          original=$(mktemp)
+          cp src/lib/supabase/sessao-servidor.ts "$original"
+          server_pid=""
+          cleanup() {
+            if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
+            cp "$original" src/lib/supabase/sessao-servidor.ts
+            rm -f "$original" src/app/api/ajustes-notas/route.ts
+            rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          mkdir -p src/app/api/ajustes-notas
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          cp scripts/fixtures/sessao-ajustes-ficticia.ts src/lib/supabase/sessao-servidor.ts
+          # API real e sessão artificial compiladas SOMENTE neste runner descartável.
+          npm run build
+          EXCELENCIA_AJUSTES_API_ENABLED=true EXCELENCIA_AUTH_GUARD_ENABLED=true \
+            ./node_modules/.bin/next dev --hostname 127.0.0.1 --port 3198 > /tmp/ajustes-http-fixture.log 2>&1 &
+          server_pid=$!
+          pronto=0
+          for i in $(seq 1 45); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:3198/api/ajustes-notas; then pronto=1; break; fi
+            sleep 1
+          done
+          if [ "$pronto" != "1" ]; then cat /tmp/ajustes-http-fixture.log; exit 1; fi
+          node scripts/testar-ajustes-http-sessao-ficticia.cjs
+          # Nunca deixar uma sessão simulada ou rota dinâmica nos arquivos da CI.
+      - name: Validar Auth, RLS, RPC e auditoria no Supabase local descartavel
+        if: ${{ github.event.pull_request.head.ref == 'test/supabase-local-e2e-73' }}
+        timeout-minutes: 22
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Proibido qualquer supabase link, db push, projeto Cloud ou segredo externo.
+          cleanup() {
+            ./node_modules/.bin/supabase stop --no-backup || true
+          }
+          trap cleanup EXIT
+          ./node_modules/.bin/supabase start
+          # Chaves geradas apenas pelo Supabase CLI local. Nunca imprimir os valores.
+          export SUPABASE_URL="http://127.0.0.1:54321"
+          eval "$(./node_modules/.bin/supabase status -o env | grep -E '^(ANON_KEY|SERVICE_ROLE_KEY)=')"
+          test -n "${ANON_KEY:-}"
+          test -n "${SERVICE_ROLE_KEY:-}"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          node scripts/testar-supabase-local-e2e.cjs
+      - name: E2E HTTP Next e Supabase Auth/PostgREST/SQL locais (sem Cloud)
+        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' }}
+        timeout-minutes: 24
+        shell: bash
+        run: |
+          set -euo pipefail
+          original=$(mktemp)
+          cp src/lib/supabase/sessao-servidor.ts "$original"
+          server_pid=""
+          cleanup() {
+            if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
+            cp "$original" src/lib/supabase/sessao-servidor.ts
+            rm -f "$original" /tmp/e5-ajustes-e2e-fixture.json
+            rm -f src/app/api/ajustes-notas/route.ts src/app/api/ci-login/route.ts src/app/ajustes-notas-live/page.tsx
+            rmdir src/app/api/ajustes-notas src/app/api/ci-login src/app/api src/app/ajustes-notas-live 2>/dev/null || true
+            ./node_modules/.bin/supabase stop --no-backup || true
+          }
+          trap cleanup EXIT
+          ./node_modules/.bin/supabase start
+          export SUPABASE_URL="http://127.0.0.1:54321"
+          eval "$(./node_modules/.bin/supabase status -o env | grep -E '^(ANON_KEY|SERVICE_ROLE_KEY)=')"
+          test -n "${ANON_KEY:-}"
+          test -n "${SERVICE_ROLE_KEY:-}"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          E5_E2E_SETUP_ONLY=true E5_E2E_FIXTURE_PATH=/tmp/e5-ajustes-e2e-fixture.json node scripts/testar-supabase-local-e2e.cjs
+          node scripts/fixtures/preparar-ssr-local-e2e.cjs
+          mkdir -p src/app/api/ajustes-notas src/app/api/ci-login
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          cp scripts/fixtures/ci-login-route.ts src/app/api/ci-login/route.ts
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
+            mkdir -p src/app/ajustes-notas-live
+            cp src/server/templates/ajustes-notas-live-page.tsx src/app/ajustes-notas-live/page.tsx
+          fi
+          # A chave local é legado JWT e só existe no ambiente de teste descartável.
+          export SUPABASE_PUBLISHABLE_KEY="$ANON_KEY"
+          export E5_E2E_LOCAL_ONLY=true
+          export EXCELENCIA_AUTH_GUARD_ENABLED=true
+          export EXCELENCIA_AJUSTES_API_ENABLED=true
+          ./node_modules/.bin/next dev --hostname 127.0.0.1 --port 3197 > /tmp/e5-next-local.log 2>&1 &
+          server_pid=$!
+          pronto=0
+          for i in $(seq 1 50); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:3197/api/ajustes-notas; then pronto=1; break; fi
+            sleep 1
+          done
+          if [ "$pronto" != "1" ]; then tail -n 35 /tmp/e5-next-local.log; exit 1; fi
+          node scripts/testar-api-http-supabase-local-e2e.cjs
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
+            # Navegador executado aqui antes do trap que destrói o Supabase local.
+            npm install --no-save --no-audit --no-fund playwright@1.64.1
+            npx playwright install chromium
+            node scripts/testar-modal-api-browser-e2e.cjs
+          fi
       - name: Instalar navegador para regressao visual
         run: |
           set -euo pipefail
