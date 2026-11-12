@@ -41,3 +41,8 @@
 6. Exigir revisão e aprovação antes de qualquer migração, ativação ou deploy.
 
 > O teste de contrato confirma invariantes de código; não substitui testes E2E nem prova a segurança em runtime.
+## Integração de código — Issue #67
+- A branch `feat/integracao-isolada-ajustes-67` incorpora o handler e template Node originalmente preparados no PR #62.
+- O PR #68 é comparado contra `feat/modal-ajustes-notas-63` para permitir a CI do projeto; inclui os commits de contrato da Issue #65 e a API isolada.
+- A rotina CI testa contratos da API, SQL/RLS em PostgreSQL descartável e compilação da rota Node somente no runner.
+- Ainda **não** existe conexão de interface com a API, sessão de teste E2E HTTP ou recálculo do ranking com nota efetiva; isso depende de fase posterior.
