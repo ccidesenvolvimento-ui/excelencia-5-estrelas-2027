@@ -151,7 +151,7 @@ jobs:
             local mode="$1"
             local flag="$2"
             EXCELENCIA_AJUSTES_API_ENABLED="$flag" EXCELENCIA_AUTH_GUARD_ENABLED="$flag" \
-              npm run start -- --hostname 127.0.0.1 --port 3199 > /tmp/ajustes-http-next.log 2>&1 &
+              ./node_modules/.bin/next start --hostname 127.0.0.1 --port 3199 > /tmp/ajustes-http-next.log 2>&1 &
             server_pid=$!
             local pronto=0
             for i in $(seq 1 30); do
