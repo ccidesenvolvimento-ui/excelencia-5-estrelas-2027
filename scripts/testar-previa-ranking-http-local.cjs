@@ -48,6 +48,15 @@ async function executar(){
  ra=await buscar(a);assert.equal(ra.status,200);
  assert.equal(ra.body.linhas.length,1);
  const linha=ra.body.linhas[0];
+ if(process.env.E5_VERIFICAR_DIAGNOSTICO==="true"){
+  assert.equal(ra.body.diagnostico.rankingOficial,false);
+  assert.equal(ra.body.diagnostico.participantesAnalisados,1);
+  assert.equal(ra.body.diagnostico.registrosComNotasCompletas,1);
+  assert.equal(ra.body.diagnostico.linhas[0].notaZero,true);
+  assert.ok(ra.body.diagnostico.impedimentosGlobais.includes("ESCOPO_RLS_PARCIAL"));
+  assert.equal(rb.body.diagnostico.participantesAnalisados,0);
+ }
+
  assert.equal(linha.score,62,"Score usa produtividade efetiva 90 ajustada pelo E2E anterior");
  assert.equal(linha.status,"Inelegível");
  assert.equal(linha.posicao,null);
