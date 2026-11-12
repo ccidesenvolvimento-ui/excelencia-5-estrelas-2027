@@ -2,7 +2,8 @@
 /** Template de prévia isolada: instalar apenas no runner Node protegido. */
 import {useEffect,useState} from "react";
 import type { PreviaRanking } from "@/lib/projecao-ranking-efetivo";
-type Previa=PreviaRanking;
+import type { DiagnosticoProntidao } from "@/lib/diagnostico-prontidao-ranking";
+type Previa=PreviaRanking & {diagnostico?:DiagnosticoProntidao};
 const pilares=["seguranca","produtividade","dirigibilidade","jornada","treinamentos"] as const;
 const titulo:{[k:string]:string}={seguranca:"Segurança",produtividade:"Produtividade",dirigibilidade:"Dirigibilidade",jornada:"Jornada",treinamentos:"Treinamentos"};
 const meses=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -63,6 +64,19 @@ export default function PreviaRankingNotasEfetivas(){
      </tr>)}</tbody>
     </table></div>
     <p>* Valor efetivo corrigido; nota original preservada para auditoria.</p>
+    {dados.diagnostico&&<section aria-label="Diagnóstico de prontidão" className="painel">
+     <h2>Diagnóstico de prontidão — não oficial</h2>
+     <p>Somente filiais autorizadas. As verificações a seguir não certificam cobertura global nem situação de RH.</p>
+     <p><strong>{dados.diagnostico.participantesAnalisados}</strong> participantes analisados;
+      {" "}<strong>{dados.diagnostico.registrosComNotasCompletas}</strong> com cinco notas;
+      {" "}<strong>{dados.diagnostico.registrosPendentes}</strong> com notas ausentes.</p>
+     <div className="tabela-scroll"><table className="tabela"><thead><tr><th>Colaborador</th><th>Notas presentes</th><th>Pilares ausentes</th><th>Impedimentos cadastrais</th></tr></thead>
+     <tbody>{dados.diagnostico.linhas.map(l=><tr key={l.colaboradorId}><td>{l.nome} / {l.matricula}</td>
+      <td>{l.notasPresentes}/5</td><td>{l.pilaresAusentes.join(", ")||"Nenhum"}</td><td>{l.motivos.join(", ")||"Nenhum"}</td>
+     </tr>)}</tbody></table></div>
+     <h3>Impedimentos para classificação oficial</h3>
+     <ul>{dados.diagnostico.impedimentosGlobais.map(m=><li key={m}>{m.replaceAll("_"," ")}</li>)}</ul>
+    </section>}
     <section aria-label="Avisos de homologação"><h2>Limitações desta prévia</h2><ul>{dados.avisos.map((a,i)=><li key={i}>{a}</li>)}</ul></section>
    </>}
   </section>
