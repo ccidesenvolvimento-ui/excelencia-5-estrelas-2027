@@ -36,6 +36,8 @@ jobs:
         run: npm run test:rules
       - name: Testar motor puro do ranking com notas ficticias
         run: npm run test:motor-ranking
+      - name: Testar leitura integral do ranking sob RLS com fixtures ficticias
+        run: npm run test:leitura-ranking
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
@@ -228,7 +230,7 @@ jobs:
           export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
           node scripts/testar-supabase-local-e2e.cjs
       - name: E2E HTTP Next e Supabase Auth/PostgREST/SQL locais (sem Cloud)
-        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' }}
+        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' || github.event.pull_request.head.ref == 'feat/leitura-efetiva-ranking-80' }}
         timeout-minutes: 24
         shell: bash
         run: |
