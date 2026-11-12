@@ -11,6 +11,7 @@ Module._load=function(name,parent,isMain){
  if(name==="@/lib/supabase/sessao-servidor")return {criarClienteAutenticadoServidor:async()=>null};
  if(name==="@/lib/calculo-ranking")return native.call(this,"../lib/calculo-ranking.ts",parent,isMain);
  if(name==="@/lib/dominio-rh-temporal")return native.call(this,"../lib/dominio-rh-temporal.ts",parent,isMain);
+ if(name==="@/lib/conciliacao-seguranca")return native.call(this,"../lib/conciliacao-seguranca.ts",parent,isMain);
  return native.call(this,name,parent,isMain);
 };
 const rh=require("../src/lib/dominio-rh-temporal.ts");
