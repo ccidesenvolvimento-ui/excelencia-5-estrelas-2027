@@ -45,7 +45,7 @@ type Consulta<T>={
 export type FontePaginada<T>=(tabela:string,colunas:string)=>Consulta<T>;
 
 /** Falha fechada em erro, limite excedido, duplicação ou resposta inesperada. */
-export async function lerTodasPaginas<T extends {id:string}>(
+export async function lerTodasPaginas<T extends {id:string|number}>(
  fonte:FontePaginada<T>,tabela:string,colunas:string
 ):Promise<T[]>{
  const saida:T[]=[];
@@ -55,8 +55,8 @@ export async function lerTodasPaginas<T extends {id:string}>(
   const {data,error}=await fonte(tabela,colunas).order("id",{ascending:true}).range(inicio,inicio+TAMANHO_PAGINA-1);
   if(error||!Array.isArray(data))throw new Error("Consulta incompleta: "+tabela);
   for(const item of data){
-   if(!item||typeof item.id!=="string"||!item.id||ids.has(item.id))throw new Error("Registro duplicado ou inválido: "+tabela);
-   ids.add(item.id);saida.push(item);
+   if(!item||(typeof item.id!=="string"&&typeof item.id!=="number")||!item.id||ids.has(String(item.id)))throw new Error("Registro duplicado ou inválido: "+tabela);
+   ids.add(String(item.id));saida.push(item);
   }
   if(data.length<TAMANHO_PAGINA)return saida;
  }
@@ -65,7 +65,7 @@ export async function lerTodasPaginas<T extends {id:string}>(
 
 function numero(v:unknown):number{
  const n=typeof v==="number"?v:typeof v==="string"&&v.trim()?Number(v):NaN;
- if(!Number.isFinite(n)||n<0||n>100||Math.round(n*100)!==n*100 && Math.abs(Math.round(n*100)-n*100)>1e-7)
+ if(!Number.isFinite(n)||n<0||n>100||Math.abs(Math.round(n*100)-n*100)>1e-7)
   throw new Error("Valor de nota inválido");
  return n;
 }
@@ -117,7 +117,7 @@ export async function consultarBaseRankingEfetivo():Promise<BaseRankingAutorizad
  const usuario=await cliente.auth.getUser();
  if(usuario.error||!usuario.data.user)throw new Error("Sessão não autenticada");
  // Somente chave pública com sessão de usuário; as políticas RLS decidem visibilidade.
- const fonte= ((tabela:string,colunas:string)=>cliente.from(tabela).select(colunas)) as FontePaginada<never>;
+ const fonte= ((tabela:string,colunas:string)=>cliente.from(tabela).select(colunas)) as unknown as FontePaginada<NotaEfetivaBanco>;
  const [notas,colaboradores,categoriasLidas]=await Promise.all([
   lerTodasPaginas<NotaEfetivaBanco>(fonte as FontePaginada<NotaEfetivaBanco>,
    "notas_mensais_efetivas","id,colaborador_id,competencia,estrela,nota,nota_efetiva,possui_ajuste"),
