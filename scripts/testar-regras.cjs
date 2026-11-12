@@ -1,12 +1,9 @@
 const fs = require('node:fs');
-const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const ts = require('typescript');
-const source = fs.readFileSync('src/lib/dados-demo.ts', 'utf8');
-const js = ts.transpileModule(source, {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
-const moduleObj = {exports:{}};
-vm.runInNewContext('(function(module, exports) {'+js+'\n})(moduleObj,moduleObj.exports)', {moduleObj});
-const d = moduleObj.exports;
+// Loader local para módulos TS compartilhados, sem serviços externos.
+require.extensions['.ts'] = (mod,file) => mod._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,file);
+const d = require('../src/lib/dados-demo.ts');
 const pessoa = id => d.pessoas.find(p=>p.id===id);
 const checks = [
   ['Oito categorias', () => assert.equal(d.categorias.length,8)],
