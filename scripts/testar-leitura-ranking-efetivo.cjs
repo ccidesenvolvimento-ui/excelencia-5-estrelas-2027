@@ -13,6 +13,7 @@ Module._load=function(name,parent,isMain){
  if(name==="server-only")return {};
  if(name==="@/lib/supabase/sessao-servidor")return {criarClienteAutenticadoServidor:async()=>cliente};
  if(name==="@/lib/calculo-ranking")return originalLoad.call(this,"../lib/calculo-ranking.ts",parent,isMain);
+ if(name==="@/lib/dominio-rh-temporal")return originalLoad.call(this,"../lib/dominio-rh-temporal.ts",parent,isMain);
  return originalLoad.call(this,name,parent,isMain);
 };
 const leitura=require("../src/server/consulta-ranking-efetivo.ts");
