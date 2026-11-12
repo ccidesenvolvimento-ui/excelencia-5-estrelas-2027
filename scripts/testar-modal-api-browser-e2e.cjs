@@ -5,6 +5,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const fixture=JSON.parse(fs.readFileSync("/tmp/e5-ajustes-e2e-fixture.json","utf8"));
 const base="http://127.0.0.1:3197";
+fs.mkdirSync("artifacts/ajustes",{recursive:true});
 async function login(context){
  const u=fixture.usuarios.adminA;
  const r=await context.request.post(base+"/api/ci-login",{data:{email:u.email,password:fixture.senha}});
