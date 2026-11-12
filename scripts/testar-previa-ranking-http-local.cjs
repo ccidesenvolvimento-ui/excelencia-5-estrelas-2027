@@ -18,7 +18,11 @@ async function login(papel){
 async function buscar(cookie){
  const r=await fetch(endpoint,{headers:cookie?{cookie}:{},redirect:"manual"});
  assert.match(r.headers.get("cache-control")??"",/(?:^|,)\s*no-store\s*(?:,|$)/i,"Respostas autenticadas não podem ser armazenadas em cache");
- return {status:r.status,body:await r.json()};
+ const texto=await r.text();
+ const tipo=r.headers.get("content-type")??"";
+ assert.ok(tipo.includes("application/json"),
+  "API de ranking deve responder JSON (HTTP "+r.status+", content-type "+tipo+"): "+texto.slice(0,500));
+ return {status:r.status,body:JSON.parse(texto)};
 }
 async function executar(){
  assert.equal((await buscar()).status,401,"Sem sessão não pode ler notas");
