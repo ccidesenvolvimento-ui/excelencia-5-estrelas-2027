@@ -70,10 +70,11 @@ export default function PreviaRankingNotasEfetivas(){
      <p><strong>{dados.diagnostico.participantesAnalisados}</strong> participantes analisados;
       {" "}<strong>{dados.diagnostico.registrosComNotasCompletas}</strong> com cinco notas;
       {" "}<strong>{dados.diagnostico.registrosPendentes}</strong> com notas ausentes.</p>
-     <div className="tabela-scroll"><table className="tabela"><thead><tr><th>Colaborador</th><th>Notas presentes</th><th>Pilares ausentes</th><th>Impedimentos cadastrais</th></tr></thead>
+     <div className="tabela-scroll"><table className="tabela"><thead><tr><th>Colaborador</th><th>Notas presentes</th><th>Férias no mês</th><th>Categoria histórica</th><th>Pilares ausentes</th><th>Impedimentos cadastrais</th></tr></thead>
      <tbody>{dados.diagnostico.linhas.map(l=><tr key={l.colaboradorId}><td>{l.nome} / {l.matricula}</td>
-      <td>{l.notasPresentes}/5</td><td>{l.pilaresAusentes.join(", ")||"Nenhum"}</td><td>{l.motivos.join(", ")||"Nenhum"}</td>
+      <td>{l.notasPresentes}/5</td><td>{l.feriasNoMes===null?"Não consultado":l.feriasNoMes}</td><td>{l.categoriasHistoricasNoMes===null?"Não consultado":l.categoriasHistoricasNoMes+" registro(s)"}</td><td>{l.pilaresAusentes.join(", ")||"Nenhum"}</td><td>{l.motivos.join(", ")||"Nenhum"}</td>
      </tr>)}</tbody></table></div>
+     <p>Fontes RH: {dados.diagnostico.fontesHistoricasLidas?"consultadas sob RLS (sem homologação de regras de RH)":"não consultadas"}.</p>
      <h3>Impedimentos para classificação oficial</h3>
      <ul>{dados.diagnostico.impedimentosGlobais.map(m=><li key={m}>{m.replaceAll("_"," ")}</li>)}</ul>
     </section>}
