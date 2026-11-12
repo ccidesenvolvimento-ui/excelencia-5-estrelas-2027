@@ -34,6 +34,8 @@ jobs:
         run: npm run typecheck
       - name: Testar regras e exportacao XLSX
         run: npm run test:rules
+      - name: Testar motor puro do ranking com notas ficticias
+        run: npm run test:motor-ranking
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
