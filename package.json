@@ -11,13 +11,14 @@
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
-    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes",
+    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes && npm run test:api-ajustes-isolada",
     "test:ui": "node scripts/testar-interface-v06.cjs",
     "test:xlsx": "node scripts/testar-exportacao-pendencias-xlsx.cjs",
     "test:portal": "node scripts/testar-portal-motorista.cjs",
     "test:entrada": "node scripts/testar-entrada-browser.cjs",
     "test:cinema": "node scripts/testar-cinema-browser.cjs",
-    "test:contratos-ajustes": "node scripts/testar-contratos-ajustes-isolados.cjs"
+    "test:contratos-ajustes": "node scripts/testar-contratos-ajustes-isolados.cjs",
+    "test:api-ajustes-isolada": "node scripts/testar-api-ajustes-config.cjs"
   },
   "dependencies": {
     "next": "16.4.3",
