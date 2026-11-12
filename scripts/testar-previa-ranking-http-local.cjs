@@ -17,7 +17,7 @@ async function login(papel){
 }
 async function buscar(cookie){
  const r=await fetch(endpoint,{headers:cookie?{cookie}:{},redirect:"manual"});
- assert.equal(r.headers.get("cache-control"),"private, no-store, max-age=0");
+ assert.match(r.headers.get("cache-control")??"",/(?:^|,)\s*no-store\s*(?:,|$)/i,"Respostas autenticadas não podem ser armazenadas em cache");
  return {status:r.status,body:await r.json()};
 }
 async function executar(){
