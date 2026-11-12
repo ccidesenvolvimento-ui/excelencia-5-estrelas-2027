@@ -11,7 +11,7 @@
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
-    "test:rules": "node scripts/testar-regras.cjs && npm run test:motor-ranking && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes && npm run test:api-ajustes-isolada && npm run test:ajustes-opt-in && npm run test:leitura-ranking",
+    "test:rules": "node scripts/testar-regras.cjs && npm run test:motor-ranking && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes && npm run test:api-ajustes-isolada && npm run test:ajustes-opt-in && npm run test:leitura-ranking && npm run test:previa-ranking",
     "test:ui": "node scripts/testar-interface-v06.cjs",
     "test:xlsx": "node scripts/testar-exportacao-pendencias-xlsx.cjs",
     "test:portal": "node scripts/testar-portal-motorista.cjs",
@@ -21,7 +21,8 @@
     "test:api-ajustes-isolada": "node scripts/testar-api-ajustes-config.cjs",
     "test:ajustes-opt-in": "node scripts/testar-conexao-ajustes-opt-in.cjs",
     "test:motor-ranking": "node scripts/testar-motor-ranking.cjs",
-    "test:leitura-ranking": "node scripts/testar-leitura-ranking-efetivo.cjs"
+    "test:leitura-ranking": "node scripts/testar-leitura-ranking-efetivo.cjs",
+    "test:previa-ranking": "node scripts/testar-previa-ranking-efetivo.cjs"
   },
   "dependencies": {
     "next": "16.4.3",
