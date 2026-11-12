@@ -5,6 +5,7 @@ import { consultarBaseRankingEfetivo } from "./consulta-ranking-efetivo";
 import { projetarPreviaEfetiva } from "@/lib/projecao-ranking-efetivo";
 import { diagnosticarProntidao } from "@/lib/diagnostico-prontidao-ranking";
 import { conciliarSeguranca } from "@/lib/conciliacao-seguranca";
+import { montarMatrizBloqueios } from "@/lib/matriz-bloqueios-homologacao";
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 const HEADERS={"Cache-Control":"private, no-store, max-age=0","X-Content-Type-Options":"nosniff"};
@@ -17,9 +18,11 @@ export async function GET(request:NextRequest){
  try{
   const base=await consultarBaseRankingEfetivo();
   const mes=Number(raw);
-  return resposta({...projetarPreviaEfetiva(base,mes),
-   diagnostico:diagnosticarProntidao(base,`2027-${String(mes+1).padStart(2,"0")}-01`),
-   seguranca:conciliarSeguranca(base,`2027-${String(mes+1).padStart(2,"0")}-01`)});
+  const competencia=`2027-${String(mes+1).padStart(2,"0")}-01`;
+  const diagnostico=diagnosticarProntidao(base,competencia);
+  const seguranca=conciliarSeguranca(base,competencia);
+  return resposta({...projetarPreviaEfetiva(base,mes),diagnostico,seguranca,
+   matriz:montarMatrizBloqueios(diagnostico,seguranca)});
  }catch(erro){
   // Mensagens internas de banco, autenticação e RLS não são expostas ao cliente.
   if(erro instanceof Error&&erro.message==="Sessão não autenticada")return resposta({erro:"Autenticação necessária."},401);
