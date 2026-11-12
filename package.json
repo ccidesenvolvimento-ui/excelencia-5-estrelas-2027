@@ -11,7 +11,7 @@
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
-    "test:rules": "node scripts/testar-regras.cjs && npm run test:motor-ranking && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes && npm run test:api-ajustes-isolada && npm run test:ajustes-opt-in && npm run test:leitura-ranking && npm run test:previa-ranking && npm run test:exportacao-previa && npm run test:diagnostico-prontidao && npm run test:rh-temporal && npm run test:conciliacao-seguranca",
+    "test:rules": "node scripts/testar-regras.cjs && npm run test:motor-ranking && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes && npm run test:api-ajustes-isolada && npm run test:ajustes-opt-in && npm run test:leitura-ranking && npm run test:previa-ranking && npm run test:exportacao-previa && npm run test:diagnostico-prontidao && npm run test:rh-temporal && npm run test:conciliacao-seguranca && npm run test:matriz-bloqueios",
     "test:ui": "node scripts/testar-interface-v06.cjs",
     "test:xlsx": "node scripts/testar-exportacao-pendencias-xlsx.cjs",
     "test:portal": "node scripts/testar-portal-motorista.cjs",
@@ -26,7 +26,8 @@
     "test:exportacao-previa": "node scripts/testar-exportacao-previa.cjs",
     "test:diagnostico-prontidao": "node scripts/testar-diagnostico-prontidao.cjs",
     "test:rh-temporal": "node scripts/testar-rh-temporal.cjs",
-    "test:conciliacao-seguranca": "node scripts/testar-conciliacao-seguranca.cjs"
+    "test:conciliacao-seguranca": "node scripts/testar-conciliacao-seguranca.cjs",
+    "test:matriz-bloqueios": "node scripts/testar-matriz-bloqueios.cjs"
   },
   "dependencies": {
     "next": "16.4.3",
