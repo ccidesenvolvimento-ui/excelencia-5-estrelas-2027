@@ -121,9 +121,9 @@ export async function consultarBaseRankingEfetivo():Promise<BaseRankingAutorizad
  const [notas,colaboradores,categoriasLidas]=await Promise.all([
   lerTodasPaginas<NotaEfetivaBanco>(fonte as FontePaginada<NotaEfetivaBanco>,
    "notas_mensais_efetivas","id,colaborador_id,competencia,estrela,nota,nota_efetiva,possui_ajuste"),
-  lerTodasPaginas<ColaboradorBanco>(fonte as FontePaginada<ColaboradorBanco>,
+  lerTodasPaginas<ColaboradorBanco>(fonte as unknown as FontePaginada<ColaboradorBanco>,
    "colaboradores","id,empresa_id,matricula,nome,filial_id,categoria_id,funcao,situacao_rh,participa_programa,categorizacao_status,desligado_manual,desligado_em"),
-  lerTodasPaginas<CategoriaBanco>(fonte as FontePaginada<CategoriaBanco>,"categorias","id,nome")
+  lerTodasPaginas<CategoriaBanco>(fonte as unknown as FontePaginada<CategoriaBanco>,"categorias","id,nome")
  ]);
  // A view não filtra por ano. Rejeita dados de outras competências na projeção,
  // sem transformar a ausência de notas em zero.
