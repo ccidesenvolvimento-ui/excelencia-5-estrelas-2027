@@ -15,7 +15,7 @@ export default function PreviaRankingNotasEfetivas(){
  const [dados,setDados]=useState<Previa|null>(null);
  const [erro,setErro]=useState("");
  const [carregando,setCarregando]=useState(true);
- const [exportando,setExportando]=useState<"pdf"|"xlsx"|null>(null);
+ const [exportando,setExportando]=useState<"pdf"|"xlsx"|"json"|null>(null);
  useEffect(()=>{
   let cancelado=false;
   setCarregando(true);setErro("");setDados(null);
@@ -25,13 +25,19 @@ export default function PreviaRankingNotasEfetivas(){
    .catch(e=>{if(!cancelado){setErro(e instanceof Error?e.message:"Consulta indisponível.");setCarregando(false)}});
   return ()=>{cancelado=true};
  },[mes]);
- async function exportar(formato:"pdf"|"xlsx"){
+ async function exportar(formato:"pdf"|"xlsx"|"json"){
   if(!dados||carregando||exportando)return;
   setExportando(formato);setErro("");
   try{
-   const arquivo=await import("@/lib/exportar-previa-efetiva");
-   if(formato==="pdf")arquivo.baixarPreviaPdf(dados);
-   else await arquivo.baixarPreviaXlsx(dados);
+   if(formato==="json"){
+    if(!dados.matriz)throw new Error("Matriz de homologação indisponível.");
+    const relatorio=await import("@/lib/sumario-homologacao");
+    relatorio.baixarSumarioHomologacao(dados.matriz);
+   } else {
+    const arquivo=await import("@/lib/exportar-previa-efetiva");
+    if(formato==="pdf")arquivo.baixarPreviaPdf(dados);
+    else await arquivo.baixarPreviaXlsx(dados);
+   }
   }catch(e){setErro(e instanceof Error?e.message:"Falha na exportação da prévia.")}
   finally{setExportando(null);}
  }
@@ -104,6 +110,10 @@ export default function PreviaRankingNotasEfetivas(){
       Segurança {dados.matriz.quantidadesPorClasse.seguranca};
       RH {dados.matriz.quantidadesPorClasse.rh};
       governança {dados.matriz.quantidadesPorClasse.governanca}.</p>
+     <button type="button" className="botao botao-claro" disabled={!!exportando}
+      onClick={()=>void exportar("json")}>
+      {exportando==="json"?"Gerando sumário…":"Exportar sumário agregado JSON (sem dados pessoais)"}
+     </button>
      <h3>Comprovações globais ainda necessárias</h3>
      <ul>{dados.matriz.requisitosGlobaisNaoComprovados.map(r=><li key={r}>{r.replaceAll("_"," ")}</li>)}</ul>
      <p>Fontes de acidentes e advertências consultadas não equivalem a fontes fechadas.
