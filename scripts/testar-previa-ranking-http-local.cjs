@@ -29,20 +29,7 @@ async function executar(){
  const a=await login("adminA"),b=await login("adminB");
  const rb=await buscar(b);assert.equal(rb.status,200);
  assert.equal(rb.body.linhas.length,0,"Filial B não vê colaborador da filial A");
- let if(process.env.E5_VERIFICAR_SEGURANCA==="true"){
-  const sqlSeg=`BEGIN;
-   INSERT INTO public.importacoes(tipo,arquivo_nome,competencia,estado)
-   VALUES ('advertencias','ci-aviso-ficticio.xlsx','2027-10-01','confirmada');
-   INSERT INTO public.penalizacoes_seguranca(colaborador_id,competencia,tipo,descricao,importacao_id)
-   SELECT '${fixture.ids.colaborador}','2027-10-01','advertencia',
-          'Penalização de Segurança fictícia',id FROM public.importacoes
-   WHERE arquivo_nome='ci-aviso-ficticio.xlsx';
-   COMMIT;`;
-  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],
-   {input:sqlSeg,stdio:["pipe","pipe","pipe"]});
- }
-
- ra=await buscar(a);assert.equal(ra.status,200);
+ let ra=await buscar(a);assert.equal(ra.status,200);
  assert.equal(ra.body.rankingOficial,false);assert.equal(ra.body.escopo,"filiais-autorizadas");
  assert.equal(ra.body.linhas.length,0,"Colaborador sem participação homologada ainda não entra");
  // Prepara participação fictícia e três pilares ausentes: sem tocar em cloud.
@@ -58,6 +45,19 @@ async function executar(){
   ('${fixture.ids.colaborador}','2027-10-01','treinamentos',100,'planilha',NULL);
  COMMIT;`;
  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],{input:sql,stdio:["pipe","pipe","pipe"]});
+ if(process.env.E5_VERIFICAR_SEGURANCA==="true"){
+  const sqlSeg=`BEGIN;
+   INSERT INTO public.importacoes(tipo,arquivo_nome,competencia,estado)
+   VALUES ('advertencias','ci-aviso-ficticio.xlsx','2027-10-01','confirmada');
+   INSERT INTO public.penalizacoes_seguranca(colaborador_id,competencia,tipo,descricao,importacao_id)
+   SELECT '${fixture.ids.colaborador}','2027-10-01','advertencia',
+          'Penalização de Segurança fictícia',id FROM public.importacoes
+   WHERE arquivo_nome='ci-aviso-ficticio.xlsx';
+   COMMIT;`;
+  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],
+   {input:sqlSeg,stdio:["pipe","pipe","pipe"]});
+ }
+
  if(process.env.E5_VERIFICAR_RH_TEMPORAL==="true"){
   const sqlRh=`BEGIN;
    INSERT INTO public.ferias (colaborador_id,inicio,termino,dias_gozo)
