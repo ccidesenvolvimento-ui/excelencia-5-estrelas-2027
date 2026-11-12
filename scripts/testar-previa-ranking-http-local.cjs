@@ -45,6 +45,17 @@ async function executar(){
   ('${fixture.ids.colaborador}','2027-10-01','treinamentos',100,'planilha',NULL);
  COMMIT;`;
  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],{input:sql,stdio:["pipe","pipe","pipe"]});
+ if(process.env.E5_VERIFICAR_RH_TEMPORAL==="true"){
+  const sqlRh=`BEGIN;
+   INSERT INTO public.ferias (colaborador_id,inicio,termino,dias_gozo)
+   VALUES ('${fixture.ids.colaborador}','2027-10-12','2027-10-20',9);
+   INSERT INTO public.historico_categorias(colaborador_id,categoria_id,origem,competencia_inicio,competencia_fim)
+   VALUES ('${fixture.ids.colaborador}',1,'manual','2027-01-01',NULL);
+   COMMIT;`;
+  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],
+   {input:sqlRh,stdio:["pipe","pipe","pipe"]});
+ }
+
  ra=await buscar(a);assert.equal(ra.status,200);
  assert.equal(ra.body.linhas.length,1);
  const linha=ra.body.linhas[0];
@@ -57,6 +68,13 @@ async function executar(){
   assert.equal(rb.body.diagnostico.participantesAnalisados,0);
  }
 
+ if(process.env.E5_VERIFICAR_RH_TEMPORAL==="true"){
+  assert.equal(ra.body.diagnostico.fontesHistoricasLidas,true);
+  assert.equal(ra.body.diagnostico.linhas[0].feriasNoMes,1);
+  assert.equal(ra.body.diagnostico.linhas[0].categoriasHistoricasNoMes,1);
+  assert.ok(ra.body.diagnostico.linhas[0].motivos.includes("FERIAS_NO_MES"));
+  assert.equal(rb.body.diagnostico.linhas.length,0,"Filial B sem dados de férias/histórico da A");
+ }
  assert.equal(linha.score,62,"Score usa produtividade efetiva 90 ajustada pelo E2E anterior");
  assert.equal(linha.status,"Inelegível");
  assert.equal(linha.posicao,null);

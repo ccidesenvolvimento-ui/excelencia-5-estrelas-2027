@@ -44,6 +44,8 @@ jobs:
         run: npm run test:exportacao-previa
       - name: Auditar prontidao sem atribuicao de posicoes
         run: npm run test:diagnostico-prontidao
+      - name: Validar ferias e categorias historicas sob RLS
+        run: npm run test:rh-temporal
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
@@ -236,7 +238,7 @@ jobs:
           export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
           node scripts/testar-supabase-local-e2e.cjs
       - name: E2E HTTP Next e Supabase Auth/PostgREST/SQL locais (sem Cloud)
-        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' || github.event.pull_request.head.ref == 'feat/leitura-efetiva-ranking-80' || github.event.pull_request.head.ref == 'feat/previa-notas-efetivas-81' || github.event.pull_request.head.ref == 'feat/exportacao-previa-85' || github.event.pull_request.head.ref == 'feat/diagnostico-prontidao-87' }}
+        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' || github.event.pull_request.head.ref == 'feat/leitura-efetiva-ranking-80' || github.event.pull_request.head.ref == 'feat/previa-notas-efetivas-81' || github.event.pull_request.head.ref == 'feat/exportacao-previa-85' || github.event.pull_request.head.ref == 'feat/diagnostico-prontidao-87' || github.event.pull_request.head.ref == 'feat/ferias-historico-89' }}
         timeout-minutes: 24
         shell: bash
         run: |
@@ -269,7 +271,7 @@ jobs:
             mkdir -p src/app/ajustes-notas-live
             cp src/server/templates/ajustes-notas-live-page.tsx src/app/ajustes-notas-live/page.tsx
           fi
-          if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/exportacao-previa-85" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/diagnostico-prontidao-87" ]; then
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/exportacao-previa-85" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/diagnostico-prontidao-87" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/ferias-historico-89" ]; then
             mkdir -p src/app/api/ranking-efetivo src/app/ranking-efetivo-live
             cp src/server/templates/ranking-efetivo-route.ts src/app/api/ranking-efetivo/route.ts
             cp src/server/templates/ranking-efetivo-page.tsx src/app/ranking-efetivo-live/page.tsx
@@ -289,8 +291,8 @@ jobs:
           done
           if [ "$pronto" != "1" ]; then tail -n 35 /tmp/e5-next-local.log; exit 1; fi
           node scripts/testar-api-http-supabase-local-e2e.cjs
-          if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ]; then
-            if ! node scripts/testar-previa-ranking-http-local.cjs; then
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/ferias-historico-89" ]; then
+            if ! E5_VERIFICAR_DIAGNOSTICO=true E5_VERIFICAR_RH_TEMPORAL=${{ github.event.pull_request.head.ref == 'feat/ferias-historico-89' }} node scripts/testar-previa-ranking-http-local.cjs; then
               echo "Diagnostico de compilacao da rota de previa no runner:"
               tail -n 50 /tmp/e5-next-local.log
               exit 1
