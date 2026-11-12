@@ -5,7 +5,8 @@
  */
 import "server-only";
 import { criarClienteAutenticadoServidor } from "@/lib/supabase/sessao-servidor";
-import { categorias, estrelas, type Categoria, type Estrela, type NotaRastreavel } from "@/lib/calculo-ranking";
+import { categorias, estrelas, type Estrela, type NotaRastreavel } from "@/lib/calculo-ranking";
+import { validarFerias, validarHistoricoCategorias, type FeriasRH, type HistoricoCategoriaRH } from "@/lib/dominio-rh-temporal";
 
 const TAMANHO_PAGINA=500;
 const LIMITE_PAGINAS=200;
@@ -33,6 +34,9 @@ export type BaseRankingAutorizada={
  colaboradores:ColaboradorBanco[];
  categorias:CategoriaBanco[];
  registros:RegistroCalculo[];
+ /** Não confundir fonte não consultada com fonte lida e sem registros. */
+ ferias?:FeriasRH[]; historicoCategorias?:HistoricoCategoriaRH[];
+ fontesHistoricasLidas?:boolean;
  alertas:string[];
 };
 
@@ -118,17 +122,23 @@ export async function consultarBaseRankingEfetivo():Promise<BaseRankingAutorizad
  if(usuario.error||!usuario.data.user)throw new Error("Sessão não autenticada");
  // Somente chave pública com sessão de usuário; as políticas RLS decidem visibilidade.
  const fonte= ((tabela:string,colunas:string)=>cliente.from(tabela).select(colunas)) as unknown as FontePaginada<NotaEfetivaBanco>;
- const [notas,colaboradores,categoriasLidas]=await Promise.all([
+ const [notas,colaboradores,categoriasLidas,feriasBrutas,historicoBruto]=await Promise.all([
   lerTodasPaginas<NotaEfetivaBanco>(fonte as FontePaginada<NotaEfetivaBanco>,
    "notas_mensais_efetivas","id,colaborador_id,competencia,estrela,nota,nota_efetiva,possui_ajuste"),
   lerTodasPaginas<ColaboradorBanco>(fonte as unknown as FontePaginada<ColaboradorBanco>,
    "colaboradores","id,empresa_id,matricula,nome,filial_id,categoria_id,funcao,situacao_rh,participa_programa,categorizacao_status,desligado_manual,desligado_em"),
-  lerTodasPaginas<CategoriaBanco>(fonte as unknown as FontePaginada<CategoriaBanco>,"categorias","id,nome")
+  lerTodasPaginas<CategoriaBanco>(fonte as unknown as FontePaginada<CategoriaBanco>,"categorias","id,nome"),
+  lerTodasPaginas<FeriasRH>(fonte as unknown as FontePaginada<FeriasRH>,"ferias","id,colaborador_id,inicio,termino,dias_gozo"),
+  lerTodasPaginas<HistoricoCategoriaRH>(fonte as unknown as FontePaginada<HistoricoCategoriaRH>,
+   "historico_categorias","id,colaborador_id,categoria_id,origem,competencia_inicio,competencia_fim")
  ]);
  // A view não filtra por ano. Rejeita dados de outras competências na projeção,
  // sem transformar a ausência de notas em zero.
  const apenas2027=notas.filter(n=>n.competencia.startsWith("2027-"));
  const registros=prepararRegistros(apenas2027,colaboradores);
+ const ferias=validarFerias(feriasBrutas,colaboradores);
+ const historicoCategorias=validarHistoricoCategorias(historicoBruto,colaboradores);
  return {escopo:"filiais-autorizadas",rankingOficial:false,colaboradores,
-  categorias:categoriasLidas,registros,alertas:alertasMetadados(colaboradores,categoriasLidas)};
+  categorias:categoriasLidas,registros,ferias,historicoCategorias,fontesHistoricasLidas:true,
+  alertas:alertasMetadados(colaboradores,categoriasLidas)};
 }
