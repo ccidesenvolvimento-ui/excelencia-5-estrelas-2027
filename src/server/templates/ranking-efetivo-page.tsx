@@ -1,10 +1,8 @@
 "use client";
 /** Template de prévia isolada: instalar apenas no runner Node protegido. */
 import {useEffect,useState} from "react";
-type Nota={id:string;original:number;efetiva:number;ajustada:boolean};
-type Linha={id:string;nome:string;matricula:string;filialId:string;categoria:string;competencia:string;
- notas:Record<string,Nota|undefined>;score:number|null;status:string;posicao:null;faltantes:string[]};
-type Previa={escopo:"filiais-autorizadas";rankingOficial:false;mes:number;linhas:Linha[];avisos:string[]};
+import type { PreviaRanking } from "@/lib/projecao-ranking-efetivo";
+type Previa=PreviaRanking;
 const pilares=["seguranca","produtividade","dirigibilidade","jornada","treinamentos"];
 const titulo:{[k:string]:string}={seguranca:"Segurança",produtividade:"Produtividade",dirigibilidade:"Dirigibilidade",jornada:"Jornada",treinamentos:"Treinamentos"};
 const meses=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
