@@ -97,6 +97,19 @@ async function executar(){
   assert.deepEqual(ra.body.seguranca.linhas[0].conflitos,[]);
   assert.equal(rb.body.seguranca.linhas.length,0,"Outra filial não vê penalizações");
  }
+ if(process.env.E5_VERIFICAR_MATRIZ==="true"){
+  const m=ra.body.matriz;
+  assert.ok(m,"Matriz autenticada obrigatória");
+  assert.equal(m.rankingOficial,false);
+  assert.equal(m.escopo,"filiais-autorizadas");
+  assert.equal(m.situacao,"BLOQUEADO","Não autorizar ranking oficial");
+  assert.equal(m.participantesAnalisados,1);
+  assert.equal(m.totalComBloqueios,1);
+  assert.ok(m.requisitosGlobaisNaoComprovados.includes("ESCOPO_RLS_PARCIAL"));
+  assert.ok(m.requisitosGlobaisNaoComprovados.includes("SEGURANCA_SEM_FECHAMENTO_DE_ACIDENTES"));
+  assert.equal(rb.body.matriz.participantesAnalisados,0,"RLS de filial B não pode revelar A");
+  assert.equal(rb.body.matriz.situacao,"BLOQUEADO");
+ }
  assert.equal(linha.score,62,"Score usa produtividade efetiva 90 ajustada pelo E2E anterior");
  assert.equal(linha.status,"Inelegível");
  assert.equal(linha.posicao,null);
