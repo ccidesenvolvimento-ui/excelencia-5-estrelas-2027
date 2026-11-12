@@ -4,7 +4,8 @@ import {useEffect,useState} from "react";
 import type { PreviaRanking } from "@/lib/projecao-ranking-efetivo";
 import type { DiagnosticoProntidao } from "@/lib/diagnostico-prontidao-ranking";
 import type { ConciliacaoSeguranca } from "@/lib/conciliacao-seguranca";
-type Previa=PreviaRanking & {diagnostico?:DiagnosticoProntidao;seguranca?:ConciliacaoSeguranca};
+import type { MatrizBloqueios } from "@/lib/matriz-bloqueios-homologacao";
+type Previa=PreviaRanking & {diagnostico?:DiagnosticoProntidao;seguranca?:ConciliacaoSeguranca;matriz?:MatrizBloqueios};
 const pilares=["seguranca","produtividade","dirigibilidade","jornada","treinamentos"] as const;
 const titulo:{[k:string]:string}={seguranca:"Segurança",produtividade:"Produtividade",dirigibilidade:"Dirigibilidade",jornada:"Jornada",treinamentos:"Treinamentos"};
 const meses=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -91,6 +92,22 @@ export default function PreviaRankingNotasEfetivas(){
       <td>{formatar(l.notaSeguranca)}</td><td>{l.conflitos.join(", ")||"Nenhuma divergência identificada"}</td>
      </tr>)}</tbody></table></div>
      <ul>{dados.seguranca.avisos.map(a=><li key={a}>{a}</li>)}</ul>
+    </section>}
+    {dados.matriz&&<section aria-label="Matriz de bloqueios para homologação" className="painel">
+     <h2>Matriz de bloqueios — classificação oficial indisponível</h2>
+     <p role="status"><strong>{dados.matriz.situacao}</strong> — Apenas filiais autorizadas sob RLS.
+      Nenhum resultado desta página autoriza posições, premiações ou decisões de RH.</p>
+     <p>Participantes analisados: {dados.matriz.participantesAnalisados}.
+      Com cinco notas informadas: {dados.matriz.completosNasNotas}.
+      Com impedimentos de homologação: {dados.matriz.totalComBloqueios}.</p>
+     <p>Bloqueios por classe: dados {dados.matriz.quantidadesPorClasse.dados};
+      Segurança {dados.matriz.quantidadesPorClasse.seguranca};
+      RH {dados.matriz.quantidadesPorClasse.rh};
+      governança {dados.matriz.quantidadesPorClasse.governanca}.</p>
+     <h3>Comprovações globais ainda necessárias</h3>
+     <ul>{dados.matriz.requisitosGlobaisNaoComprovados.map(r=><li key={r}>{r.replaceAll("_"," ")}</li>)}</ul>
+     <p>Fontes de acidentes e advertências consultadas não equivalem a fontes fechadas.
+      A ausência de penalização não gera nota 100.</p>
     </section>}
     <section aria-label="Avisos de homologação"><h2>Limitações desta prévia</h2><ul>{dados.avisos.map((a,i)=><li key={i}>{a}</li>)}</ul></section>
    </>}
