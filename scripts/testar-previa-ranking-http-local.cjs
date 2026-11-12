@@ -44,31 +44,22 @@ async function executar(){
  ra=await buscar(a);assert.equal(ra.status,200);
  assert.equal(ra.body.linhas.length,1);
  const linha=ra.body.linhas[0];
- assert.equal(linha.score,58.25,"Score antes do ajuste inclui segurança zero e produtividade 75");
+ assert.equal(linha.score,62,"Score usa produtividade efetiva 90 ajustada pelo E2E anterior");
  assert.equal(linha.status,"Inelegível");
  assert.equal(linha.posicao,null);
- // O E2E HTTP existente registrou correção de produtividade 75 -> 90.
- // Confirma que leitura subsequente reflete somente a efetiva.
- const ajustes=await fetch("http://127.0.0.1:3197/api/ajustes-notas",{
-  headers:{cookie:a},redirect:"manual"
+ // Exercita um segundo ajuste real (90 -> 95), preservando a origem 75.
+ const novo=await fetch("http://127.0.0.1:3197/api/ajustes-notas",{
+  method:"POST",headers:{cookie:a,origin:"http://127.0.0.1:3197","content-type":"application/json"},
+  body:JSON.stringify({notaId:fixture.ids.nota,notaEsperada:90,novaNota:95,
+   justificativa:"Segunda correção auditada para verificação local fictícia do ranking."})
  });
- assert.equal(ajustes.status,200);
- const lista=await ajustes.json();
- const atual=lista.notas.find(n=>n.id===fixture.ids.nota);
- assert.ok(atual);
- if(atual.nota_efetiva===75){
-  const r=await fetch("http://127.0.0.1:3197/api/ajustes-notas",{
-   method:"POST",headers:{cookie:a,origin:"http://127.0.0.1:3197","content-type":"application/json"},
-   body:JSON.stringify({notaId:fixture.ids.nota,notaEsperada:75,novaNota:90,
-    justificativa:"Correção auditada para verificação local fictícia do ranking."})
-  });assert.equal(r.status,201);
- }
+ assert.equal(novo.status,201,"Segundo ajuste auditado autorizado");
  const corrigida=await buscar(a);assert.equal(corrigida.status,200);
  const l=corrigida.body.linhas[0];
  assert.equal(l.notas.produtividade.original,75);
- assert.equal(l.notas.produtividade.efetiva,90);
+ assert.equal(l.notas.produtividade.efetiva,95);
  assert.equal(l.notas.produtividade.ajustada,true);
- assert.equal(l.score,62,"Score corrigido deve subir 3,75");
+ assert.equal(l.score,63.25,"Segundo ajuste deve elevar score em 1,25");
  assert.equal(l.posicao,null,"Sem classificação global");
  assert.equal((await buscar(b)).body.linhas.length,0,"RLS continua isolando filial B");
  console.log("✓ HTTP real: sessão, RLS de filiais, score corrigido, segurança e ausência de posições oficiais.");
