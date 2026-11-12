@@ -45,6 +45,19 @@ async function executar(){
   ('${fixture.ids.colaborador}','2027-10-01','treinamentos',100,'planilha',NULL);
  COMMIT;`;
  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],{input:sql,stdio:["pipe","pipe","pipe"]});
+ if(process.env.E5_VERIFICAR_SEGURANCA==="true"){
+  const sqlSeg=`BEGIN;
+   INSERT INTO public.importacoes(tipo,arquivo_nome,competencia,estado)
+   VALUES ('advertencias','ci-aviso-ficticio.xlsx','2027-10-01','confirmada');
+   INSERT INTO public.penalizacoes_seguranca(colaborador_id,competencia,tipo,descricao,importacao_id)
+   SELECT '${fixture.ids.colaborador}','2027-10-01','advertencia',
+          'Penalização de Segurança fictícia',id FROM public.importacoes
+   WHERE arquivo_nome='ci-aviso-ficticio.xlsx';
+   COMMIT;`;
+  execFileSync("docker",["exec","-i",container,"psql","-X","-U","postgres","-d","postgres","-v","ON_ERROR_STOP=1","-q"],
+   {input:sqlSeg,stdio:["pipe","pipe","pipe"]});
+ }
+
  if(process.env.E5_VERIFICAR_RH_TEMPORAL==="true"){
   const sqlRh=`BEGIN;
    INSERT INTO public.ferias (colaborador_id,inicio,termino,dias_gozo)
@@ -74,6 +87,15 @@ async function executar(){
   assert.equal(ra.body.diagnostico.linhas[0].categoriasHistoricasNoMes,1);
   assert.ok(ra.body.diagnostico.linhas[0].motivos.includes("FERIAS_NO_MES"));
   assert.equal(rb.body.diagnostico.linhas.length,0,"Filial B sem dados de férias/histórico da A");
+ }
+ if(process.env.E5_VERIFICAR_SEGURANCA==="true"){
+  assert.equal(ra.body.seguranca.fonteLida,true);
+  assert.equal(ra.body.seguranca.totalAdvertencias,1);
+  assert.equal(ra.body.seguranca.fonteAdvertenciasFechada,false);
+  assert.equal(ra.body.seguranca.fonteAcidentesFechada,false);
+  assert.equal(ra.body.seguranca.linhas[0].notaSeguranca,0);
+  assert.deepEqual(ra.body.seguranca.linhas[0].conflitos,[]);
+  assert.equal(rb.body.seguranca.linhas.length,0,"Outra filial não vê penalizações");
  }
  assert.equal(linha.score,62,"Score usa produtividade efetiva 90 ajustada pelo E2E anterior");
  assert.equal(linha.status,"Inelegível");
