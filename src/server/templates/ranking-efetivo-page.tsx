@@ -3,7 +3,7 @@
 import {useEffect,useState} from "react";
 import type { PreviaRanking } from "@/lib/projecao-ranking-efetivo";
 type Previa=PreviaRanking;
-const pilares=["seguranca","produtividade","dirigibilidade","jornada","treinamentos"];
+const pilares=["seguranca","produtividade","dirigibilidade","jornada","treinamentos"] as const;
 const titulo:{[k:string]:string}={seguranca:"Segurança",produtividade:"Produtividade",dirigibilidade:"Dirigibilidade",jornada:"Jornada",treinamentos:"Treinamentos"};
 const meses=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 const formatar=(n:number|null|undefined)=>n===null||n===undefined?"—":n.toFixed(2).replace(".",",");
