@@ -205,6 +205,26 @@ jobs:
           if [ "$pronto" != "1" ]; then cat /tmp/ajustes-http-fixture.log; exit 1; fi
           node scripts/testar-ajustes-http-sessao-ficticia.cjs
           # Nunca deixar uma sessão simulada ou rota dinâmica nos arquivos da CI.
+      - name: Validar Auth, RLS, RPC e auditoria no Supabase local descartavel
+        if: ${{ github.event.pull_request.head.ref == 'test/supabase-local-e2e-73' }}
+        timeout-minutes: 22
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Proibido qualquer supabase link, db push, projeto Cloud ou segredo externo.
+          cleanup() {
+            ./node_modules/.bin/supabase stop --no-backup || true
+          }
+          trap cleanup EXIT
+          ./node_modules/.bin/supabase start
+          # Chaves geradas apenas pelo Supabase CLI local. Nunca imprimir os valores.
+          export SUPABASE_URL="http://127.0.0.1:54321"
+          eval "$(./node_modules/.bin/supabase status -o env | grep -E '^(ANON_KEY|SERVICE_ROLE_KEY)=')"
+          test -n "${ANON_KEY:-}"
+          test -n "${SERVICE_ROLE_KEY:-}"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          node scripts/testar-supabase-local-e2e.cjs
       - name: Instalar navegador para regressao visual
         run: |
           set -euo pipefail
