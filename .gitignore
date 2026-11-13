@@ -18,3 +18,13 @@ artifacts/
 
 # Proxy gerado somente no build Docker/Node do Next.js 16
 src/proxy.ts
+
+# Backups locais do banco — NUNCA versionar ou anexar em PR/Actions.
+backups/
+backup/
+*.dump
+*.backup
+*.pgdump
+roles.sql
+schema.sql
+data.sql
