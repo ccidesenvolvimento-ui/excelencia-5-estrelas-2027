@@ -46,7 +46,7 @@ BEGIN
   IF TG_OP = 'UPDATE' THEN RETURN NEW; END IF;
   RETURN OLD;
 END;
-$;
+$$;
 CREATE TRIGGER impedir_update_delete_nota_ajustada
 BEFORE UPDATE OR DELETE ON public.notas_mensais
 FOR EACH ROW EXECUTE FUNCTION public.impedir_substituicao_nota_ajustada();
