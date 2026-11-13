@@ -63,6 +63,12 @@ CREATE TRIGGER ajustes_notas_append_only
 BEFORE UPDATE OR DELETE ON public.ajustes_notas
 FOR EACH ROW EXECUTE FUNCTION public.impedir_mutacao_ajuste();
 
+-- Funções de gatilho não são APIs. O PostgreSQL concede EXECUTE a PUBLIC
+-- por padrão; revogar explicitamente para reduzir a superfície de acesso.
+-- Os gatilhos internos continuam sendo executados pelo PostgreSQL.
+REVOKE ALL ON FUNCTION public.impedir_substituicao_nota_ajustada() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.impedir_mutacao_ajuste() FROM PUBLIC, anon, authenticated;
+
 -- Transação indivisível: bloqueia a nota, verifica versão esperada,
 -- insere ajuste e registra auditoria. Nunca altera o valor original.
 CREATE FUNCTION public.registrar_ajuste_nota(

@@ -152,4 +152,29 @@ BEGIN
  THEN RAISE EXCEPTION 'DELETE sem ajuste foi bloqueado pelo trigger'; END IF;
 END $$;
 
+-- Acesso direto a funções internas de gatilho deve permanecer revogado.
+-- Execução por trigger PostgreSQL independe de grant direto ao usuário.
+DO $$
+DECLARE
+  assinatura text;
+  papel text;
+BEGIN
+  FOREACH assinatura IN ARRAY ARRAY[
+    'public.impedir_substituicao_nota_ajustada()',
+    'public.impedir_mutacao_ajuste()'
+  ] LOOP
+    FOREACH papel IN ARRAY ARRAY['anon','authenticated'] LOOP
+      IF has_function_privilege(papel, assinatura, 'EXECUTE') THEN
+        RAISE EXCEPTION 'EXECUTE indevido: papel %, função %', papel, assinatura;
+      END IF;
+    END LOOP;
+  END LOOP;
+  IF NOT has_function_privilege('authenticated',
+      'public.registrar_ajuste_nota(uuid,numeric,numeric,text)', 'EXECUTE')
+    OR has_function_privilege('anon',
+      'public.registrar_ajuste_nota(uuid,numeric,numeric,text)', 'EXECUTE') THEN
+    RAISE EXCEPTION 'Privilégios de RPC de ajustes inconsistentes';
+  END IF;
+END $$;
+
 ROLLBACK;
