@@ -67,6 +67,8 @@ jobs:
         run: node scripts/testar-preparar-ajustes-node.cjs
       - name: Validar preflight Supabase apenas leitura
         run: node scripts/testar-preflight-cloud.cjs
+      - name: Validar plano de backup manual e restauracao isolada
+        run: node scripts/testar-plano-backup-free.cjs
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
