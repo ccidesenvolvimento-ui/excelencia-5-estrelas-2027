@@ -7,8 +7,15 @@ COPY package.json ./
 # Repositório ainda sem lockfile: pinagem reprodutível será tratada em PR próprio.
 RUN npm install --no-audit --no-fund
 COPY . .
-# Next.js 16: proxy só no build Node; GitHub Pages permanece sem proxy.
-RUN cp src/server/proxy-autenticacao.ts src/proxy.ts && npm run build
+# Instalacao opcional da tela/API de ajustes APENAS na imagem Node.
+# Valor padrao false. Nunca injetar segredos nem habilitar no GitHub Pages.
+ARG EXCELENCIA_NODE_AJUSTES_ENABLED=false
+# Next.js 16: proxy apenas no build Node; a API depende ainda de flags
+# e de permissoes no runtime. Nao configura contas ou banco.
+RUN EXCELENCIA_NODE_AJUSTES_ENABLED="$EXCELENCIA_NODE_AJUSTES_ENABLED" \
+    node scripts/preparar-ajustes-node.cjs \
+    && cp src/server/proxy-autenticacao.ts src/proxy.ts \
+    && npm run build
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
