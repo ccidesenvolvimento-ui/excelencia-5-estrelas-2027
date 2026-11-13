@@ -60,6 +60,8 @@ jobs:
         run: npm run test:integracao-guardrails
       - name: Validar gate de liberacao nao autorizado
         run: npm run test:gate-liberacao
+      - name: Verificar plano pre-merge sem autorizacao automatica
+        run: node scripts/testar-plano-integracao.cjs
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
