@@ -43,6 +43,17 @@ teste("Classificação oficial permanece indisponível na prévia",()=>{
  assert.match(resumo,/rankingOficial:false/);
  assert.match(resumo,/SUMARIO_AGREGADO_NAO_OFICIAL/);
 });
+teste("Compose de homologação exige WEB_PORT explícita e não usa 3107 por padrão",()=>{
+ const compose=ler("compose.homologacao.yml");
+ const exemplo=ler(".env.homologacao.example");
+ assert.match(compose,/127\\.0\\.0\\.1:\\$\\{WEB_PORT:\?/);
+ assert.ok(!compose.includes("WEB_PORT:-3107"),"Porta corporativa não pode ser o default");
+ assert.ok(!/^WEB_PORT=3107$/m.test(exemplo),"Exemplo não deve sugerir porta corporativa");
+ assert.match(exemplo,/^WEB_PORT=3117$/m);
+ const docs=ler("docs/HOMOLOGACAO_LOCAL_2026.md");
+ assert.ok(docs.includes("WEB_PORT"));
+ assert.ok(docs.includes("NUNCA reutilizar 3107"));
+});
 teste("Build CI de GitHub Pages e testes de segurança são mantidos",()=>{
  const ci=ler(".github/workflows/validar-pr.yml");
  assert.match(ci,/NEXT_PUBLIC_DEPLOY_TARGET:\s*github-pages/);
