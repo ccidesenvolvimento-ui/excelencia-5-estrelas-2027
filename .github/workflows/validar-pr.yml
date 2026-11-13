@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - "style/**"
+      - "infra/**"
+      - "db/**"
+      - "auth/**"
+      - "feat/**"
 
 permissions:
   contents: read
@@ -15,7 +19,8 @@ concurrency:
 
 jobs:
   validar:
-    runs-on: ubuntu-latest
+    # Fixar LTS estável; runner pré-configurado com bibliotecas para testes Chromium.
+    runs-on: ubuntu-24.04
     steps:
       - name: Baixar codigo
         uses: actions/checkout@v4
@@ -29,15 +34,304 @@ jobs:
         run: npm run typecheck
       - name: Testar regras e exportacao XLSX
         run: npm run test:rules
+      - name: Testar motor puro do ranking com notas ficticias
+        run: npm run test:motor-ranking
+      - name: Testar leitura integral do ranking sob RLS com fixtures ficticias
+        run: npm run test:leitura-ranking
+      - name: Validar previa mensal de notas efetivas sem dados reais
+        run: npm run test:previa-ranking
+      - name: Verificar exportacoes PDF e XLSX da previa autenticada
+        run: npm run test:exportacao-previa
+      - name: Auditar prontidao sem atribuicao de posicoes
+        run: npm run test:diagnostico-prontidao
+      - name: Validar ferias e categorias historicas sob RLS
+        run: npm run test:rh-temporal
+      - name: Conciliar penalizacoes e notas de Seguranca
+        run: npm run test:conciliacao-seguranca
+      - name: Validar matriz de bloqueios de homologacao
+        run: npm run test:matriz-bloqueios
+      - name: Validar privacidade do sumario de homologacao
+        run: npm run test:sumario-homologacao
+      - name: Validar contrato de admissao e situacao RH com dados ficticios
+        run: npm run test:contrato-rh
+      - name: Verificar isolamento do deploy e da pilha Draft
+        run: npm run test:integracao-guardrails
+      - name: Verificar cliente Supabase server-only sem dados reais
+        if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
+        run: node scripts/testar-cliente-supabase-cloud.cjs
+      - name: Verificar base de sessao Supabase SSR
+        if: ${{ github.event.pull_request.head.ref == 'auth/supabase-ssr-47' }}
+        run: node scripts/testar-sessao-supabase-ssr.cjs
+      - name: Verificar login Supabase opt-in sem dados reais
+        if: ${{ github.event.pull_request.head.ref == 'auth/login-inicial-49' }}
+        run: node scripts/testar-login-supabase.cjs
+      - name: Verificar controle de rotas e isolamento do proxy
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
+        run: node scripts/testar-protecao-rotas.cjs
+      - name: Testar RLS de filiais em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'db/rls-filiais-53' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-rls-somente-teste-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/29_auth_uid_apenas_ci.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < supabase/migrations/20261106000100_rls_filiais_leitura.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/30_testar_rls_filiais.sql
+
+      - name: Testar autorizacao de administradores importadores
+        if: ${{ github.event.pull_request.head.ref == 'auth/admin-importacoes-55' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-admin-teste-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          for arquivo in \
+            db/homologacao/29_auth_uid_apenas_ci.sql \
+            supabase/migrations/20261106000100_rls_filiais_leitura.sql \
+            supabase/migrations/20261111000100_admin_importacoes_autorizacao.sql \
+            db/homologacao/40_testar_admin_importacoes.sql; do
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+              psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 < "$arquivo"
+          done
+
+      - name: Testar ajustes administrativos e auditoria em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'feat/ajuste-administrativo-notas-57' || github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' || github.event.pull_request.head.ref == 'test/http-api-ajustes-isolada-69' || github.event.pull_request.head.ref == 'test/sessao-http-ficticia-ajustes-71' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-ajustes-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          for arquivo in \
+            db/homologacao/29_auth_uid_apenas_ci.sql \
+            supabase/migrations/20261106000100_rls_filiais_leitura.sql \
+            supabase/migrations/20261111000100_admin_importacoes_autorizacao.sql \
+            supabase/migrations/20261111000200_ajustes_administrativos_notas.sql \
+            db/homologacao/41_testar_ajustes_notas.sql; do
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+              psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 < "$arquivo"
+          done
+
       - name: Compilar sistema
         run: npm run build
         env:
           NEXT_PUBLIC_DEPLOY_TARGET: github-pages
           NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
+      - name: Compilar rota Node de ajustes apenas no runner descartavel
+        if: ${{ github.event.pull_request.head.ref == 'feat/integracao-isolada-ajustes-67' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/app/api/ajustes-notas
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          trap 'rm -f src/app/api/ajustes-notas/route.ts; rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true' EXIT
+          npm run build
+          # Sem flags, sem Supabase e sem qualquer servidor externo.
+      - name: Testar API de ajustes via HTTP isolado no runner
+        if: ${{ github.event.pull_request.head.ref == 'test/http-api-ajustes-isolada-69' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/app/api/ajustes-notas
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          server_pid=""
+          cleanup() {
+            if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
+            rm -f src/app/api/ajustes-notas/route.ts
+            rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          npm run build
+          run_case() {
+            local mode="$1"
+            local flag="$2"
+            local modo_servidor="$3"
+            EXCELENCIA_AJUSTES_API_ENABLED="$flag" EXCELENCIA_AUTH_GUARD_ENABLED="$flag" \
+              ./node_modules/.bin/next "$modo_servidor" --hostname 127.0.0.1 --port 3199 > /tmp/ajustes-http-next.log 2>&1 &
+            server_pid=$!
+            local pronto=0
+            for i in $(seq 1 30); do
+              if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:3199/api/ajustes-notas; then pronto=1; break; fi
+              sleep 1
+            done
+            if [ "$pronto" != "1" ]; then cat /tmp/ajustes-http-next.log; return 1; fi
+            AJUSTES_HTTP_MODO="$mode" AJUSTES_HTTP_PORTA=3199 node scripts/testar-api-ajustes-http-isolada.cjs
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+            server_pid=""
+            # Garante que a segunda execução não reutilize a anterior.
+            for i in $(seq 1 15); do
+              if ! curl --silent --output /dev/null --max-time 1 http://127.0.0.1:3199/api/ajustes-notas; then break; fi
+              sleep 1
+            done
+          }
+          run_case desativado false start
+          run_case producao true start
+          # Next dev aceita Origin HTTP apenas no loopback; não é teste de produção HTTPS.
+          run_case ativado true dev
+      - name: Exercitar API com usuarios e RPC inteiramente ficticios (sem Auth/Cloud)
+        if: ${{ github.event.pull_request.head.ref == 'test/sessao-http-ficticia-ajustes-71' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          original=$(mktemp)
+          cp src/lib/supabase/sessao-servidor.ts "$original"
+          server_pid=""
+          cleanup() {
+            if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
+            cp "$original" src/lib/supabase/sessao-servidor.ts
+            rm -f "$original" src/app/api/ajustes-notas/route.ts
+            rmdir src/app/api/ajustes-notas src/app/api 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          mkdir -p src/app/api/ajustes-notas
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          cp scripts/fixtures/sessao-ajustes-ficticia.ts src/lib/supabase/sessao-servidor.ts
+          # API real e sessão artificial compiladas SOMENTE neste runner descartável.
+          npm run build
+          EXCELENCIA_AJUSTES_API_ENABLED=true EXCELENCIA_AUTH_GUARD_ENABLED=true \
+            ./node_modules/.bin/next dev --hostname 127.0.0.1 --port 3198 > /tmp/ajustes-http-fixture.log 2>&1 &
+          server_pid=$!
+          pronto=0
+          for i in $(seq 1 45); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:3198/api/ajustes-notas; then pronto=1; break; fi
+            sleep 1
+          done
+          if [ "$pronto" != "1" ]; then cat /tmp/ajustes-http-fixture.log; exit 1; fi
+          node scripts/testar-ajustes-http-sessao-ficticia.cjs
+          # Nunca deixar uma sessão simulada ou rota dinâmica nos arquivos da CI.
+      - name: Validar Auth, RLS, RPC e auditoria no Supabase local descartavel
+        if: ${{ github.event.pull_request.head.ref == 'test/supabase-local-e2e-73' }}
+        timeout-minutes: 22
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Proibido qualquer supabase link, db push, projeto Cloud ou segredo externo.
+          cleanup() {
+            ./node_modules/.bin/supabase stop --no-backup || true
+          }
+          trap cleanup EXIT
+          ./node_modules/.bin/supabase start
+          # Chaves geradas apenas pelo Supabase CLI local. Nunca imprimir os valores.
+          export SUPABASE_URL="http://127.0.0.1:54321"
+          eval "$(./node_modules/.bin/supabase status -o env | grep -E '^(ANON_KEY|SERVICE_ROLE_KEY)=')"
+          test -n "${ANON_KEY:-}"
+          test -n "${SERVICE_ROLE_KEY:-}"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          node scripts/testar-supabase-local-e2e.cjs
+      - name: Confirmar candidato de integração sem rotas públicas
+        if: ${{ github.event.pull_request.head.ref == 'integration/candidata-homologacao-101' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e src/app/api/ranking-efetivo/route.ts
+          test ! -e src/app/api/ajustes-notas/route.ts
+          test ! -e src/app/ranking-efetivo-live/page.tsx
+          npm run test:integracao-guardrails
+      - name: E2E HTTP Next e Supabase Auth/PostgREST/SQL locais (sem Cloud)
+        if: ${{ github.event.pull_request.head.ref == 'test/api-http-supabase-local-75' || github.event.pull_request.head.ref == 'feat/modal-api-homologacao-77' || github.event.pull_request.head.ref == 'feat/leitura-efetiva-ranking-80' || github.event.pull_request.head.ref == 'feat/previa-notas-efetivas-81' || github.event.pull_request.head.ref == 'feat/exportacao-previa-85' || github.event.pull_request.head.ref == 'feat/diagnostico-prontidao-87' || github.event.pull_request.head.ref == 'feat/ferias-historico-89' || github.event.pull_request.head.ref == 'feat/conciliacao-seguranca-91' || github.event.pull_request.head.ref == 'feat/matriz-bloqueios-93' || github.event.pull_request.head.ref == 'feat/sumario-homologacao-95' || github.event.pull_request.head.ref == 'integration/candidata-homologacao-101' }}
+        timeout-minutes: 24
+        shell: bash
+        run: |
+          set -euo pipefail
+          original=$(mktemp)
+          cp src/lib/supabase/sessao-servidor.ts "$original"
+          server_pid=""
+          cleanup() {
+            if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; fi
+            cp "$original" src/lib/supabase/sessao-servidor.ts
+            rm -f "$original" /tmp/e5-ajustes-e2e-fixture.json
+            rm -f src/app/api/ajustes-notas/route.ts src/app/api/ci-login/route.ts src/app/ajustes-notas-live/page.tsx src/app/api/ranking-efetivo/route.ts src/app/ranking-efetivo-live/page.tsx
+            rmdir src/app/api/ajustes-notas src/app/api/ci-login src/app/api/ranking-efetivo src/app/api src/app/ajustes-notas-live src/app/ranking-efetivo-live 2>/dev/null || true
+            ./node_modules/.bin/supabase stop --no-backup || true
+          }
+          trap cleanup EXIT
+          ./node_modules/.bin/supabase start
+          export SUPABASE_URL="http://127.0.0.1:54321"
+          eval "$(./node_modules/.bin/supabase status -o env | grep -E '^(ANON_KEY|SERVICE_ROLE_KEY)=')"
+          test -n "${ANON_KEY:-}"
+          test -n "${SERVICE_ROLE_KEY:-}"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          E5_E2E_SETUP_ONLY=true E5_E2E_FIXTURE_PATH=/tmp/e5-ajustes-e2e-fixture.json node scripts/testar-supabase-local-e2e.cjs
+          node scripts/fixtures/preparar-ssr-local-e2e.cjs
+          mkdir -p src/app/api/ajustes-notas src/app/api/ci-login
+          cp src/server/templates/ajustes-notas-route.ts src/app/api/ajustes-notas/route.ts
+          cp scripts/fixtures/ci-login-route.ts src/app/api/ci-login/route.ts
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
+            mkdir -p src/app/ajustes-notas-live
+            cp src/server/templates/ajustes-notas-live-page.tsx src/app/ajustes-notas-live/page.tsx
+          fi
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/exportacao-previa-85" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/diagnostico-prontidao-87" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/ferias-historico-89" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/conciliacao-seguranca-91" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/matriz-bloqueios-93" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/sumario-homologacao-95" ] || [ "${{ github.event.pull_request.head.ref }}" = "integration/candidata-homologacao-101" ]; then
+            mkdir -p src/app/api/ranking-efetivo src/app/ranking-efetivo-live
+            cp src/server/templates/ranking-efetivo-route.ts src/app/api/ranking-efetivo/route.ts
+            cp src/server/templates/ranking-efetivo-page.tsx src/app/ranking-efetivo-live/page.tsx
+          fi
+          # A chave local é legado JWT e só existe no ambiente de teste descartável.
+          export SUPABASE_PUBLISHABLE_KEY="$ANON_KEY"
+          export E5_E2E_LOCAL_ONLY=true
+          export EXCELENCIA_AUTH_GUARD_ENABLED=true
+          export EXCELENCIA_AJUSTES_API_ENABLED=true
+          export EXCELENCIA_RANKING_PREVIA_ENABLED=true
+          ./node_modules/.bin/next dev --hostname 127.0.0.1 --port 3197 > /tmp/e5-next-local.log 2>&1 &
+          server_pid=$!
+          pronto=0
+          for i in $(seq 1 50); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:3197/api/ajustes-notas; then pronto=1; break; fi
+            sleep 1
+          done
+          if [ "$pronto" != "1" ]; then tail -n 35 /tmp/e5-next-local.log; exit 1; fi
+          node scripts/testar-api-http-supabase-local-e2e.cjs
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/previa-notas-efetivas-81" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/ferias-historico-89" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/conciliacao-seguranca-91" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/matriz-bloqueios-93" ] || [ "${{ github.event.pull_request.head.ref }}" = "feat/sumario-homologacao-95" ] || [ "${{ github.event.pull_request.head.ref }}" = "integration/candidata-homologacao-101" ]; then
+            if ! E5_VERIFICAR_DIAGNOSTICO=true E5_VERIFICAR_RH_TEMPORAL=${{ github.event.pull_request.head.ref == 'feat/ferias-historico-89' || github.event.pull_request.head.ref == 'feat/conciliacao-seguranca-91' || github.event.pull_request.head.ref == 'feat/matriz-bloqueios-93' || github.event.pull_request.head.ref == 'feat/sumario-homologacao-95' || github.event.pull_request.head.ref == 'integration/candidata-homologacao-101' }} E5_VERIFICAR_SEGURANCA=${{ github.event.pull_request.head.ref == 'feat/conciliacao-seguranca-91' || github.event.pull_request.head.ref == 'feat/matriz-bloqueios-93' || github.event.pull_request.head.ref == 'feat/sumario-homologacao-95' || github.event.pull_request.head.ref == 'integration/candidata-homologacao-101' }} E5_VERIFICAR_MATRIZ=${{ github.event.pull_request.head.ref == 'feat/matriz-bloqueios-93' || github.event.pull_request.head.ref == 'feat/sumario-homologacao-95' || github.event.pull_request.head.ref == 'integration/candidata-homologacao-101' }} E5_VERIFICAR_SUMARIO=${{ github.event.pull_request.head.ref == 'feat/sumario-homologacao-95' || github.event.pull_request.head.ref == 'integration/candidata-homologacao-101' }} node scripts/testar-previa-ranking-http-local.cjs; then
+              echo "Diagnostico de compilacao da rota de previa no runner:"
+              tail -n 50 /tmp/e5-next-local.log
+              exit 1
+            fi
+          fi
+          if [ "${{ github.event.pull_request.head.ref }}" = "feat/modal-api-homologacao-77" ]; then
+            # Navegador executado aqui antes do trap que destrói o Supabase local.
+            npm install --no-save --no-audit --no-fund playwright@1.64.1
+            npx playwright install chromium
+            node scripts/testar-modal-api-browser-e2e.cjs
+          fi
       - name: Instalar navegador para regressao visual
         run: |
+          set -euo pipefail
+          # Falhas temporárias de DNS do mirror apt não devem ser confundidas com regressão do sistema.
           npm install --no-save --no-audit --no-fund playwright@1.64.1
-          npx playwright install --with-deps chromium
+          # Evita apt-get/--with-deps: mirrors Ubuntu estão indisponíveis no runner.
+          # O Chromium é obtido pelo instalador Playwright; dependências de sistema
+          # já disponíveis no runner são verificadas ao iniciar o navegador.
+          npx playwright install chromium
       - name: Verificar desktop e celular
         run: |
           node scripts/testar-ajustes-browser.cjs
@@ -50,3 +344,57 @@ jobs:
         with:
           name: ajustes-desktop-celular
           path: artifacts/
+
+      - name: Compilar com proxy de autenticacao no Next.js Node
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'rm -f src/proxy.ts' EXIT
+          cp src/server/proxy-autenticacao.ts src/proxy.ts
+          npm run build
+
+      - name: Validar homologacao Docker e Next.js servidor
+        # Executa contêineres efêmeros somente no runner do GitHub, sem acesso ao servidor do setor.
+        if: ${{ github.event.pull_request.head.ref == 'infra/homologacao-local-39' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml config --quiet
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --build --wait
+          for tentativa in $(seq 1 40); do
+            if curl --fail --silent --show-error --max-time 4 -I http://127.0.0.1:3107/ >/dev/null 2>&1; then
+              echo 'Smoke test Next.js via loopback: OK'
+              exit 0
+            fi
+            sleep 3
+          done
+          echo 'Falha no smoke test do Next.js'
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml ps
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml logs --tail=80 web
+          exit 1
+
+      - name: Testar schema PostgreSQL de homologacao
+        # Somente no PR da Issue 41, com banco descartavel do runner.
+        if: ${{ github.event.pull_request.head.ref == 'db/schema-homologacao-41' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml config --quiet
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          bash scripts/aplicar-schema-homologacao.sh
