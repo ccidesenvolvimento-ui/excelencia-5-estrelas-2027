@@ -129,4 +129,27 @@ BEGIN
     RAISE EXCEPTION 'Histórico sofreu mutação';
   EXCEPTION WHEN check_violation THEN NULL; END;
 END $$;
+-- Regressão: uma nota sem ajuste deve poder ser atualizada/excluída pelo
+-- proprietário autorizado; o trigger não pode devolver OLD em BEFORE UPDATE.
+-- Teste no papel proprietário, exclusivamente na transação descartável.
+INSERT INTO public.notas_mensais(id,colaborador_id,competencia,estrela,nota,origem)
+VALUES ('62000000-0000-4000-8000-000000000032',
+ '62000000-0000-4000-8000-000000000020','2027-10-01','jornada',55,'planilha');
+UPDATE public.notas_mensais SET nota=65
+WHERE id='62000000-0000-4000-8000-000000000032';
+DO $$
+BEGIN
+ IF (SELECT nota FROM public.notas_mensais
+     WHERE id='62000000-0000-4000-8000-000000000032') <> 65
+ THEN RAISE EXCEPTION 'UPDATE sem ajuste foi descartado pelo trigger'; END IF;
+END $$;
+DELETE FROM public.notas_mensais
+WHERE id='62000000-0000-4000-8000-000000000032';
+DO $$
+BEGIN
+ IF EXISTS (SELECT 1 FROM public.notas_mensais
+     WHERE id='62000000-0000-4000-8000-000000000032')
+ THEN RAISE EXCEPTION 'DELETE sem ajuste foi bloqueado pelo trigger'; END IF;
+END $$;
+
 ROLLBACK;

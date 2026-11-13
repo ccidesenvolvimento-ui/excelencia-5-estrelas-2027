@@ -41,6 +41,9 @@ BEGIN
     RAISE EXCEPTION 'Nota com ajuste administrativo: reimportação exige resolução explícita'
       USING ERRCODE = '23514';
   END IF;
+  -- BEFORE UPDATE deve devolver NEW para não descartar silenciosamente mudanças permitidas.
+  -- BEFORE DELETE precisa devolver OLD para permitir exclusão de notas sem ajuste.
+  IF TG_OP = 'UPDATE' THEN RETURN NEW; END IF;
   RETURN OLD;
 END;
 $$;
