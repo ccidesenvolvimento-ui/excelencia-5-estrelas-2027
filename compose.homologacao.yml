@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "127.0.0.1:${WEB_PORT:-3107}:3000"
+      - "127.0.0.1:${WEB_PORT:?Configure WEB_PORT explicitamente em .env.homologacao}:3000"
     environment:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"

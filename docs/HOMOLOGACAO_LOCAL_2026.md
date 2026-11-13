@@ -26,7 +26,7 @@ docker stats --no-stream
 ss -lnt
 ```
 
-O arquivo `compose.homologacao.yml` reserva no máximo 768 MiB para a aplicação e 512 MiB para um PostgreSQL exclusivo, **sem garantia de desempenho sob carga**. Banco e aplicação usam uma rede Compose própria; o banco não publica portas no host. A web publica apenas no loopback `127.0.0.1`, porta 3107 por padrão. Não mapear a interface a `0.0.0.0` para testes administrativos sem autenticação.
+O arquivo `compose.homologacao.yml` reserva no máximo 768 MiB para a aplicação e 512 MiB para um PostgreSQL exclusivo, **sem garantia de desempenho sob carga**. Banco e aplicação usam uma rede Compose própria; o banco não publica portas no host. A web publica apenas no loopback `127.0.0.1`, uma porta WEB_PORT de escolha explícita; nunca presumir que a porta corporativa 3107 está disponível. Não mapear a interface a `0.0.0.0` para testes administrativos sem autenticação.
 
 ## Pré-requisitos
 
@@ -41,11 +41,14 @@ O arquivo `compose.homologacao.yml` reserva no máximo 768 MiB para a aplicaçã
 git clone <URL_PRIVADA_AUTORIZADA_DO_REPOSITORIO>
 cd excelencia-5-estrelas-2027
 cp .env.homologacao.example .env.homologacao
+# Escolher WEB_PORT livre e autorizada (exemplo 3117); NUNCA reutilizar 3107 sem aprovação.
 # Substituir DB_PASSWORD por senha longa aleatória; restringir leitura: chmod 600 .env.homologacao
 docker compose --env-file .env.homologacao -f compose.homologacao.yml config
 docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --build
-curl -I http://127.0.0.1:3107/
+curl -I http://127.0.0.1:3117/ # Ajustar para a WEB_PORT aprovada
 ```
+
+Antes de executar, conferir com `ss -lnt` que a porta WEB_PORT escolhida está livre. Se WEB_PORT estiver ausente, o Compose deve falhar antes de iniciar serviços. Os exemplos de CI usam 3107 apenas em runner descartável, nunca no servidor da empresa.
 
 O arquivo `.env.homologacao` **não pode ser commitado**, enviado ao chat ou anexado a uma Issue. É necessário validar backup, permissões e resolução de imagens no ambiente interno. Para parar:
 
