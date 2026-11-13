@@ -26,18 +26,19 @@ A exportação SQL não inclui automaticamente arquivos reais do Supabase Storag
    supabase login
    supabase link --project-ref upehxsdwpxqgzkrihgvz
    ```
-5. Dentro do diretório de backup seguro, com a CLI devidamente vinculada ao projeto, produzir **roles, schema e data** como três arquivos separados, conforme a [documentação oficial](https://supabase.com/docs/guides/self-hosting/restore-from-platform):
+5. A partir do **diretório do projeto CLI vinculado**, gravando a saída **fora do repositório** em uma pasta segura indicada por \`BACKUP_DIR\`, produzir **roles, schema e data** como três arquivos separados, conforme a [documentação oficial](https://supabase.com/docs/guides/self-hosting/restore-from-platform):
    ```bash
-   supabase db dump --role-only -f roles.sql
-   supabase db dump -f schema.sql
-   supabase db dump --data-only --use-copy -f data.sql
+   # Definir BACKUP_DIR com o caminho absoluto da pasta corporativa segura
+   test -d "$BACKUP_DIR" && test -w "$BACKUP_DIR" || exit 1
+   supabase db dump --role-only -f "$BACKUP_DIR/roles.sql"
+   supabase db dump -f "$BACKUP_DIR/schema.sql"
+   supabase db dump --data-only --use-copy -f "$BACKUP_DIR/data.sql"
    ```
    **Atenção:** comandos acima pressupõem o diretório de trabalho do projeto corretamente vinculado à CLI e as flags confirmadas com `--help`. A CLI pode precisar de Docker. Nunca compartilhar os arquivos com o ChatGPT.
 6. Validar cada retorno de comando (código de saída zero), presença e tamanho não nulo dos três arquivos:
    ```bash
-   test -s roles.sql && test -s schema.sql && test -s data.sql
-   sha256sum roles.sql schema.sql data.sql > hashes.sha256
-   sha256sum -c hashes.sha256
+   test -s "$BACKUP_DIR/roles.sql" && test -s "$BACKUP_DIR/schema.sql" && test -s "$BACKUP_DIR/data.sql"
+   ( cd "$BACKUP_DIR" && sha256sum roles.sql schema.sql data.sql > hashes.sha256 && sha256sum -c hashes.sha256 )
    ```
    Guardar as hashes e o relatório **sem** conteúdo dos arquivos. Um checksum só confirma integridade do arquivo, não restauração válida.
 7. Criptografar e guardar conforme política corporativa de segurança, restringindo acesso e definindo responsável/validade/retenção. Evitar cópia de dados corporativos para dispositivos pessoais ou backup não autorizado.
