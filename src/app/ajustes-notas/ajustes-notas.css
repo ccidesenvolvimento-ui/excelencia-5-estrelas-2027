@@ -1,0 +1,52 @@
+.ajustes-admin{display:flex;flex-direction:column;gap:18px}
+.ajustes-filtros{display:grid;grid-template-columns:1.5fr repeat(3,minmax(130px,1fr));gap:12px;margin-bottom:14px}
+.ajustes-filtros .campo{min-width:0}
+.ajustes-filtros input,.ajustes-filtros select{width:100%}
+.ajustes-tabela{min-width:860px}
+.ajustes-tabela td small{display:block;margin-top:4px;color:#9cbfd4;font-size:11px}
+.ajustes-tabela .botao{font-size:12px;min-height:35px;padding:6px 11px}
+.ajustes-selecionado{background:#16476580}
+.ajustes-colunas{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.ajustes-identificacao{margin-bottom:17px}
+.ajustes-identificacao span{display:block;color:#a7c6d8;font-size:12px;margin-top:5px}
+.ajustes-valores{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.ajustes-valores>div{padding:16px;background:#0b2940;border:1px solid #315875;border-radius:10px}
+.ajustes-valores small{display:block;color:#a1c1d7;margin-bottom:6px}
+.ajustes-valores strong{font-size:29px;color:#f2fcff}
+.ajustes-admin .campo{margin:0 0 14px}
+.ajustes-admin .campo input,.ajustes-admin .campo select,.ajustes-admin .campo textarea{width:100%;padding:10px 12px}
+.ajustes-admin .campo textarea{min-height:115px;resize:vertical}
+.ajustes-erro{color:#ffd7ad;font-size:12px;margin:10px 0}
+.ajustes-alerta{background:#102f46;border:1px solid #355e79;border-radius:9px;padding:14px;margin-bottom:13px;color:#bed6e4;font-size:13px;line-height:1.5}
+.ajustes-alerta strong{color:#e9f8ff}.ajustes-alerta p{margin:6px 0 0}
+.ajustes-evento{border-left:3px solid #65d2ff;padding:13px 16px;background:#12344a;border-radius:6px;margin:14px 0}
+.ajustes-evento p{margin:8px 0;font-size:13px}.ajustes-evento small{color:#9ebbd1}
+.ajustes-overlay{position:fixed;inset:0;z-index:100;background:#03111bda;display:flex;align-items:center;justify-content:center;padding:16px}
+.ajustes-dialogo{background:#102b42;border:1px solid #4f89ab;border-radius:14px;padding:26px;width:min(560px,100%);color:#e8f7ff;box-shadow:0 26px 90px #0007}
+.ajustes-dialogo h2{font-size:22px;margin-bottom:10px}.ajustes-dialogo p{line-height:1.6}
+.ajustes-acoes{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:18px}
+@media(max-width:980px){.ajustes-filtros{grid-template-columns:repeat(2,minmax(0,1fr))}.ajustes-colunas{grid-template-columns:1fr}}
+@media(max-width:570px){.ajustes-filtros{grid-template-columns:1fr}.ajustes-acoes button{width:100%}}
+
+/* Modal editorial centralizado: conserva contexto da tabela ao fundo */
+.ajustes-overlay-embaçado{z-index:120;background:rgba(3,12,25,.72);backdrop-filter:blur(9px) saturate(.8);-webkit-backdrop-filter:blur(9px);animation:ajuste-sombra .2s ease-out}
+.ajustes-editor{width:min(650px,100%);max-height:min(90dvh,860px);overflow-y:auto;overscroll-behavior:contain;box-shadow:0 30px 110px rgba(0,0,0,.75);animation:ajuste-entrada .24s cubic-bezier(.2,.8,.2,1)}
+.ajustes-modal-cabecalho{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:18px}
+.ajustes-modal-cabecalho h2{margin:7px 0 5px}
+.ajustes-modal-cabecalho p{margin:0;color:#aac6d8;font-size:12px}
+.ajustes-modal-fechar{flex:0 0 40px;height:40px;border:1px solid #4a7c9b;border-radius:10px;background:#173e58;color:#e9f9ff;font-size:25px;line-height:1;transition:background .2s,transform .2s}
+.ajustes-modal-fechar:hover{background:#235c7d;transform:rotate(6deg)}
+.ajustes-modal-fechar:focus-visible{outline:2px solid #80dcff;outline-offset:3px}
+.ajustes-resumo-confirmacao{border:1px solid #376581;background:#0d314a;padding:16px;border-radius:11px;margin-bottom:12px}
+.ajustes-resumo-confirmacao p{margin:5px 0 11px}
+.ajustes-editor .ajustes-acoes{position:sticky;bottom:-26px;background:linear-gradient(to bottom,rgba(16,43,66,.96),#102b42);padding:15px 0 4px}
+@keyframes ajuste-entrada{from{opacity:0;transform:translateY(16px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes ajuste-sombra{from{opacity:0}to{opacity:1}}
+/* Ícone único e realce alinhado à linguagem luminosa das outras áreas */
+.menu a.menu-ajustes-notas{position:relative;transition:background .2s,border-color .2s,color .2s,box-shadow .2s,transform .2s}
+.menu a.menu-ajustes-notas:hover{background:linear-gradient(90deg,#164766,#174b70);box-shadow:inset 0 0 0 1px #3e8ab050,0 5px 18px #28a9d51a;transform:translateX(2px)}
+.menu a.menu-ajustes-notas:hover .menu-icone{filter:drop-shadow(0 0 7px #5bd4ff);transform:scale(1.07)}
+.menu a.menu-ajustes-notas .menu-icone{transition:transform .2s,filter .2s}
+.menu a.menu-ajustes-notas.ativo{background:linear-gradient(90deg,#0d5b98,#0e3b60);box-shadow:inset 0 0 0 1px #65d0ff22,0 0 18px #228dbe24}
+@media(max-width:570px){.ajustes-overlay-embaçado{padding:10px}.ajustes-editor{padding:18px;max-height:94dvh}.ajustes-editor .ajustes-acoes{bottom:-18px}}
+@media(prefers-reduced-motion:reduce){.ajustes-overlay-embaçado,.ajustes-editor{animation:none}.menu a.menu-ajustes-notas,.menu a.menu-ajustes-notas .menu-icone{transition:none}}

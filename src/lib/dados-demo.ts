@@ -1,20 +1,8 @@
-import type { FonteDirigibilidade } from "./fontes-dirigibilidade";
+import { categorias,estrelas,pesos,rotulos,meses,mesesPeriodo,avaliarComNotas,classificarComNotas } from "./calculo-ranking";
+import type { Pessoa,Notas,Periodo,Avaliacao } from "./calculo-ranking";
+export { categorias,estrelas,pesos,rotulos,rotuloEstrela,meses,periodos,mesesPeriodo,compararRanking,formatarNota } from "./calculo-ranking";
+export type { Categoria,Estrela,Pessoa,Notas,Periodo,Avaliacao } from "./calculo-ranking";
 /** Dados completamente fictícios. PROIBIDO usá-los para premiação ou decisões de RH. */
-export const categorias = [
-  "Florestal", "Sucro", "Mineração", "Bebidas",
-  "Rodoviário – Cavalo Mecânico", "Motoristas de Truck/Toco",
-  "E-commerce", "Operadores de Máquinas e Tratores",
-] as const;
-export type Categoria = (typeof categorias)[number];
-export const estrelas = ["seguranca", "produtividade", "dirigibilidade", "jornada", "treinamentos"] as const;
-export type Estrela = (typeof estrelas)[number];
-export const pesos: Record<Estrela,number> = { seguranca: .3, produtividade: .25, dirigibilidade: .2, jornada: .15, treinamentos: .1 };
-export const rotulos:Record<Estrela,string> = {seguranca:"Segurança",produtividade:"Produtividade",dirigibilidade:"Dirigibilidade",jornada:"Jornada",treinamentos:"Treinamentos"};
-export function rotuloEstrela(e:Estrela,categoria:Categoria|null):string {
- if(categoria==="Operadores de Máquinas e Tratores") {if(e==="dirigibilidade")return "Eficiência Operacional";if(e==="jornada")return "Conservação/Operação";}
- return rotulos[e];
-}
-export type Pessoa = { id:string; nome:string; matricula:string; empresa:string; filial:string; categoria:Categoria|null; funcao:string; situacao:"Ativo"|"Férias"|"Desligado"; tipo:"Motorista"|"Operador"; dataAdmissao?:string|null };
 export const pessoas:Pessoa[] = [
 ["m001","Ana Ribeiro","F001","E01","Lavras",0,"Motorista","Ativo","Motorista"],
 ["m002","Bruno Lima","F002","E01","Lavras",0,"Motorista","Ativo","Motorista"],
@@ -62,8 +50,6 @@ export const pessoas:Pessoa[] = [
  // Em produção, a data oficial deverá ser importada da RH0034.
  dataAdmissao: `${2004 + (Number(String(id).slice(1)) * 7) % 20}-${String(1 + Number(String(id).slice(1)) % 12).padStart(2,"0")}-15`
 }));
-export type Notas = Partial<Record<Estrela,number>>;
-export const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 /** Modelo determinístico para demonstração: NÃO simula importação RH0034 real. */
 export function notasDe(p:Pessoa,mes:number):Notas {
  if(!p.categoria || (p.categoria==="Sucro"&&(mes<2||mes>10))) return {};
@@ -85,56 +71,10 @@ export function notasDe(p:Pessoa,mes:number):Notas {
  }
  return notas;
 }
-export type Periodo="mensal"|"ciclo1"|"ciclo2"|"ciclo3"|"anual";
-export const periodos:{id:Periodo;nome:string}[]=[
- {id:"mensal",nome:"Mensal"},{id:"ciclo1",nome:"Ciclo 1"},{id:"ciclo2",nome:"Ciclo 2"},{id:"ciclo3",nome:"Ciclo 3"},{id:"anual",nome:"Anual"}
-];
-export function mesesPeriodo(categoria:Categoria,periodo:Periodo,mes:number):number[]{
- if(periodo==="mensal")return [mes];
- if(periodo==="anual")return categoria==="Sucro"?[2,3,4,5,6,7,8,9,10]:Array.from({length:12},(_,i)=>i);
- const idx=Number(periodo.slice(-1))-1;
- return categoria==="Sucro"?Array.from({length:3},(_,i)=>2+idx*3+i):Array.from({length:4},(_,i)=>idx*4+i);
+export function avaliarPessoa(pessoa:Pessoa,periodo:Periodo,mes=0):Avaliacao {
+ return avaliarComNotas(pessoa,periodo,mes,notasDe);
 }
-export type Avaliacao={pessoa:Pessoa;fonteDirigibilidade?:FonteDirigibilidade|null;notas:Notas;score:number|null;status:"Elegível"|"Inelegível"|"Pendente";posicao:number|null;faltantes:string[];mensais:(number|null)[]};
-export function avaliarPessoa(pessoa:Pessoa,periodo:Periodo,mes=0):Avaliacao{
- const indices=pessoa.categoria?mesesPeriodo(pessoa.categoria,periodo,mes):[];
- const amostras=indices.map(i=>notasDe(pessoa,i));
- const faltantes=[...new Set(amostras.flatMap((n,i)=>estrelas.filter(e=>n[e]===undefined).map(e=>`${meses[indices[i]]}: ${rotulos[e]}`)))];
- const inseguro=amostras.some(n=>estrelas.some(e=>n[e]===0));
- const mensais=amostras.map(n=>estrelas.some(e=>n[e]===undefined)?null:Math.round(estrelas.reduce((s,e)=>s+(n[e]??0)*pesos[e],0)*100)/100);
- const score=mensais.some(s=>s===null)?null:Math.round(mensais.reduce<number>((s,v)=>s+(v??0),0)/mensais.length*100)/100;
- const notas:Object=Object.fromEntries(estrelas.map(e=>[e,amostras.every(n=>n[e]!==undefined)?Math.round(amostras.reduce((s,n)=>s+(n[e]??0),0)/amostras.length*100)/100:undefined]));
- return {pessoa,notas:notas as Notas,score,status:faltantes.length?"Pendente":inseguro?"Inelegível":"Elegível",posicao:null,faltantes,mensais};
+/** Posições por segmento calculadas antes de filtros, usando somente dados fictícios. */
+export function ranking(periodo:Periodo,mes:number):Avaliacao[] {
+ return classificarComNotas(pessoas,periodo,mes,notasDe);
 }
-/** Prioridade oficial: score > admissão mais antiga > chave estável. */
-export function compararRanking(a:Avaliacao,b:Avaliacao,scoreCrescente=false):number {
-  const scoreA=a.score??-1;
-  const scoreB=b.score??-1;
-  const diferenca=scoreCrescente?scoreA-scoreB:scoreB-scoreA;
-  if(diferenca!==0)return diferenca;
-
-  // Datas ISO AAAA-MM-DD podem ser comparadas lexicalmente.
-  const dataA=a.pessoa.dataAdmissao??null;
-  const dataB=b.pessoa.dataAdmissao??null;
-
-  if(dataA&&dataB&&dataA!==dataB)return dataA.localeCompare(dataB);
-  if(dataA&&!dataB)return -1;
-  if(!dataA&&dataB)return 1;
-
-  // Se ambos tiverem a mesma admissão, desempate apenas técnico.
-  return a.pessoa.empresa.localeCompare(b.pessoa.empresa,"pt-BR")
-    || a.pessoa.matricula.localeCompare(b.pessoa.matricula,"pt-BR",{numeric:true})
-    || a.pessoa.id.localeCompare(b.pessoa.id,"pt-BR",{numeric:true});
-}
-/** Posições são calculadas por segmento ANTES de aplicar filtros de filial. */
-export function ranking(periodo:Periodo,mes:number):Avaliacao[]{
- const registros=pessoas.filter(p=>p.categoria!==null&&p.situacao!=="Desligado"&&!(periodo==="mensal"&&p.categoria==="Sucro"&&(mes<2||mes>10))).map(p=>avaliarPessoa(p,periodo,mes));
- const resultado:Avaliacao[]=[];
- for(const categoria of categorias){
-   const setor=registros.filter(r=>r.pessoa.categoria===categoria).sort(compararRanking);
-   let pos=0;
-   for(const r of setor){if(r.status==="Elegível")r.posicao=++pos; resultado.push(r);}
- }
- return resultado;
-}
-export const formatarNota=(v:number|null|undefined)=>v===null||v===undefined?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});

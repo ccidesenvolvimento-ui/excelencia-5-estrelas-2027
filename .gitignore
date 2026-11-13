@@ -12,3 +12,9 @@ supabase/.branches/
 # Exportação estática e evidências locais de navegador
 out/
 artifacts/
+
+# Segredos de infraestrutura de homologação
+.env.homologacao
+
+# Proxy gerado somente no build Docker/Node do Next.js 16
+src/proxy.ts

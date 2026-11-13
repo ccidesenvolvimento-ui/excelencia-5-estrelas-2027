@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 /** Ícones vetoriais com traço uniforme, sem fontes externas ou dependências. */
 export type NomeIconeSistema =
   | "visao" | "painel" | "ranking" | "pendencias" | "importacoes"
-  | "rh" | "relatorios" | "usuarios" | "configuracoes" | "diagnostico"
+  | "rh" | "relatorios" | "usuarios" | "configuracoes" | "diagnostico" | "ajustes-notas"
   | "painel-fechar" | "painel-abrir" | "menu" | "fechar" | "seta" | "estrela";
 
 const desenhos: Record<NomeIconeSistema, ReactNode> = {
@@ -16,6 +16,7 @@ const desenhos: Record<NomeIconeSistema, ReactNode> = {
   relatorios: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/><path d="M8 17v-3M11 17v-5M14 17v-2M17 17v-6"/></>,
   usuarios: <><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 11l2 2 3-4M17 3.5a4 4 0 0 1 3 3"/></>,
   configuracoes: <><path d="M10.4 2.4h3.2l.5 2.1 1.6.7 2-.9 2.3 2.3-.9 2 .7 1.6 2.1.5v3.2l-2.1.5-.7 1.6.9 2-2.3 2.3-2-.9-1.6.7-.5 2.1h-3.2l-.5-2.1-1.6-.7-2 .9-2.3-2.3.9-2-.7-1.6-2.1-.5v-3.2l2.1-.5.7-1.6-.9-2 2.3-2.3 2 .9 1.6-.7z"/><circle cx="12" cy="12" r="3"/></>,
+  "ajustes-notas": <><path d="M4 4h10v16H4zM7 9h4M7 13h4M7 17h3"/><path d="m14 16 6-6 2 2-6 6-3 1 1-3zM18.5 11.5l2 2"/></>,
   diagnostico: <><path d="M8 7 6.5 4M16 7l1.5-3M5 10 2 8M19 10l3-2M5 16l-3 2M19 16l3 2"/><rect x="6" y="7" width="12" height="14" rx="5"/><path d="M6 13h12M12 13v8M9 3h6"/></>,
   "painel-fechar": <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M16 9l-3 3 3 3"/></>,
   "painel-abrir": <><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18m4-12 3 3-3 3"/></>,

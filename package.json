@@ -11,12 +11,26 @@
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
-    "test:rules": "node scripts/testar-regras.cjs && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs",
+    "test:rules": "node scripts/testar-regras.cjs && npm run test:motor-ranking && node scripts/testar-interface-v06.cjs && node scripts/testar-exportacao-pendencias-xlsx.cjs && node scripts/testar-portal-motorista.cjs && node scripts/testar-pendencias-v09.cjs && node scripts/testar-visao-geral.cjs && npm run test:contratos-ajustes && npm run test:api-ajustes-isolada && npm run test:ajustes-opt-in && npm run test:leitura-ranking && npm run test:previa-ranking && npm run test:exportacao-previa && npm run test:diagnostico-prontidao && npm run test:rh-temporal && npm run test:conciliacao-seguranca && npm run test:matriz-bloqueios && npm run test:sumario-homologacao && npm run test:contrato-rh && npm run test:integracao-guardrails",
     "test:ui": "node scripts/testar-interface-v06.cjs",
     "test:xlsx": "node scripts/testar-exportacao-pendencias-xlsx.cjs",
     "test:portal": "node scripts/testar-portal-motorista.cjs",
     "test:entrada": "node scripts/testar-entrada-browser.cjs",
-    "test:cinema": "node scripts/testar-cinema-browser.cjs"
+    "test:cinema": "node scripts/testar-cinema-browser.cjs",
+    "test:contratos-ajustes": "node scripts/testar-contratos-ajustes-isolados.cjs",
+    "test:api-ajustes-isolada": "node scripts/testar-api-ajustes-config.cjs",
+    "test:ajustes-opt-in": "node scripts/testar-conexao-ajustes-opt-in.cjs",
+    "test:motor-ranking": "node scripts/testar-motor-ranking.cjs",
+    "test:leitura-ranking": "node scripts/testar-leitura-ranking-efetivo.cjs",
+    "test:previa-ranking": "node scripts/testar-previa-ranking-efetivo.cjs",
+    "test:exportacao-previa": "node scripts/testar-exportacao-previa.cjs",
+    "test:diagnostico-prontidao": "node scripts/testar-diagnostico-prontidao.cjs",
+    "test:rh-temporal": "node scripts/testar-rh-temporal.cjs",
+    "test:conciliacao-seguranca": "node scripts/testar-conciliacao-seguranca.cjs",
+    "test:matriz-bloqueios": "node scripts/testar-matriz-bloqueios.cjs",
+    "test:sumario-homologacao": "node scripts/testar-sumario-homologacao.cjs",
+    "test:contrato-rh": "node scripts/testar-contrato-rh-homologacao.cjs",
+    "test:integracao-guardrails": "node scripts/testar-guardrails-integracao.cjs"
   },
   "dependencies": {
     "next": "16.4.3",
@@ -25,7 +39,8 @@
     "@supabase/supabase-js": "2.118.0",
     "@supabase/ssr": "0.12.7",
     "jszip": "^3.10.2",
-    "exceljs": "4.4.0"
+    "exceljs": "4.4.0",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "typescript": "^5.9.0",
