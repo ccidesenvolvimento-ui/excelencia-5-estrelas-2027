@@ -46,7 +46,7 @@ teste("Classificação oficial permanece indisponível na prévia",()=>{
 teste("Compose de homologação exige WEB_PORT explícita e não usa 3107 por padrão",()=>{
  const compose=ler("compose.homologacao.yml");
  const exemplo=ler(".env.homologacao.example");
- assert.match(compose,/127\\.0\\.0\\.1:\\$\\{WEB_PORT:\?/);
+ assert.ok(compose.includes('127.0.0.1:${WEB_PORT:?'),"Compose deve exigir WEB_PORT explícita");
  assert.ok(!compose.includes("WEB_PORT:-3107"),"Porta corporativa não pode ser o default");
  assert.ok(!/^WEB_PORT=3107$/m.test(exemplo),"Exemplo não deve sugerir porta corporativa");
  assert.match(exemplo,/^WEB_PORT=3117$/m);
