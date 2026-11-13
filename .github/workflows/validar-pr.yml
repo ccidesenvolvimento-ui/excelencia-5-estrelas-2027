@@ -62,6 +62,8 @@ jobs:
         run: npm run test:gate-liberacao
       - name: Verificar plano pre-merge sem autorizacao automatica
         run: node scripts/testar-plano-integracao.cjs
+      - name: Testar instalacao opt-in da tela Node de ajustes
+        run: node scripts/testar-preparar-ajustes-node.cjs
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
