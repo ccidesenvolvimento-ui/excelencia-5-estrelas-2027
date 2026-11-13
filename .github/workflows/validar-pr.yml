@@ -11,6 +11,7 @@ on:
       - "feat/**"
       - "integration/**"
       - "fix/**"
+      - "docs/**"
 
 permissions:
   contents: read
