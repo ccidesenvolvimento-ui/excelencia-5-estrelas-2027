@@ -141,6 +141,7 @@ export function FormularioLoginSupabase() {
       <input id="senha-corporativa" type="password" placeholder="Sua senha corporativa" autoComplete="current-password" required value={senha} onChange={e => setSenha(e.target.value)} />
       <button type="submit" disabled={ocupado} className={styles.loginButton}>{ocupado ? "Validando..." : "Entrar (teste)"} <SetaEntrada /></button>
     </form>
+    <p className={styles.loginNotice}><a href="/recuperar-senha">Esqueci minha senha</a></p>
     <p id="aviso-login" className={styles.loginNotice}>Acesso temporário para contas previamente criadas pela equipe. Ainda não é possível consultar dados reais.</p>
     <p className={styles.loginNotice} role="status" aria-live="polite">{mensagem}</p>
   </>;

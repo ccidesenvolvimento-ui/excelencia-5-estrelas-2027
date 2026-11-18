@@ -10,7 +10,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const rotasPublicas = new Set(["/", "/login", "/motorista"]);
+const rotasPublicas = new Set([
+  "/", "/login", "/motorista", "/recuperar-senha", "/definir-senha", "/auth/confirm",
+]);
 const recursosPublicos = new Set([
   "/favicon.ico", "/favicon.png", "/apple-touch-icon.png",
   "/robots.txt", "/sitemap.xml", "/manifest.webmanifest",
