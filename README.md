@@ -1,8 +1,22 @@
 # Programa Excelência 5 Estrelas 2027
 
-**Versão 0.9 — Central de Pendências redesenhada e fonte da Dirigibilidade prevista na planilha de importação, para testes.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
+**Registro histórico da versão demonstrativa 0.9 — Central de Pendências e fonte da Dirigibilidade na planilha de importação.** Projeto Next.js 16 / React 19 / TypeScript, visualização de regras com dados inteiramente **fictícios**.
 
-## O que funciona nesta versão
+## Visão atual do projeto
+
+O **Programa Excelência 5 Estrelas 2027** é uma aplicação para acompanhamento e classificação de motoristas em cinco pilares: **Segurança, Produtividade, Dirigibilidade, Jornada e Treinamentos**. A proposta reúne importação de dados, acompanhamento de pendências, ranking mensal/por ciclos/anual e relatórios para apoiar a gestão operacional.
+
+**Estado dos dados:** a demonstração e os testes descritos neste repositório utilizam dados fictícios. O projeto evoluiu além da maquete visual inicial, incluindo trabalho posterior em regras, infraestrutura, integração com Supabase/PostgreSQL, migração de esquema e homologação em ambiente separado. **Isso não significa que o sistema esteja liberado para operar com dados reais ou em produção.** Autenticação, políticas RLS, permissões, importações e relatórios devem ser validados no ambiente de destino antes de qualquer utilização corporativa.
+
+**Tecnologias:** Next.js 16, React 19, TypeScript, Supabase/PostgreSQL, ExcelJS e ferramentas de teste e automação.
+
+> **Leitura importante:** as seções abaixo registram o estado e as decisões de **versões demonstrativas anteriores (v0.6–v0.9)**. As afirmações de que a migração ainda não foi aplicada, de que determinadas funções não existem e de que tudo é apenas uma maquete são **históricas**, não uma auditoria atual do código ou dos ambientes de homologação. Consulte também os arquivos em `docs/`, as migrações em `supabase/` e o histórico de Pull Requests para a evolução posterior.
+
+> **Segurança e propriedade:** não utilizar planilhas reais, informações de colaboradores ou credenciais em demonstrações públicas. A publicação e divulgação de detalhes operacionais dependem de autorização da organização.
+
+---
+
+## Histórico: o que funcionava na versão demonstrativa v0.9
 
 - Visão Geral com filtros e gráficos fictícios; sidebar flutuante/fixa com ícones modernos e rolagem discreta.
 - Menu consolidado: Visão Geral, Ranking, Pendências, Importações, RH0034, Configurações e Testes.
@@ -17,7 +31,7 @@
 - Compilação para **GitHub Pages** com workflow `.github/workflows/github-pages.yml`.
 - Migração **inicial, ainda não aplicada**, de Supabase/PostgreSQL com RLS fechado por padrão.
 
-## O que NÃO funciona (não utilizar dados reais)
+## Histórico: limitações da versão demonstrativa v0.9 (não utilizar dados reais)
 
 - Importação/leitura/validação completa de Excel e RH0034.
 - Login, usuários reais, acesso por filial, controle de segurança/RLS do aplicativo.
