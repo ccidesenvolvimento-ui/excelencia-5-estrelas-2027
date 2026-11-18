@@ -1,0 +1,41 @@
+name: excelencia-auth-lab
+
+services:
+  web:
+    image: excelencia-auth-lab:local
+    build:
+      context: .
+      dockerfile: Dockerfile.auth-lab
+    container_name: excelencia-auth-lab-web
+    restart: "no"
+
+    ports:
+      - "127.0.0.1:3118:3000"
+
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_SUPABASE_LOGIN_ENABLED: "false"
+      EXCELENCIA_AUTH_GUARD_ENABLED: "true"
+
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 128
+
+    security_opt:
+      - no-new-privileges:true
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+
+    cap_drop:
+      - ALL
+
+    networks:
+      - auth_isolada
+
+networks:
+  auth_isolada:
+    driver: bridge

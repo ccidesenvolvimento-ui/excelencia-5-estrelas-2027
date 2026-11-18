@@ -11,11 +11,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const rotasPublicas = new Set([
-  "/", "/login", "/motorista", "/recuperar-senha", "/definir-senha", "/auth/confirm",
+  "/", "/login", "/recuperar-senha", "/definir-senha", "/auth/confirm",
 ]);
 const recursosPublicos = new Set([
   "/favicon.ico", "/favicon.png", "/apple-touch-icon.png",
   "/robots.txt", "/sitemap.xml", "/manifest.webmanifest",
+  "/marca-programa.png", "/estrela-oficial-5-estrelas.png",
 ]);
 
 function publica(pathname: string) {
@@ -23,14 +24,12 @@ function publica(pathname: string) {
   // Endpoints de API sempre passam pela verificação de identidade.
   if (caminho === "/api" || caminho.startsWith("/api/")) return false;
   return rotasPublicas.has(caminho) ||
-    caminho.startsWith("/motorista/") ||
     caminho.startsWith("/_next/") ||
-    recursosPublicos.has(caminho) ||
-    /\.(?:png|jpe?g|webp|gif|ico|svg|woff2?|ttf|css|js|map|txt)$/i.test(caminho);
+    recursosPublicos.has(caminho);
 }
 
 function naoAutorizado(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/api/")) {
+  if (request.nextUrl.pathname === "/api" || request.nextUrl.pathname.startsWith("/api/")) {
     return NextResponse.json({ erro: "Autenticação necessária." }, { status: 401 });
   }
   const url = request.nextUrl.clone();
