@@ -17,6 +17,7 @@ services:
       NEXT_TELEMETRY_DISABLED: "1"
       NEXT_PUBLIC_SUPABASE_LOGIN_ENABLED: "false"
       EXCELENCIA_AUTH_GUARD_ENABLED: "true"
+      EXCELENCIA_AUTH_DIAGNOSTICO_ENABLED: "true"
 
     mem_limit: 512m
     cpus: 0.5
