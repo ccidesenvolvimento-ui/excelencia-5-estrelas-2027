@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+artifacts
+.git
+.github
+.env
+.env.*
+!.env.homologacao.example
+*.log
+*.tsbuildinfo
+README.md
+docs

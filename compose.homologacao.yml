@@ -1,0 +1,49 @@
+# Homologação local 2026, execução separada dos serviços preexistentes.
+# Não executar sem aprovação da equipe responsável pelo servidor.
+name: excelencia5-homologacao
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3107}:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Não ativar APIs corporativas até autenticação e autorização serem implementadas.
+    mem_limit: 768m
+    cpus: 1.0
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_privada
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: excelencia5_homologacao
+      POSTGRES_USER: excelencia5_app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD em .env.homologacao}
+    volumes:
+      - pg_homologacao:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    mem_limit: 512m
+    cpus: 0.75
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - app_privada
+volumes:
+  pg_homologacao:
+networks:
+  app_privada:
+    driver: bridge

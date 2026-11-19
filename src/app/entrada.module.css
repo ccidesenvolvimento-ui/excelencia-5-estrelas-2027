@@ -242,3 +242,9 @@
   .art:has(.starTilt[data-hover="true"]) .halo { transform: none; opacity: .65; }
   .starTilt[data-hover="true"] .star { filter: drop-shadow(0 0 18px #6acfff45); }
 }
+
+/* Autenticação Supabase somente quando explicitamente habilitada. */
+.fields input:not(:disabled) { cursor: text; color: #e6f5ff; }
+.loginButton:not(:disabled) { cursor: pointer; color: #e7f7ff; border-color: #83c6e9; background: linear-gradient(110deg,#174b70,#1d5b7e); }
+.loginButton:not(:disabled):hover { border-color: #b5ebff; }
+.loginButton:focus-visible { outline: 2px solid #a9e5ff; outline-offset: 3px; }

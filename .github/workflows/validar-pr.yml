@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - "style/**"
+      - "infra/**"
+      - "db/**"
+      - "auth/**"
 
 permissions:
   contents: read
@@ -15,7 +18,8 @@ concurrency:
 
 jobs:
   validar:
-    runs-on: ubuntu-latest
+    # Fixar LTS estável; runner pré-configurado com bibliotecas para testes Chromium.
+    runs-on: ubuntu-24.04
     steps:
       - name: Baixar codigo
         uses: actions/checkout@v4
@@ -29,6 +33,53 @@ jobs:
         run: npm run typecheck
       - name: Testar regras e exportacao XLSX
         run: npm run test:rules
+      - name: Verificar fluxos de senhas
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-fluxo-senhas.cjs
+
+      - name: Verificar autorizacao corporativa por perfil e filial
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-autorizacao-corporativa.cjs
+
+      - name: Verificar exportacao XLSX de pendencias
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-exportacao-pendencias-xlsx.cjs
+      - name: Verificar cliente Supabase server-only sem dados reais
+        if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
+        run: node scripts/testar-cliente-supabase-cloud.cjs
+      - name: Verificar base de sessao Supabase SSR
+        if: ${{ github.event.pull_request.head.ref == 'auth/supabase-ssr-47' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-sessao-supabase-ssr.cjs
+      - name: Verificar login Supabase opt-in sem dados reais
+        if: ${{ github.event.pull_request.head.ref == 'auth/login-inicial-49' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-login-supabase.cjs
+      - name: Verificar controle de rotas e isolamento do proxy
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-protecao-rotas.cjs
+      - name: Testar RLS de filiais em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'db/rls-filiais-53' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-rls-somente-teste-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/29_auth_uid_apenas_ci.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < supabase/migrations/20261106000100_rls_filiais_leitura.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/30_testar_rls_filiais.sql
+
       - name: Compilar sistema
         run: npm run build
         env:
@@ -36,8 +87,13 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /excelencia-5-estrelas-2027
       - name: Instalar navegador para regressao visual
         run: |
+          set -euo pipefail
+          # Falhas temporárias de DNS do mirror apt não devem ser confundidas com regressão do sistema.
           npm install --no-save --no-audit --no-fund playwright@1.64.1
-          npx playwright install --with-deps chromium
+          # Evita apt-get/--with-deps: mirrors Ubuntu estão indisponíveis no runner.
+          # O Chromium é obtido pelo instalador Playwright; dependências de sistema
+          # já disponíveis no runner são verificadas ao iniciar o navegador.
+          npx playwright install chromium
       - name: Verificar desktop e celular
         run: |
           node scripts/testar-ajustes-browser.cjs
@@ -50,3 +106,57 @@ jobs:
         with:
           name: ajustes-desktop-celular
           path: artifacts/
+
+      - name: Compilar com proxy de autenticacao no Next.js Node
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'rm -f src/proxy.ts' EXIT
+          cp src/server/proxy-autenticacao.ts src/proxy.ts
+          npm run build
+
+      - name: Validar homologacao Docker e Next.js servidor
+        # Executa contêineres efêmeros somente no runner do GitHub, sem acesso ao servidor do setor.
+        if: ${{ github.event.pull_request.head.ref == 'infra/homologacao-local-39' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml config --quiet
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --build --wait
+          for tentativa in $(seq 1 40); do
+            if curl --fail --silent --show-error --max-time 4 -I http://127.0.0.1:3107/ >/dev/null 2>&1; then
+              echo 'Smoke test Next.js via loopback: OK'
+              exit 0
+            fi
+            sleep 3
+          done
+          echo 'Falha no smoke test do Next.js'
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml ps
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml logs --tail=80 web
+          exit 1
+
+      - name: Testar schema PostgreSQL de homologacao
+        # Somente no PR da Issue 41, com banco descartavel do runner.
+        if: ${{ github.event.pull_request.head.ref == 'db/schema-homologacao-41' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-descartavel-sem-dados-reais-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml config --quiet
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          bash scripts/aplicar-schema-homologacao.sh
