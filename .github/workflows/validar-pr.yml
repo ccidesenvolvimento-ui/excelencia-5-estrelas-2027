@@ -33,17 +33,28 @@ jobs:
         run: npm run typecheck
       - name: Testar regras e exportacao XLSX
         run: npm run test:rules
+      - name: Verificar fluxos de senhas
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-fluxo-senhas.cjs
+
+      - name: Verificar autorizacao corporativa por perfil e filial
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-autorizacao-corporativa.cjs
+
+      - name: Verificar exportacao XLSX de pendencias
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        run: node scripts/testar-exportacao-pendencias-xlsx.cjs
       - name: Verificar cliente Supabase server-only sem dados reais
         if: ${{ github.event.pull_request.head.ref == 'infra/supabase-cloud-45' }}
         run: node scripts/testar-cliente-supabase-cloud.cjs
       - name: Verificar base de sessao Supabase SSR
-        if: ${{ github.event.pull_request.head.ref == 'auth/supabase-ssr-47' }}
+        if: ${{ github.event.pull_request.head.ref == 'auth/supabase-ssr-47' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
         run: node scripts/testar-sessao-supabase-ssr.cjs
       - name: Verificar login Supabase opt-in sem dados reais
-        if: ${{ github.event.pull_request.head.ref == 'auth/login-inicial-49' }}
+        if: ${{ github.event.pull_request.head.ref == 'auth/login-inicial-49' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
         run: node scripts/testar-login-supabase.cjs
       - name: Verificar controle de rotas e isolamento do proxy
-        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
         run: node scripts/testar-protecao-rotas.cjs
       - name: Testar RLS de filiais em PostgreSQL descartavel
         if: ${{ github.event.pull_request.head.ref == 'db/rls-filiais-53' }}
@@ -97,7 +108,7 @@ jobs:
           path: artifacts/
 
       - name: Compilar com proxy de autenticacao no Next.js Node
-        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' }}
+        if: ${{ github.event.pull_request.head.ref == 'auth/protecao-rotas-51' || github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
         shell: bash
         run: |
           set -euo pipefail
