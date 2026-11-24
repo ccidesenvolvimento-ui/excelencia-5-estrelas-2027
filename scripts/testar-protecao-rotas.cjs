@@ -1,4 +1,5 @@
 // Inspeção estrutural sem rede, sem credenciais e sem dados corporativos.
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("node:fs");
 const assert = require("node:assert/strict");
 const proxy = fs.readFileSync("src/server/proxy-autenticacao.ts", "utf8");
@@ -15,6 +16,19 @@ assert.match(proxy, /resposta\.cookies\.set\(/);
 assert.match(proxy, /caminho\.startsWith\("\/api\/"\)\) return false/);
 assert.match(proxy, /NextResponse\.json\(\{ erro: "Autenticação necessária\." \}, \{ status: 401 \}\)/);
 assert.match(proxy, /NextResponse\.redirect\(url\)/);
+assert.match(proxy, /request\.headers\.get\("sec-fetch-dest"\) === "document"/);
+assert.match(proxy, /request\.headers\.get\("accept"\)\?\.includes\("text\/html"\)/);
+assert.match(proxy, /if \(!rotaApi && requisicaoDePaginaHtml\(request\)\)/);
+assert.match(proxy, /new NextResponse\(paginaAcessoNegado\(\), \{\s*status: 403/);
+assert.match(proxy, /"Content-Type": "text\/html; charset=utf-8"/);
+assert.match(proxy, /Sua conta não possui permissão para acessar esta área\./);
+assert.match(proxy, /<a href="\/login">Retornar à página de login<\/a>/);
+assert.match(proxy, /return NextResponse\.json\(\s*\{ erro: mensagemJson \},\s*\{ status: 403/);
+assert.match(proxy, /const rotaApi = caminho === "\/api" \|\| caminho\.startsWith\("\/api\/"\)/);
+assert.doesNotMatch(
+  proxy.match(/function acessoCorporativoNegado[\s\S]*?\n\}/)?.[0] ?? "",
+  /NextResponse\.redirect/
+);
 assert.match(docker, /cp src\/server\/proxy-autenticacao\.ts src\/proxy\.ts && npm run build/);
 assert.match(gitignore, /^src\/proxy\.ts$/m);
 assert.ok(!fs.existsSync("src/proxy.ts"), "src/proxy.ts não deve existir no checkout: é gerado só no build Node");
