@@ -1,7 +1,8 @@
 "use client";
 
-import {useEffect,useState} from "react";
+import {useState,useSyncExternalStore} from "react";
 import {AvisoDemo,Cabecalho,BlocoTitulo} from "@/components/Elementos";
+import {UsuariosCorporativos} from "@/components/configuracoes/UsuariosCorporativos";
 import {categorias,estrelas,pesos,rotulos,pessoas} from "@/lib/dados-demo";
 
 type Aba="regras"|"usuarios"|"seguranca";
@@ -13,26 +14,81 @@ const FILIAIS=[...new Set(pessoas.map(p=>p.filial))].sort((a,b)=>a.localeCompare
 const ADMINS:UsuarioDemo[]=Array.from({length:3},(_,i)=>({id:`admin-${i+1}`,nome:`Administrador ${String(i+1).padStart(2,"0")}`,perfil:"Administrador",filiais:["Todas"],permissoes:[],ativo:true}));
 const INICIAIS:UsuarioDemo[]=[...ADMINS,{id:"consulta-001",nome:"Usuário demonstração",perfil:"Consulta",filiais:["Lavras"],permissoes:["Visão geral:Visualizar","Ranking e relatórios:Visualizar"],ativo:true}];
 const STORAGE="excelencia-5-estrelas-usuarios-demo-v06";
+const EVENTO_STORAGE="excelencia-5-estrelas:usuarios-demo";
 const abas:{id:Aba;nome:string}[]=[{id:"regras",nome:"Regras e ciclos"},{id:"usuarios",nome:"Usuários e acessos"},{id:"seguranca",nome:"Segurança e auditoria"}];
 
-export default function Configuracoes(){
- const [aba,setAba]=useState<Aba>("regras");
- const [usuarios,setUsuarios]=useState<UsuarioDemo[]>(INICIAIS);
+const semInscricao=()=>()=>{};
+const USUARIOS_INICIAIS=JSON.stringify(INICIAIS);
+const obterUsuariosIniciais=()=>USUARIOS_INICIAIS;
+let usuariosMemoria=USUARIOS_INICIAIS;
+let usuariosInicializados=false;
+
+function obterAba():Aba{
+  if(window.location.hash==="#usuarios")return "usuarios";
+  if(window.location.hash==="#seguranca")return "seguranca";
+  return "regras";
+}
+
+function obterAbaServidor():Aba{return "regras"}
+
+function inscreverAba(notificar:()=>void){
+  window.addEventListener("hashchange",notificar);
+  window.addEventListener("popstate",notificar);
+  return ()=>{
+    window.removeEventListener("hashchange",notificar);
+    window.removeEventListener("popstate",notificar);
+  };
+}
+
+function usuariosValidos(valor:string):boolean{
+  try{
+    const salvo=JSON.parse(valor) as UsuarioDemo[]|null;
+    return Array.isArray(salvo) && salvo.length>=3 && salvo.every(x=>x&&typeof x.id==="string"&&typeof x.nome==="string"&&Array.isArray(x.filiais)&&Array.isArray(x.permissoes)&&typeof x.ativo==="boolean"&&["Administrador","Analista","Consulta"].includes(x.perfil));
+  }catch{return false}
+}
+
+function obterUsuarios():string{
+  if(usuariosInicializados)return usuariosMemoria;
+  try{
+    const salvo=window.localStorage.getItem(STORAGE);
+    usuariosMemoria=salvo&&usuariosValidos(salvo)?salvo:USUARIOS_INICIAIS;
+    usuariosInicializados=true;
+  }catch{/* armazenamento temporariamente indisponível */}
+  return usuariosMemoria;
+}
+
+function inscreverUsuarios(notificar:()=>void){
+  const aoArmazenar=(evento:StorageEvent)=>{
+    if(evento.key!==STORAGE)return;
+    usuariosMemoria=evento.newValue&&usuariosValidos(evento.newValue)?evento.newValue:USUARIOS_INICIAIS;
+    usuariosInicializados=true;
+    notificar();
+  };
+  window.addEventListener("storage",aoArmazenar);
+  window.addEventListener(EVENTO_STORAGE,notificar);
+  return ()=>{
+    window.removeEventListener("storage",aoArmazenar);
+    window.removeEventListener(EVENTO_STORAGE,notificar);
+  };
+}
+
+function persistirUsuarios(usuarios:UsuarioDemo[]){
+  usuariosMemoria=JSON.stringify(usuarios);
+  usuariosInicializados=true;
+  try{window.localStorage.setItem(STORAGE,usuariosMemoria)}catch{/* armazenamento temporariamente indisponível */}
+  window.dispatchEvent(new Event(EVENTO_STORAGE));
+}
+
+function ConfiguracoesDemo({corporativo}:{corporativo:boolean}){
+ const aba=useSyncExternalStore(inscreverAba,obterAba,obterAbaServidor);
+ const usuariosSerializados=useSyncExternalStore(corporativo?semInscricao:inscreverUsuarios,corporativo?obterUsuariosIniciais:obterUsuarios,obterUsuariosIniciais);
+ const usuarios=JSON.parse(usuariosSerializados) as UsuarioDemo[];
  const [selecionado,setSelecionado]=useState("consulta-001");
  const [novoNome,setNovoNome]=useState("");
  const [novoPerfil,setNovoPerfil]=useState<Perfil>("Consulta");
- const [carregado,setCarregado]=useState(false);
  const [aviso,setAviso]=useState("");
- useEffect(()=>{
-   if(window.location.hash==="#usuarios")setAba("usuarios");
-   else if(window.location.hash==="#seguranca")setAba("seguranca");
-   try{const salvo=JSON.parse(localStorage.getItem(STORAGE)||"null") as UsuarioDemo[]|null;
-     if(Array.isArray(salvo) && salvo.length>=3 && salvo.every(x=>x&&typeof x.id==="string"&&typeof x.nome==="string"&&Array.isArray(x.filiais)&&Array.isArray(x.permissoes)&&typeof x.ativo==="boolean"&&["Administrador","Analista","Consulta"].includes(x.perfil)))setUsuarios(salvo);
-   }catch{/* armazenamento desabilitado */}
-   setCarregado(true);
- },[]);
- useEffect(()=>{if(carregado){try{localStorage.setItem(STORAGE,JSON.stringify(usuarios))}catch{/* navegador bloqueou */}}},[usuarios,carregado]);
- function mudarAba(proxima:Aba){setAba(proxima);if(typeof window!=="undefined")window.history.replaceState(null,"",proxima==="regras"?window.location.pathname:`#${proxima}`);}
+ function setUsuarios(atualizar:UsuarioDemo[]|((atual:UsuarioDemo[])=>UsuarioDemo[])){persistirUsuarios(typeof atualizar==="function"?atualizar(usuarios):atualizar)}
+ function mudarAba(proxima:Aba){window.history.replaceState(null,"",proxima==="regras"?window.location.pathname:`#${proxima}`);window.dispatchEvent(new PopStateEvent("popstate"));}
  const usuario=usuarios.find(u=>u.id===selecionado)??usuarios[0];
  function atualizar(alteracoes:Partial<UsuarioDemo>){if(!usuario||usuario.perfil==="Administrador")return;setUsuarios(atual=>atual.map(u=>u.id===usuario.id?{...u,...alteracoes}:u));setAviso("Preferências de demonstração alteradas somente neste navegador.")}
  function criarUsuario(){const nome=novoNome.trim();if(nome.length<3){setAviso("Preencha um nome fictício com pelo menos três caracteres.");return}
@@ -42,7 +98,10 @@ export default function Configuracoes(){
  function reset(){setUsuarios(INICIAIS);setSelecionado("consulta-001");setAviso("Simulação redefinida para os perfis fictícios iniciais.")}
  return <main className="configuracoes-fase7">
  <Cabecalho tag="ADMINISTRAÇÃO / PROGRAMA 2027" titulo="Configurações do sistema" descricao="Reúna metodologia, ciclos de avaliação, usuários, acessos por filial e requisitos de auditoria em uma só área."/>
- <AvisoDemo texto="Nesta versão pública, as regras são informativas e os perfis de usuários são uma simulação local. Nenhum acesso real é criado ou autorizado."/>
+ <AvisoDemo texto={corporativo
+    ? "A aba Usuários e acessos consulta o Supabase em modo somente leitura. As demais abas ainda apresentam informações demonstrativas."
+    : "Nesta versão pública, as regras são informativas e os perfis de usuários são uma simulação local. Nenhum acesso real é criado ou autorizado."
+  }/>
  <div className="mod-tabbar" role="tablist" aria-label="Áreas de configurações">{abas.map(a=><button key={a.id} type="button" role="tab" aria-selected={aba===a.id} className="mod-tab" onClick={()=>mudarAba(a.id)}>{a.nome}</button>)}</div>
  {aba==="regras"&&<>
  <div className="mod-grid-estatisticas"><div className="mod-estatistica"><small>Categorias</small><strong>08</strong><span>Competitivas</span></div><div className="mod-estatistica"><small>Estrelas</small><strong>05</strong><span>Por avaliação</span></div><div className="mod-estatistica"><small>Ciclos</small><strong>03</strong><span>Além do anual</span></div><div className="mod-estatistica"><small>Fechamento mensal</small><strong>12</strong><span>Do mês seguinte</span></div></div>
@@ -51,7 +110,7 @@ export default function Configuracoes(){
  <section className="painel"><BlocoTitulo superior="ESTRUTURA COMPETITIVA" titulo="Oito categorias participantes" descricao="Categorias oficiais utilizadas nas avaliações do programa."/><div className="mod-categoria-lista">{categorias.map((c,i)=><div className="mod-categoria-item" key={c}><span className="rotulo-chave">{String(i+1).padStart(2,"0")} / CATEGORIA</span><div style={{marginTop:7}}>{c}</div></div>)}</div></section>
  <section className="painel"><BlocoTitulo superior="REGRAS TRANSVERSAIS" titulo="Princípios da avaliação"/><ol className="passos"><li>Segurança: 100 somente após validação das duas planilhas; 0 para quem tiver advertência ou acidente.</li><li>Qualquer estrela com zero elimina a elegibilidade do ciclo e do anual correspondente.</li><li>Nota ausente é pendência, nunca um zero automático.</li><li>Férias: estimativa apenas no fechamento de ciclo, sem alterar as cinco notas originais.</li><li>Fechamento mensal no dia 12 do mês seguinte, ou próximo dia útil se cair no fim de semana.</li><li>Alterações após fechamento: somente administradores e com auditoria.</li></ol></section>
  </>}
- {aba==="usuarios"&&<>
+ {aba==="usuarios"&&(corporativo ? <UsuariosCorporativos /> : <>
  <div className="mod-grid-estatisticas"><div className="mod-estatistica"><small>Administradores iniciais</small><strong>03</strong><span>Acesso global previsto</span></div><div className="mod-estatistica"><small>Perfis em demonstração</small><strong>{usuarios.length}</strong><span>Dados somente no navegador</span></div><div className="mod-estatistica"><small>Filiais de exemplo</small><strong>{FILIAIS.length}</strong><span>Selecionáveis para testes</span></div><div className="mod-estatistica"><small>Autenticação real</small><strong>—</strong><span>Não implementada</span></div></div>
  <section className="painel"><BlocoTitulo superior="CONTROLE DE ACESSOS / SIMULAÇÃO" titulo="Usuários e permissões" descricao="Escolha um perfil fictício, simule permissões por área e selecione filiais autorizadas." acao={<button className="botao botao-claro" type="button" onClick={reset}>Redefinir demonstração</button>}/>
  <div className="mod-accessos"><div><div className="campo"><label htmlFor="usuario-selecionado">Perfil para visualizar / configurar</label><select id="usuario-selecionado" value={usuario?.id??""} onChange={e=>{setSelecionado(e.target.value);setAviso("")}}>{usuarios.map(u=><option key={u.id} value={u.id}>{u.nome} — {u.perfil}</option>)}</select></div>
@@ -64,7 +123,16 @@ export default function Configuracoes(){
  {aviso&&<p role="status" className="bloco-info">{aviso}</p>}
  </section>
  <section className="painel"><BlocoTitulo superior="POLÍTICA DE ACESSOS" titulo="Matriz de autorização prevista"/><div className="tabela-scroll"><table className="tabela"><thead><tr><th>Perfil</th><th>Visualizar</th><th>Importar</th><th>Editar</th><th>Exportar</th><th>Filiais</th></tr></thead><tbody><tr><td>Administrador (3 iniciais)</td><td>Sim</td><td>Sim</td><td>Com auditoria</td><td>Sim</td><td>Todas</td></tr><tr><td>Analista autorizado</td><td>Conforme concessão</td><td>Conforme concessão</td><td>Conforme concessão</td><td>Conforme concessão</td><td>Específicas</td></tr><tr><td>Consulta</td><td>Conforme concessão</td><td>Não, por padrão</td><td>Não, por padrão</td><td>Conforme concessão</td><td>Específicas</td></tr></tbody></table></div></section>
- </>}
+ </>)}
  {aba==="seguranca"&&<><section className="painel"><BlocoTitulo superior="SEGURANÇA CORPORATIVA" titulo="Requisitos antes de habilitar dados reais" descricao="A demonstração é pública, portanto não deve possuir dados pessoais, chaves privadas ou endpoints de edição reais."/><ol className="passos"><li>Autenticação corporativa segura (Supabase Auth ou provedor aprovado).</li><li>Row Level Security por usuário, filial e operação.</li><li>Backend autenticado para importação e validação integral das planilhas.</li><li>Auditoria imutável de alterações e fechamento da competência.</li><li>Exportações protegidas pelas mesmas regras do banco de dados.</li></ol></section><section className="painel"><BlocoTitulo superior="AUDITORIA" titulo="Registro de alterações — estrutura prevista"/><div className="tabela-scroll"><table className="tabela"><thead><tr><th>Data e hora</th><th>Responsável</th><th>Tipo de alteração</th><th>Antes / Depois</th></tr></thead><tbody><tr><td colSpan={4} className="mod-vazio">Sem registros: não existe auditoria conectada nesta demonstração.</td></tr></tbody></table></div></section></>}
  </main>;
+}
+
+
+// A demonstração pública permanece independente da interface corporativa.
+export default function Configuracoes() {
+  const corporativo =
+    process.env.NEXT_PUBLIC_SUPABASE_LOGIN_ENABLED === "true" &&
+    process.env.NEXT_PUBLIC_DEPLOY_TARGET !== "github-pages";
+  return <ConfiguracoesDemo corporativo={corporativo}/>;
 }
