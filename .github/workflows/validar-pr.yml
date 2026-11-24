@@ -80,6 +80,39 @@ jobs:
             psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
             < db/homologacao/30_testar_rls_filiais.sql
 
+      - name: Testar RLS administrativa e helpers privados em PostgreSQL descartavel
+        if: ${{ github.event.pull_request.head.ref == 'auth/fluxo-completo-homologacao' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'WEB_PORT=3107\nDB_PASSWORD=ci-rls-admin-somente-teste-descartavel-123\n' > .env.homologacao
+          chmod 600 .env.homologacao
+          cleanup() {
+            docker compose --env-file .env.homologacao -f compose.homologacao.yml down --volumes --remove-orphans || true
+            rm -f .env.homologacao
+          }
+          trap cleanup EXIT
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml up -d --wait db
+          bash scripts/aplicar-schema-homologacao.sh
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/29_auth_uid_apenas_ci.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < supabase/migrations/20261106000100_rls_filiais_leitura.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/30_testar_rls_filiais.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < supabase/migrations/20261119205846_leitura_administrativa_usuarios.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < supabase/migrations/20261123131447_mover_helpers_rls_para_esquema_privado.sql
+          docker compose --env-file .env.homologacao -f compose.homologacao.yml exec -T db \
+            psql -X -U excelencia5_app -d excelencia5_homologacao -v ON_ERROR_STOP=1 \
+            < db/homologacao/31_testar_rls_administrativa.sql
+
       - name: Compilar sistema
         run: npm run build
         env:
