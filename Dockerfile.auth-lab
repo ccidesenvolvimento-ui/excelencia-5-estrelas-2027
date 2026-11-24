@@ -8,10 +8,19 @@ RUN npm ci --no-audit --no-fund
 
 COPY . .
 
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_SUPABASE_LOGIN_ENABLED=false
+
 ENV NEXT_PUBLIC_DEPLOY_TARGET=""
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+ENV NEXT_PUBLIC_SUPABASE_LOGIN_ENABLED=${NEXT_PUBLIC_SUPABASE_LOGIN_ENABLED}
 RUN mkdir -p src/app/api/auth-lab/estado \
     && cp src/server/proxy-autenticacao.ts src/proxy.ts \
     && cp src/server/rota-diagnostico-auth-lab.ts src/app/api/auth-lab/estado/route.ts \
+    && mkdir -p src/app/api/admin/usuarios \
+    && cp src/server/rota-usuarios-admin.ts src/app/api/admin/usuarios/route.ts \
     && npm run build
 
 FROM node:22-alpine AS runtime
