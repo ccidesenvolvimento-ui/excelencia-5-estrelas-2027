@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AvisoDemo } from "@/components/Elementos";
+import { useEscopoDemo } from "@/lib/supabase/use-escopo-demo";
 import { categorias, meses, pessoas, ranking, type Avaliacao } from "@/lib/dados-demo";
 import { exportarPendenciasXlsx, type LinhaPendenciaExcel, type TipoEstrela } from "@/lib/exportar-pendencias-xlsx";
 import { fonteDaAvaliacao } from "@/lib/fontes-dirigibilidade";
@@ -20,6 +21,31 @@ const PALETA: Record<Exclude<TipoPendencia, "">, string> = {
 const compararTexto = (a: string, b: string) => a.localeCompare(b, "pt-BR", { numeric: true, sensitivity: "base" });
 
 export default function Pendencias() {
+  const { corporativo, escopo, carregando, erro } = useEscopoDemo();
+
+  if (corporativo && (carregando || erro || !escopo)) {
+    return <main className="cp-pagina" role="status">
+      {erro
+        ? "Não foi possível validar as filiais autorizadas."
+        : "Carregando pendências autorizadas..."}
+    </main>;
+  }
+
+  const filiaisAutorizadas = corporativo
+    ? escopo?.filiais ?? []
+    : null;
+
+  return <PendenciasConteudo
+    key={filiaisAutorizadas?.join("|") ?? "demo-publica"}
+    filiaisAutorizadas={filiaisAutorizadas}
+  />;
+}
+
+function PendenciasConteudo({
+  filiaisAutorizadas,
+}: {
+  filiaisAutorizadas: readonly string[] | null;
+}) {
   const [mes, setMes] = useState(3);
   const [tipo, setTipo] = useState<TipoPendencia>("");
   const [categoria, setCategoria] = useState("");
@@ -41,9 +67,19 @@ export default function Pendencias() {
   }, [detalhe]);
 
   const filiais = useMemo(() => [...new Set(
-    pessoas.filter(p => p.categoria !== null && (!categoria || p.categoria === categoria)).map(p => p.filial)
-  )].sort(compararTexto), [categoria]);
-  const pendentes = useMemo(() => ranking("mensal", mes).filter(r => r.status === "Pendente"), [mes]);
+    pessoas.filter(p =>
+      p.categoria !== null &&
+      (!categoria || p.categoria === categoria) &&
+      (filiaisAutorizadas === null || filiaisAutorizadas.includes(p.filial))
+    ).map(p => p.filial)
+  )].sort(compararTexto), [categoria, filiaisAutorizadas]);
+
+  const pendentes = useMemo(() =>
+    ranking("mensal", mes).filter(r =>
+      r.status === "Pendente" &&
+      (filiaisAutorizadas === null ||
+        filiaisAutorizadas.includes(r.pessoa.filial))
+    ), [mes, filiaisAutorizadas]);
   const faltantes = useMemo(() => pendentes.filter(r =>
     (!categoria || r.pessoa.categoria === categoria) &&
     (!filial || r.pessoa.filial === filial) &&
@@ -137,7 +173,15 @@ export default function Pendencias() {
           <option value="">Todas as filiais</option>{filiais.map(f => <option key={f}>{f}</option>)}
         </select></label>
         <label className="cp-campo"><span>Segmento</span><select value={categoria} onChange={e => { setCategoria(e.target.value); setFilial(""); setPagina(1); }}>
-          <option value="">Todos os segmentos</option>{categorias.map(c => <option key={c}>{c}</option>)}
+          <option value="">Todos os segmentos</option>{categorias
+            .filter(c =>
+              filiaisAutorizadas === null ||
+              pessoas.some(p =>
+                p.categoria === c &&
+                filiaisAutorizadas.includes(p.filial)
+              )
+            )
+            .map(c => <option key={c}>{c}</option>)}
         </select></label>
         <label className="cp-campo"><span>Competência</span><select value={mes} onChange={e => {setMes(Number(e.target.value)); setPagina(1);}}>
           {meses.map((m, i) => <option key={m} value={i}>{m}/2027</option>)}

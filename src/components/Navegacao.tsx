@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { IconeSistema, type NomeIconeSistema } from "@/components/IconesSistema";
+import { permissaoParaRota } from "@/lib/permissoes-rotas";
+import { clienteSupabaseBrowser, loginSupabaseHabilitado } from "@/lib/supabase/cliente-browser";
+import { obterPermissoesMenu } from "@/lib/supabase/permissoes-menu";
 
 type ItemMenu = { url: string; titulo: string; icone: NomeIconeSistema };
 const itens: ItemMenu[] = [
@@ -17,37 +20,104 @@ const itens: ItemMenu[] = [
   { url: "/motorista", titulo: "Portal do motorista", icone: "rh" },
 ];
 const CHAVE_MENU = "excelencia-5-estrelas-sidebar-modo-v05";
+const EVENTO_MENU = "excelencia-5-estrelas:sidebar-modo";
 type ModoMenu = "flutuante" | "fixo";
+let modoMenuMemoria: ModoMenu = "flutuante";
+let modoMenuInicializado = false;
+
+function obterModoMenu(): ModoMenu {
+  if (modoMenuInicializado) return modoMenuMemoria;
+  try {
+    modoMenuMemoria = window.localStorage.getItem(CHAVE_MENU) === "fixo" ? "fixo" : "flutuante";
+    modoMenuInicializado = true;
+  } catch { /* armazenamento temporariamente indisponível */ }
+  return modoMenuMemoria;
+}
+
+function obterModoMenuServidor(): ModoMenu {
+  return "flutuante";
+}
+
+function inscreverModoMenu(notificar: () => void) {
+  const aoArmazenar = (evento: StorageEvent) => {
+    if (evento.key !== CHAVE_MENU) return;
+    modoMenuMemoria = evento.newValue === "fixo" ? "fixo" : "flutuante";
+    modoMenuInicializado = true;
+    notificar();
+  };
+  window.addEventListener("storage", aoArmazenar);
+  window.addEventListener(EVENTO_MENU, notificar);
+  return () => {
+    window.removeEventListener("storage", aoArmazenar);
+    window.removeEventListener(EVENTO_MENU, notificar);
+  };
+}
 
 export function Navegacao({ children }: { children: ReactNode }) {
   const caminho = (usePathname() || "/").replace(/\/+$/, "") || "/";
   const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   // No primeiro acesso a navegação começa flutuante. Só o botão superior fixa o menu.
-  const [modoMenu, setModoMenu] = useState<ModoMenu>("flutuante");
+  const modoMenu = useSyncExternalStore(inscreverModoMenu, obterModoMenu, obterModoMenuServidor);
   const [expansaoTemporaria, setExpansaoTemporaria] = useState(false);
-  const [mobileAberto, setMobileAberto] = useState(false);
+  const [estadoMobile, setEstadoMobile] = useState({ caminho, aberto: false });
+  const [estadoPermissoes, setEstadoPermissoes] = useState({ caminho, permissoes: [] as string[] });
+  const mobileAberto = estadoMobile.caminho === caminho && estadoMobile.aberto;
+  const permissoesMenu = estadoPermissoes.caminho === caminho ? estadoPermissoes.permissoes : [];
   const flutuante = modoMenu === "flutuante";
   const expandida = !flutuante || expansaoTemporaria;
 
   useEffect(() => {
-    try {
-      setModoMenu(window.localStorage.getItem(CHAVE_MENU) === "fixo" ? "fixo" : "flutuante");
-    } catch { /* armazenamento indisponível */ }
-  }, []);
-  useEffect(() => { setMobileAberto(false); }, [caminho]);
+    if (!loginSupabaseHabilitado) return;
+
+    let ativo = true;
+    let versaoRequisicao = 0;
+
+    const atualizarPermissoes = async () => {
+      const versaoAtual = ++versaoRequisicao;
+      const permissoes = await obterPermissoesMenu();
+      if (ativo && versaoAtual === versaoRequisicao) setEstadoPermissoes({ caminho, permissoes });
+    };
+
+    void atualizarPermissoes();
+
+    const cliente = clienteSupabaseBrowser();
+    const { data: listener } = cliente?.auth.onAuthStateChange(() => {
+      ++versaoRequisicao;
+      setEstadoPermissoes({ caminho, permissoes: [] });
+      void atualizarPermissoes();
+    }) ?? { data: null };
+
+    return () => {
+      ativo = false;
+      listener?.subscription.unsubscribe();
+    };
+  }, [caminho]);
   useEffect(() => {
     if (!mobileAberto) return;
-    const tecla = (evento: KeyboardEvent) => { if (evento.key === "Escape") setMobileAberto(false); };
+    const tecla = (evento: KeyboardEvent) => { if (evento.key === "Escape") setEstadoMobile({ caminho, aberto: false }); };
     window.addEventListener("keydown", tecla);
     return () => window.removeEventListener("keydown", tecla);
-  }, [mobileAberto]);
+  }, [caminho, mobileAberto]);
 
   function alternarModo() {
     const proximo: ModoMenu = flutuante ? "fixo" : "flutuante";
-    setModoMenu(proximo);
     setExpansaoTemporaria(false);
-    try { window.localStorage.setItem(CHAVE_MENU, proximo); } catch { /* armazenamento indisponível */ }
+    modoMenuMemoria = proximo;
+    modoMenuInicializado = true;
+    try {
+      window.localStorage.setItem(CHAVE_MENU, proximo);
+    } catch { /* armazenamento temporariamente indisponível */ }
+    window.dispatchEvent(new Event(EVENTO_MENU));
   }
+
+  const itensVisiveis = loginSupabaseHabilitado
+    ? itens.filter(item => {
+        const permissao = permissaoParaRota(item.url);
+        return permissao !== null && permissoesMenu.includes(permissao);
+      })
+    : itens;
+
+  const destinoInicial = itensVisiveis[0]?.url ?? "/login";
 
   // A rota pública tem experiência independente e mobile-first, sem o painel administrativo.
   if(caminho === "/" || caminho === "/login" || caminho === `${base}/login` || (base && caminho === base) || caminho === "/motorista" || caminho.startsWith("/motorista/") || (base && (caminho===`${base}/motorista` || caminho.startsWith(`${base}/motorista/`)))) return <>{children}</>;
@@ -67,7 +137,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
     >
       <div className="branding">
         <div className="branding-top">
-          <Link href="/visao-geral" className="branding-home" aria-label="Ir para Visão geral" onClick={() => { setMobileAberto(false); if (flutuante) setExpansaoTemporaria(false); }}>
+          <Link href={destinoInicial} className="branding-home" aria-label="Ir para Visão geral" onClick={() => { setEstadoMobile({ caminho, aberto: false }); if (flutuante) setExpansaoTemporaria(false); }}>
             <img className="branding-imagem" src={`${base}/marca-programa.png`} alt="Programa Excelência 5 Estrelas" />
             <span className="branding-marca-mini"><img className="estrela-oficial-mini" src={`${base}/estrela-oficial-5-estrelas.png`} alt="Símbolo oficial do Programa 5 Estrelas" /></span>
           </Link>
@@ -81,7 +151,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
           >
             <IconeSistema nome={flutuante ? "painel-abrir" : "painel-fechar"} tamanho={19}/>
           </button>
-          <button type="button" className="mobile-close" aria-label="Fechar menu" onClick={() => setMobileAberto(false)}><IconeSistema nome="fechar" tamanho={19}/></button>
+          <button type="button" className="mobile-close" aria-label="Fechar menu" onClick={() => setEstadoMobile({ caminho, aberto: false })}><IconeSistema nome="fechar" tamanho={19}/></button>
         </div>
         <span className="branding-subtitulo">Plataforma de avaliação · 2027</span>
       </div>
@@ -90,7 +160,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
         <span className="ambiente-texto">AMBIENTE DE DEMONSTRAÇÃO</span>
       </div>
       <nav id="menu-lateral" className="menu" aria-label="Páginas do sistema">
-        {itens.map(item => <Link
+        {itensVisiveis.map(item => <Link
           key={item.url}
           href={item.url}
           aria-label={item.titulo}
@@ -98,7 +168,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
           className={caminho === item.url ? "ativo" : ""}
           title={!expandida && !mobileAberto ? item.titulo : undefined}
           onClick={() => {
-            setMobileAberto(false);
+            setEstadoMobile({ caminho, aberto: false });
             // Navegar NÃO altera o modo. Se flutuante, recolhe após a escolha.
             if (flutuante) setExpansaoTemporaria(false);
           }}
@@ -115,7 +185,7 @@ export function Navegacao({ children }: { children: ReactNode }) {
 
     <div className="workspace">
       <header className="header">
-        <button type="button" className="menu-toggle" onClick={() => setMobileAberto(v => !v)} aria-label={mobileAberto ? "Fechar menu" : "Abrir menu"} aria-expanded={mobileAberto} aria-controls="menu-lateral">
+        <button type="button" className="menu-toggle" onClick={() => setEstadoMobile({ caminho, aberto: !mobileAberto })} aria-label={mobileAberto ? "Fechar menu" : "Abrir menu"} aria-expanded={mobileAberto} aria-controls="menu-lateral">
           <IconeSistema nome="menu" tamanho={22}/>
         </button>
         <div><strong>Excelência 5 Estrelas</strong><span>Programa de reconhecimento operacional</span></div>
@@ -123,6 +193,6 @@ export function Navegacao({ children }: { children: ReactNode }) {
       </header>
       <div className="area-conteudo">{children}</div>
     </div>
-    {mobileAberto && <button type="button" className="overlay" aria-label="Fechar menu lateral" onClick={() => setMobileAberto(false)} />}
+    {mobileAberto && <button type="button" className="overlay" aria-label="Fechar menu lateral" onClick={() => setEstadoMobile({ caminho, aberto: false })} />}
   </div>;
 }

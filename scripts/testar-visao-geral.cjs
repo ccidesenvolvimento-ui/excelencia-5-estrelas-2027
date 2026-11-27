@@ -37,7 +37,22 @@ delete global.window;
 const home=fs.readFileSync('src/app/visao-geral/page.tsx','utf8');
 const config=fs.readFileSync('src/app/configuracoes/page.tsx','utf8');
 const pend=fs.readFileSync('src/app/pendencias/page.tsx','utf8');
-assert.ok(home.includes('const evolucao = evolucaoGeral();'));
+// A evolução preserva a série geral na demonstração pública,
+ // mas considera somente as filiais autorizadas no laboratório.
+assert.ok(home.includes('const evolucao = evolucaoGeral(mesReferencia => {'));
+assert.ok(home.includes('filiaisAutorizadas === null'));
+assert.ok(home.includes('filiaisAutorizadas.includes(r.pessoa.filial)'));
+
+// Verifica também o cálculo de uma série mensal restrita a Lavras.
+const serieLavras = v.evolucaoGeral(mes =>
+  d.ranking('mensal', mes).filter(r => r.pessoa.filial === 'Lavras')
+);
+
+for (let mes = 0; mes < 12; mes++) {
+  const registrosLavras = d.ranking('mensal', mes)
+    .filter(r => r.pessoa.filial === 'Lavras');
+  assert.equal(serieLavras[mes], v.mediaCompleta(registrosLavras));
+}
 assert.ok(!config.includes('ConfiguracaoFontes')&&!config.includes('#fontes-dirigibilidade'));
 assert.ok(!pend.includes('fonteFilial')&&!pend.includes('#fontes-dirigibilidade'));
 assert.ok(config.includes('Pesos dos cinco pilares')&&config.includes('Usuários e acessos')&&config.includes('Segurança e auditoria'));

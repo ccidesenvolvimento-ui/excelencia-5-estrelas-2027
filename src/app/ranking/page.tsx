@@ -4,6 +4,7 @@ import {useEffect,useMemo,useRef,useState} from "react";
 import {AvisoDemo,Cabecalho,Estado,BlocoTitulo} from "@/components/Elementos";
 import {categorias,meses,periodos,pessoas,ranking,compararRanking,formatarNota,estrelas,rotuloEstrela,type Periodo,type Categoria} from "@/lib/dados-demo";
 import {exportarCsv} from "@/lib/exportar";
+import {useEscopoDemo} from "@/lib/supabase/use-escopo-demo";
 import {renderizarPaginasRelatorio, baixarPDFDireto, type DadosRankingPDF} from "@/lib/relatorio-ranking-pdf";
 
 type Ordem = "maior"|"menor";
@@ -12,9 +13,40 @@ const nomePeriodo = (periodo:Periodo,mes:number) => `${periodos.find(p=>p.id===p
 const textoOrdenacao = (ordem:Ordem) => ordem==="maior" ? "Score: maior primeiro" : "Score: menor primeiro";
 
 export default function Ranking(){
+ const {corporativo,escopo,carregando,erro}=useEscopoDemo();
+
+ const categoriasDisponiveis=corporativo
+   ? categorias.filter(c=>escopo?.categorias.includes(c))
+   : categorias;
+
+ if(corporativo && (carregando || erro || !escopo)){
+   return <div className="painel" role="status">
+     {erro
+       ? "Não foi possível validar as categorias autorizadas."
+       : "Carregando categorias autorizadas..."}
+   </div>;
+ }
+
+ if(!categoriasDisponiveis.length){
+   return <div className="painel" role="status">
+     Nenhuma categoria autorizada para esta filial.
+   </div>;
+ }
+
+ return <RankingConteudo
+   key={categoriasDisponiveis.join("|")}
+   categoriasDisponiveis={categoriasDisponiveis}
+ />;
+}
+
+function RankingConteudo({
+ categoriasDisponiveis
+}:{
+ categoriasDisponiveis: readonly Categoria[]
+}){
  const [periodo,setPeriodo]=useState<Periodo>("mensal");
  const [mes,setMes]=useState(3);
- const [categoria,setCategoria]=useState<Categoria>(categorias[0]);
+ const [categoria,setCategoria]=useState<Categoria>(categoriasDisponiveis[0]);
  const [filial,setFilial]=useState("");
  const [ordem,setOrdem]=useState<Ordem>("maior");
  const [busca,setBusca]=useState("");
@@ -96,7 +128,7 @@ export default function Ranking(){
    <div className="controles no-print ranking-fase3-filtros">
      <div className="campo"><label htmlFor="rank-periodo">Período</label><select id="rank-periodo" value={periodo} onChange={e=>setPeriodo(e.target.value as Periodo)}>{periodos.map(p=><option key={p.id} value={p.id}>{p.nome}</option>)}</select></div>
      {periodo==="mensal"&&<div className="campo"><label htmlFor="rank-mes">Competência</label><select id="rank-mes" value={mes} onChange={e=>setMes(Number(e.target.value))}>{meses.map((m,i)=><option value={i} key={m}>{m}/2027</option>)}</select></div>}
-     <div className="campo" style={{flex:"2 1 225px"}}><label htmlFor="rank-segmento">Segmento</label><select id="rank-segmento" value={categoria} onChange={e=>{setCategoria(e.target.value as Categoria);setFilial("");}}>{categorias.map(c=><option key={c}>{c}</option>)}</select></div>
+     <div className="campo" style={{flex:"2 1 225px"}}><label htmlFor="rank-segmento">Segmento</label><select id="rank-segmento" value={categoria} onChange={e=>{setCategoria(e.target.value as Categoria);setFilial("");}}>{categoriasDisponiveis.map(c=><option key={c}>{c}</option>)}</select></div>
      <div className="campo"><label htmlFor="rank-filial">Filial</label><select id="rank-filial" value={filial} onChange={e=>setFilial(e.target.value)}><option value="">Todas as filiais</option>{filiais.map(f=><option key={f}>{f}</option>)}</select></div>
      <div className="campo"><label htmlFor="rank-ordem">Ordenação</label><select id="rank-ordem" value={ordem} onChange={e=>setOrdem(e.target.value as Ordem)}><option value="maior">Score: maior primeiro</option><option value="menor">Score: menor primeiro</option></select></div>
      <div className="campo"><label htmlFor="rank-busca">Colaborador</label><input id="rank-busca" type="search" placeholder="Nome ou matrícula" value={busca} onChange={e=>setBusca(e.target.value)}/></div>
