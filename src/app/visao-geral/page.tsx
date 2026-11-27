@@ -12,6 +12,7 @@ import {
   type Periodo,
 } from "@/lib/dados-demo";
 import { mediasPorSegmento, evolucaoGeral } from "@/lib/indicadores-visao-geral";
+import { useEscopoDemo } from "@/lib/supabase/use-escopo-demo";
 import estilo from "../visao-geral.module.css";
 
 type IconeNome = "pessoas" | "check" | "alerta" | "pendente" | "seta" | "ranking" | "arquivo" | "rh" | "chart";
@@ -71,6 +72,11 @@ function linhaSerie(serie: (number | null)[]): string {
 }
 
 export default function VisaoGeral() {
+  const { corporativo, escopo } = useEscopoDemo();
+  const filiaisAutorizadas = useMemo(
+    () => corporativo ? (escopo?.filiais ?? []) : null,
+    [corporativo, escopo?.filiais]
+  );
   const [periodo, setPeriodo] = useState<Periodo>("mensal");
   const [mes, setMes] = useState(3);
   const [categoria, setCategoria] = useState<string>("Todas");
@@ -78,15 +84,21 @@ export default function VisaoGeral() {
 
   const filiais = useMemo(() => {
     const valores = pessoas
-      .filter(p => p.categoria !== null && (categoria === "Todas" || p.categoria === categoria))
+      .filter(p =>
+        p.categoria !== null &&
+        (categoria === "Todas" || p.categoria === categoria) &&
+        (filiaisAutorizadas === null || filiaisAutorizadas.includes(p.filial))
+      )
       .map(p => p.filial);
     return [...new Set(valores)].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [categoria]);
+  }, [categoria, filiaisAutorizadas]);
 
   const registros = useMemo(() => ranking(periodo, mes).filter(r =>
     (categoria === "Todas" || r.pessoa.categoria === categoria) &&
-    (filial === "Todas" || r.pessoa.filial === filial)
-  ), [periodo, mes, categoria, filial]);
+    (filial === "Todas" || r.pessoa.filial === filial) &&
+    (filiaisAutorizadas === null ||
+      filiaisAutorizadas.includes(r.pessoa.filial))
+  ), [periodo, mes, categoria, filial, filiaisAutorizadas]);
 
   const elegiveis = registros.filter(r => r.status === "Elegível");
   const inelegiveis = registros.filter(r => r.status === "Inelegível");
@@ -101,13 +113,31 @@ export default function VisaoGeral() {
   const distInelegiveis = total ? inelegiveis.length / total * 100 : 0;
 
   const mediasSegmento = useMemo(() => mediasPorSegmento(registros, categoria), [categoria, registros]);
-  // Série da empresa inteira: não recebe os filtros dos demais cards.
-  const evolucao = evolucaoGeral();
+  // No laboratório autenticado, a série considera apenas as filiais autorizadas.
+  // A demonstração pública preserva o comportamento original.
+  const evolucao = evolucaoGeral(mesReferencia => {
+    const registrosMensais = ranking("mensal", mesReferencia);
+    return filiaisAutorizadas === null
+      ? registrosMensais
+      : registrosMensais.filter(r =>
+          filiaisAutorizadas.includes(r.pessoa.filial)
+        );
+  });
 
-  const foraDeClassificacao = pessoas.filter(p => p.categoria === null).length;
-  const emFerias = pessoas.filter(p => p.situacao === "Férias" && p.categoria &&
+  const foraDeClassificacao = pessoas.filter(p =>
+    p.categoria === null &&
+    (filiaisAutorizadas === null ||
+      filiaisAutorizadas.includes(p.filial))
+  ).length;
+
+  const emFerias = pessoas.filter(p =>
+    p.situacao === "Férias" &&
+    p.categoria &&
     (categoria === "Todas" || p.categoria === categoria) &&
-    (filial === "Todas" || p.filial === filial)).length;
+    (filial === "Todas" || p.filial === filial) &&
+    (filiaisAutorizadas === null ||
+      filiaisAutorizadas.includes(p.filial))
+  ).length;
   const linha = linhaSerie(evolucao);
 
   return (
@@ -127,7 +157,7 @@ export default function VisaoGeral() {
         <div className={estilo.filtrosLabel}><span>◫</span> Filtros da visão</div>
         <label className={estilo.filtro}><span>Período</span><select value={periodo} onChange={e => setPeriodo(e.target.value as Periodo)}>{periodos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}</select></label>
         {periodo === "mensal" && <label className={estilo.filtro}><span>Mês</span><select value={mes} onChange={e => setMes(Number(e.target.value))}>{meses.map((m, i) => <option key={m} value={i}>{m}/2027</option>)}</select></label>}
-        <label className={`${estilo.filtro} ${estilo.filtroLongo}`}><span>Segmento</span><select value={categoria} onChange={e => {setCategoria(e.target.value); setFilial("Todas");}}><option value="Todas">Todos os segmentos</option>{categorias.map(c => <option value={c} key={c}>{c}</option>)}</select></label>
+        <label className={`${estilo.filtro} ${estilo.filtroLongo}`}><span>Segmento</span><select value={categoria} onChange={e => {setCategoria(e.target.value); setFilial("Todas");}}><option value="Todas">Todos os segmentos</option>{categorias.filter(c => filiaisAutorizadas === null || pessoas.some(p => p.categoria === c && filiaisAutorizadas.includes(p.filial))).map(c => <option value={c} key={c}>{c}</option>)}</select></label>
         <label className={estilo.filtro}><span>Filial</span><select value={filial} onChange={e => setFilial(e.target.value)}><option value="Todas">Todas as filiais</option>{filiais.map(f => <option key={f}>{f}</option>)}</select></label>
       </div>
 
